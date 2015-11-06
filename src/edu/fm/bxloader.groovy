@@ -4,6 +4,7 @@ package edu.fm
 @Grab(group = 'org.apache.httpcomponents', module = 'httpclient', version = '4.5')
 @Grab(group='org.jsoup', module='jsoup', version='1.8.3')
 @Grab(group='com.fasterxml.jackson.core', module='jackson-databind', version='2.6.2')
+@Grab(group = 'commons-io', module = 'commons-io', version = '2.4')
 
 /**
  * User: artem.smirnov
@@ -15,17 +16,27 @@ def argPath = "C:/TEMP/mdl-7bx/"
 
 def loadListFilename = 'playlist.rock.txt'
 def failedListFilename = 'failed.rock.txt'
+def succeededListFilename = 'succeeded.rock.txt'
+def mappingListFilename = 'mapping.rock.txt'
+def resultsSubDir = 'songs.rock'
 
 Integer songsOffset = 0
 Integer songsCount = 10
 
+//DistinctionEstimator.maxDiffFactor = 99
+
 File workDir = FileTools.getDir(argPath)
-File resultFolder = FileTools.getSubDir(workDir, 'songs')
+File resultFolder = FileTools.getSubDir(workDir, resultsSubDir)
 
 List<String> songNames = FileTools.readSongs(workDir, loadListFilename)
+List<String> loadedSongs = FileTools.getLoadedSongs(resultFolder)
 
-List<String> songsToLoad = getSubList(songNames, songsOffset, songsCount)
+List<String> subList = getSubList(songNames, songsOffset, songsCount)
+List<String> songsToLoad = filterAlreadyLoaded(subList, loadedSongs)
 
+if (subList.size() != songsToLoad.size()) {
+    println "${subList.size() - songsToLoad.size()}/${subList.size()} already exist and would not be loaded"
+}
 
 int counter = songsOffset
 int failureCounter = 0
@@ -33,6 +44,8 @@ int failureCounter = 0
 
 def failed = new ArrayList<String>()
 def succeeded = new ArrayList<String>()
+
+def mapping = new HashMap<String, String>()
 
 try {
     songsToLoad.each {
@@ -42,6 +55,7 @@ try {
             def song = Site7bxRuProvider.fetchSong(it)
             DownloadTools.downloadFile(song.foundSongName, song.downloadUrl, resultFolder)
 
+            mapping.put(it, song.foundSongName)
             succeeded.add(it)
             print "SUCCEED"
             failureCounter = 0
@@ -72,10 +86,20 @@ try {
 }
 
 FileTools.writeSongs(workDir, failed, failedListFilename, false)
+FileTools.writeSongs(workDir, succeeded, succeededListFilename, false)
+FileTools.writeMapping(workDir, mapping, mappingListFilename, false)
 
 
 
-
+private ArrayList<String> filterAlreadyLoaded(List<String> subList, List<String> loadedSongs) {
+    List<String> list = new ArrayList<>()
+    for (String songName : subList) {
+        if (!DistinctionEstimator.containsExact(loadedSongs, songName, { it })) {
+            list.add(songName)
+        }
+    }
+    list
+}
 
 private List<String> getSubList(Collection<String> songNames, int songsOffset, int songsCount) {
     List<String> songsToLoad

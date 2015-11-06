@@ -10,12 +10,42 @@ import groovy.transform.stc.FirstParam
  */
 class DistinctionEstimator {
 
+    private static char[] alphabet = "abcdefghijklmnopqrstuvwxyzàáâãäå¸æçèéêëìíîïðñòóôõö÷øùúüýþÿ1234567890".toCharArray()
+
+    static Integer maxDiffFactor = 10;
+
+    public static <T> boolean containsExact(Collection<T> els, String baseSongName, @ClosureParams(FirstParam.FirstGenericType.class) Closure<String> c) {
+        boolean contains;
+        try {
+            if (getExact(els, baseSongName, c) != null) {
+                contains = true;
+            } else {
+                contains = false;
+            }
+        } catch (Throwable e) {
+            contains = false;
+        }
+        contains
+    }
+
     public static <T> T getSimilar(Collection<T> els, String baseSongName, @ClosureParams(FirstParam.FirstGenericType.class) Closure<String> c) {
         def mostSimilar = getMostSimilar(els, baseSongName, c)
 
         def foundName = c.call(mostSimilar)
 
-        if (diffFactor(baseSongName, foundName) > 10) {
+        if (maxDiffFactor != null && diffFactor(baseSongName, foundName) > maxDiffFactor) {
+            throw new Exception("song '${baseSongName}' not found, most simular has name '${foundName}'");
+        }
+
+        mostSimilar
+    }
+
+    public static <T> T getExact(Collection<T> els, String baseSongName, @ClosureParams(FirstParam.FirstGenericType.class) Closure<String> c) {
+        def mostSimilar = getMostSimilar(els, baseSongName, c)
+
+        def foundName = c.call(mostSimilar)
+
+        if (diffFactor(baseSongName, foundName) > 0) {
             throw new Exception("song '${baseSongName}' not found, most simular has name '${foundName}'");
         }
 
@@ -36,6 +66,21 @@ class DistinctionEstimator {
     }
 
     private static Integer diffFactor(String keyI, String valueI) {
+        def key = convert(keyI)
+        def value = convert(valueI)
+
+        int difSize = 0
+
+        for (char c : alphabet) {
+            char[] ar = [ c ]
+            def str = new String(ar)
+            difSize += Math.abs(key.count(str) - value.count(str))
+        }
+
+        difSize
+    }
+
+    private static Integer diffFactor2(String keyI, String valueI) {
         def key = convert(keyI)
         def value = convert(valueI)
 

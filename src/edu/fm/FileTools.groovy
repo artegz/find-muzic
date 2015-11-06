@@ -1,5 +1,8 @@
 package edu.fm
 
+import org.apache.commons.io.IOCase
+import org.apache.commons.io.filefilter.SuffixFileFilter
+
 /**
  * User: artem.smirnov
  * Date: 06.11.2015
@@ -13,6 +16,15 @@ class FileTools {
             dir.mkdirs()
         }
         dir
+    }
+
+    static List<String> getLoadedSongs(File workDir) {
+        def result = new ArrayList<String>()
+        def filter = new SuffixFileFilter("mp3", IOCase.INSENSITIVE)
+        for (File mp3File : workDir.listFiles((FileFilter) filter)) {
+            result.add(mp3File.getName().replace(".mp3", ""))
+        }
+        result
     }
 
     static List<String> readSongs(File workDir, String filename) {
@@ -30,6 +42,33 @@ class FileTools {
         new ArrayList<>(res)
     }
 
+    static void writeMapping(File workDir, Map<String, String> songs, String filename, boolean override) {
+        def songsFile = new File(workDir, filename)
+        if (override) {
+            if (songsFile.exists()) {
+                songsFile.delete()
+            }
+            songsFile.createNewFile()
+        } else if (!songsFile.exists()) {
+            songsFile.createNewFile();
+        }
+
+        if (override) {
+            songsFile.withWriter { out ->
+                songs.each {
+                    out.println it.key + "\t" + it.value
+                }
+            }
+        } else {
+            songsFile.withWriterAppend { out ->
+                songs.each {
+                    out.println it.key + "\t" + it.value
+                }
+            }
+        }
+
+    }
+
     static void writeSongs(File workDir, Collection<String> songs, String filename, boolean override) {
         def songsFile = new File(workDir, filename)
         if (override) {
@@ -41,9 +80,17 @@ class FileTools {
             songsFile.createNewFile();
         }
 
-        songsFile.withWriter { out ->
-            songs.each {
-                out.println it
+        if (override) {
+            songsFile.withWriter { out ->
+                songs.each {
+                    out.println it
+                }
+            }
+        } else {
+            songsFile.withWriterAppend { out ->
+                songs.each {
+                    out.println it
+                }
             }
         }
     }
