@@ -1,5 +1,6 @@
 package edu.fm
 
+import groovy.util.logging.Slf4j
 import org.apache.commons.io.IOCase
 import org.apache.commons.io.filefilter.SuffixFileFilter
 
@@ -8,6 +9,7 @@ import org.apache.commons.io.filefilter.SuffixFileFilter
  * Date: 06.11.2015
  * Time: 11:00
  */
+@Slf4j
 class FileTools {
 
     static File getDir(String dirName) {
@@ -37,7 +39,7 @@ class FileTools {
                 }
             }
         } else {
-            println songsFile.getName() + "doesn't exsist"
+            log.error("${songsFile.getName()} doesn't exsist")
         }
         new ArrayList<>(res)
     }

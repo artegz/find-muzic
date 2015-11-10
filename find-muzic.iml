@@ -215,5 +215,32 @@
         <SOURCES />
       </library>
     </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Grab:logback-classic-1.0.13.jar">
+        <CLASSES>
+          <root url="jar://$USER_HOME$/.groovy/grapes/ch.qos.logback/logback-classic/jars/logback-classic-1.0.13.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Grab:logback-core-1.0.13.jar">
+        <CLASSES>
+          <root url="jar://$USER_HOME$/.groovy/grapes/ch.qos.logback/logback-core/jars/logback-core-1.0.13.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Grab:slf4j-api-1.7.5.jar">
+        <CLASSES>
+          <root url="jar://$USER_HOME$/.groovy/grapes/org.slf4j/slf4j-api/jars/slf4j-api-1.7.5.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
   </component>
 </module>

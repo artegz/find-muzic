@@ -1,5 +1,6 @@
 package edu.fm
 
+import groovy.util.logging.Slf4j
 import org.apache.http.client.utils.URIBuilder
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
@@ -9,6 +10,7 @@ import org.jsoup.nodes.Element
  * Date: 06.11.2015
  * Time: 9:48
  */
+@Slf4j
 class Site7bxRuProvider {
 
     public static final int MAX_TIMEOUT = 60 * 1000
@@ -30,8 +32,8 @@ class Site7bxRuProvider {
 
             String foundSongName = resultATag.text()
 
-            print "${aTags.size()} matches found... "
-            print "downloading '${foundSongName}'... "
+            log.info("${aTags.size()} matches found... ")
+            log.info("accepted '${foundSongName}'... ")
     
             def resolveUrl = resultATag.attr("href")
     

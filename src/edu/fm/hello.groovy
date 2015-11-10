@@ -6,4 +6,4 @@ package edu.fm
  * Time: 14:01
  */
 
-println "hello"
+Log.logln("hello")

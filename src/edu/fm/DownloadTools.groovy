@@ -1,5 +1,6 @@
 package edu.fm
 
+import groovy.util.logging.Slf4j
 import org.apache.http.HttpEntity
 import org.apache.http.HttpResponse
 import org.apache.http.client.HttpClient
@@ -13,6 +14,7 @@ import java.text.DecimalFormat
  * Date: 06.11.2015
  * Time: 9:45
  */
+@Slf4j
 class DownloadTools {
 
     static void downloadFile(String song, String url, File workDir) {
@@ -30,7 +32,7 @@ class DownloadTools {
             if (!file.exists()) {
                 file.createNewFile()
 
-                //println "(${song}) downloading '${filename}' from ${url}"
+                //Log.logln("(${song}) downloading '${filename}' from ${url}")
 
                 long bytes = 0
 
@@ -44,7 +46,8 @@ class DownloadTools {
                 bis.close();
                 bos.close();
 
-                printf("%,d bytes (%s Mb) ...", bytes, new DecimalFormat("#0.00").format(bytes / 1024 / 1024))
+                log.info(String.format("download complete (%s Mb) ...", new DecimalFormat("#0.00").format(bytes / 1024 / 1024)))
+
                 if (bytes < 1 * 1024 * 1024) {
                     file.delete()
                     throw new Exception("loaded file is too small and may be corrupted")
