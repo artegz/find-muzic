@@ -20,8 +20,8 @@ def succeededListFilename = 'succeeded.rock.txt'
 def mappingListFilename = 'mapping.rock.txt'
 def resultsSubDir = 'songs.rock'
 
-Integer songsOffset = 0
-Integer songsCount = 10
+Integer songsOffset = 200
+Integer songsCount = 100
 
 //DistinctionEstimator.maxDiffFactor = 99
 
@@ -31,8 +31,14 @@ File resultFolder = FileTools.getSubDir(workDir, resultsSubDir)
 List<String> songNames = FileTools.readSongs(workDir, loadListFilename)
 List<String> loadedSongs = FileTools.getLoadedSongs(resultFolder)
 
+List<String> failedSongNames = FileTools.readSongs(workDir, failedListFilename)
+List<String> succeededSongNames = FileTools.readSongs(workDir, succeededListFilename)
+
 List<String> subList = getSubList(songNames, songsOffset, songsCount)
-List<String> songsToLoad = filterAlreadyLoaded(subList, loadedSongs)
+List<String> songsToLoad = subList
+songsToLoad = filterAlreadyLoaded(songsToLoad, loadedSongs)
+songsToLoad = filterSongs(songsToLoad, failedSongNames)
+songsToLoad = filterSongs(songsToLoad, succeededSongNames)
 
 if (subList.size() != songsToLoad.size()) {
     println "${subList.size() - songsToLoad.size()}/${subList.size()} already exist and would not be loaded"
@@ -90,6 +96,16 @@ FileTools.writeSongs(workDir, succeeded, succeededListFilename, false)
 FileTools.writeMapping(workDir, mapping, mappingListFilename, false)
 
 
+
+private ArrayList<String> filterSongs(List<String> subList, List<String> songs) {
+    List<String> list = new ArrayList<>()
+    for (String songName : subList) {
+        if (!songs.contains(songName)) {
+            list.add(songName)
+        }
+    }
+    list
+}
 
 private ArrayList<String> filterAlreadyLoaded(List<String> subList, List<String> loadedSongs) {
     List<String> list = new ArrayList<>()
