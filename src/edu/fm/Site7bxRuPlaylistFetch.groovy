@@ -180,29 +180,4 @@ class Site7bxRuPlaylistFetch {
         dates
     }
 
-    @Deprecated
-    public File getDir(String dirName) {
-        def dir = new File(dirName)
-        if (!dir.exists()) {
-            dir.mkdirs()
-        }
-        dir
-    }
-
-    @Deprecated
-    public void writeSongs(File workDir, songs) {
-        def songsFile = new File(workDir, 'playlist.record.txt')
-        if (songsFile.exists()) {
-            songsFile.delete()
-        }
-        songsFile.createNewFile()
-
-        songsFile.withWriter {
-            out ->
-                songs.each {
-                    out.println it
-                }
-        }
-    }
-
 }
