@@ -25,7 +25,14 @@ runner.succeededListFilename = 'succeeded.rock.txt'
 runner.mappingListFilename = 'mapping.rock.txt'
 runner.resultsSubDir = 'songs.rock'
 
-runner.songsOffset = 400
-runner.songsCount = 100
+runner.excludeAlreadyExist = true
+runner.excludeFailed = false
+runner.excludeSucceeded = true
+
+runner.songsOffset = 1000
+runner.songsCount = 10
+
+DistinctionEstimator.ignoreParentheses = false
+DistinctionEstimator.maxDiffFactor = 10
 
 runner.run()

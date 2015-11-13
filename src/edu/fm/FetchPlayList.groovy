@@ -22,7 +22,7 @@ Date dateTo = new SimpleDateFormat("dd.MM.yyyy").parse(argDateTo)
 File workDir = FileTools.getDir(argPath)
 
 //def fetchedSongs = new SiteMoreradioRuPlaylistFetch().fetchSongs(dateFrom, dateTo, station)
-def fetchedSongs = new Site7bxRuPlaylistFetch().fetchSongs(dateFrom, dateTo, station)
+def fetchedSongs = new Site7bxRuPlaylistProvider().fetchSongs(dateFrom, dateTo, station)
 
 FileTools.writeSongs(workDir, fetchedSongs, "september-1.nashe.playlist.txt", true)
 

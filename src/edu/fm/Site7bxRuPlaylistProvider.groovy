@@ -29,11 +29,11 @@ import java.text.SimpleDateFormat
  * Time: 10:55
  */
 @Slf4j
-class Site7bxRuPlaylistFetch {
+class Site7bxRuPlaylistProvider {
 
     private HttpClient httpsClient
 
-    Site7bxRuPlaylistFetch() {
+    Site7bxRuPlaylistProvider() {
         httpsClient = createSSLHttpClient()
     }
 

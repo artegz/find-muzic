@@ -21,6 +21,10 @@ class FindMuzicRunner {
     Integer songsOffset
     Integer songsCount
 
+    boolean excludeFailed = false
+    boolean excludeSucceeded = false
+    boolean excludeAlreadyExist = true
+
     def run() {
 
         File workDir = FileTools.getDir(argPath)
@@ -33,16 +37,22 @@ class FindMuzicRunner {
         List<String> succeededSongNames = FileTools.readSongs(workDir, succeededListFilename)
 
         List<String> subList = getSubList(songNames, songsOffset, songsCount)
-        List<String> songsToLoad = subList
-        songsToLoad = filterAlreadyLoaded(songsToLoad, loadedSongs)
-        songsToLoad = filterSongs(songsToLoad, failedSongNames)
-        songsToLoad = filterSongs(songsToLoad, succeededSongNames)
-
-        if (subList.size() != songsToLoad.size()) {
-            log.warn("${subList.size() - songsToLoad.size()}/${subList.size()} already exist and would not be loaded")
+        Map<String, Boolean> songs = asMap(subList)
+        if (excludeAlreadyExist) {
+            filterAlreadyLoaded(songs, loadedSongs)
+        }
+        if (excludeFailed) {
+            filterSongs(songs, failedSongNames)
+        }
+        if (excludeSucceeded) {
+            filterSongs(songs, succeededSongNames)
         }
 
-//        int counter = songsOffset
+//        if (subList.size() != songs.size()) {
+//            log.warn("${subList.size() - songs.size()}/${subList.size()} already exist and would not be loaded")
+//        }
+
+        int counter = songsOffset
         int failureCounter = 0
 
 
@@ -52,29 +62,34 @@ class FindMuzicRunner {
         def mapping = new HashMap<String, String>()
 
         try {
-            songsToLoad.each {
+            songs.each {
+                def songName = it.key
 
-                log.info("searching for '${it}'... ")
-                try {
-                    def song = Site7bxRuProvider.fetchSong(it)
-                    DownloadTools.downloadFile(song.foundSongName, song.downloadUrl, resultFolder)
+                if (it.value) {
+                    log.info("[${counter++}] searching for '${songName}'... ")
+                    try {
+                        def song = SiteZaycevNetDownloadProvider.fetchSong(songName)
+                        DownloadTools.downloadFile(song.foundSongName, song.downloadUrl, resultFolder)
 
-                    mapping.put(it, song.foundSongName)
-                    succeeded.add(it)
-                    log.info("succeeded")
-                    failureCounter = 0
-                    sleep(1000)
-                } catch (Throwable e) {
-                    failed.add(it)
-                    log.error("${e.message}...")
-                    log.error("failed")
-                    failureCounter++
-                    if (failureCounter > 40) {
-                        failed.addAll(songsToLoad.subList(songsToLoad.indexOf(it), songsToLoad.size()))
-                        throw e
+                        mapping.put(songName, song.foundSongName)
+                        succeeded.add(songName)
+                        log.info("succeeded")
+                        failureCounter = 0
+                        sleep(1000)
+                    } catch (Throwable e) {
+                        failed.add(songName)
+                        log.error("${e.message}...")
+                        log.error("failed")
+                        failureCounter++
+                        if (failureCounter > 40) {
+                            def songNamesAsList = new ArrayList<>(songs.keySet())
+                            failed.addAll(songNamesAsList.subList(songNamesAsList.indexOf(songName), songNamesAsList.size()))
+                            throw e
+                        }
                     }
+                } else {
+                    log.warn("[${counter++}] '${songName}' skipped")
                 }
-
             }
         } finally {
             log.info("")
@@ -94,24 +109,36 @@ class FindMuzicRunner {
         FileTools.writeMapping(workDir, mapping, mappingListFilename, false)
     }
 
-    private ArrayList<String> filterSongs(List<String> subList, List<String> songs) {
-        List<String> list = new ArrayList<>()
-        for (String songName : subList) {
-            if (!songs.contains(songName)) {
-                list.add(songName)
-            }
+    private Map<String, Boolean> asMap(List<String> subList) {
+        Map<String, Boolean> songsToLoad = new TreeMap<>()
+        for (String song : subList) {
+            songsToLoad.put(song, true)
         }
-        list
+        songsToLoad
     }
 
-    private ArrayList<String> filterAlreadyLoaded(List<String> subList, List<String> loadedSongs) {
-        List<String> list = new ArrayList<>()
-        for (String songName : subList) {
-            if (!DistinctionEstimator.containsExact(loadedSongs, songName, { it })) {
-                list.add(songName)
+    private void filterSongs(Map<String, Boolean> songs, List<String> songsToFilter) {
+        List<String> filteredSongs = new ArrayList<>()
+        for (String songName : songs.keySet()) {
+            if (songsToFilter.contains(songName)) {
+                filteredSongs.add(songName)
             }
         }
-        list
+        for (String filteredSong : filteredSongs) {
+            songs.put(filteredSong, false)
+        }
+    }
+
+    private void filterAlreadyLoaded(Map<String, Boolean> songs, List<String> loadedSongs) {
+        def List<String> filteredSongs  = new ArrayList<>()
+        for (String songName : songs.keySet()) {
+            if (DistinctionEstimator.containsExact(loadedSongs, songName, { it })) {
+                filteredSongs.add(songName)
+            }
+        }
+        for (String filteredSong : filteredSongs) {
+            songs.put(filteredSong, false)
+        }
     }
 
     private List<String> getSubList(Collection<String> songNames, int songsOffset, int songsCount) {

@@ -14,6 +14,8 @@ class DistinctionEstimator {
 
     static Integer maxDiffFactor = 10;
 
+    static boolean ignoreParentheses = false;
+
     public static <T> boolean containsExact(Collection<T> els, String baseSongName, @ClosureParams(FirstParam.FirstGenericType.class) Closure<String> c) {
         boolean contains;
         try {
@@ -66,6 +68,7 @@ class DistinctionEstimator {
     }
 
     private static Integer diffFactor(String keyI, String valueI) {
+
         def key = convert(keyI)
         def value = convert(valueI)
 
@@ -81,8 +84,8 @@ class DistinctionEstimator {
     }
 
     private static Integer diffFactor2(String keyI, String valueI) {
-        def key = convert(keyI)
-        def value = convert(valueI)
+        def key = convert(keyI, ignoreParentheses)
+        def value = convert(valueI, ignoreParentheses)
 
         Integer difSize = 0
         if (value.length() > key.length()) {
@@ -103,7 +106,28 @@ class DistinctionEstimator {
         difSize
     }
 
-    private static String convert(String testStr) {
-        testStr.toLowerCase().replaceAll("[\\p{Punct}\\s]*", "")
+    static String convert(String orig) {
+        def cleanupParentheses = ignoreParentheses
+        def result = orig
+
+        result = toLowerCase(result)
+        if (cleanupParentheses) {
+            result = removeTextInParentheses(result)
+        }
+        result = removePunctChars(result)
+
+        result
+    }
+
+    static String removeTextInParentheses(String text) {
+        text.replaceAll("\\(.+\\)", "")
+    }
+
+    private static String removePunctChars(String text) {
+        text.replaceAll("[\\p{Punct}\\s]*", "")
+    }
+
+    private static String toLowerCase(String text) {
+        text.toLowerCase()
     }
 }

@@ -11,7 +11,7 @@ import org.jsoup.nodes.Element
  * Time: 9:48
  */
 @Slf4j
-class Site7bxRuProvider {
+class Site7bxRuDownloadProvider {
 
     public static final int MAX_TIMEOUT = 60 * 1000
     public static final String USER_AGENT = "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:41.0) Gecko/20100101 Firefox/41.0"
