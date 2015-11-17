@@ -68,7 +68,7 @@ class FindMuzicRunner {
                 if (it.value) {
                     log.info("[${counter++}] searching for '${songName}'... ")
                     try {
-                        def song = SiteZaycevNetDownloadProvider.fetchSong(songName)
+                        def song = Site7bxRuDownloadProvider.fetchSong(songName)
                         DownloadTools.downloadFile(song.foundSongName, song.downloadUrl, resultFolder)
 
                         mapping.put(songName, song.foundSongName)
@@ -145,7 +145,8 @@ class FindMuzicRunner {
         List<String> songsToLoad
         if (songsOffset != null) {
             def count = (songsCount != null) ? songsCount : songNames.size() - songsOffset
-            songsToLoad = new ArrayList<String>(songNames).subList(songsOffset, songsOffset + count)
+            def end = Math.min(songsOffset + count, songNames.size())
+            songsToLoad = new ArrayList<String>(songNames).subList(songsOffset, end)
         } else {
             songsToLoad = new ArrayList<String>(songNames)
         }

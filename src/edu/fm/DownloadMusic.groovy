@@ -13,26 +13,27 @@ package edu.fm
  * Time: 18:06
  */
 
+String station = "nashe"
 //DistinctionEstimator.maxDiffFactor = 99
-
+// todo: see http://hotcharts.ru
 def runner = new FindMuzicRunner()
 
 runner.argPath = "C:/TEMP/mdl-7bx/"
 
-runner.loadListFilename = 'playlist.rock.txt'
-runner.failedListFilename = 'failed.rock.txt'
-runner.succeededListFilename = 'succeeded.rock.txt'
-runner.mappingListFilename = 'mapping.rock.txt'
-runner.resultsSubDir = 'songs.rock'
+runner.loadListFilename = "playlist.${station}.txt"
+runner.failedListFilename = "failed.${station}.txt"
+runner.succeededListFilename = "succeeded.${station}.txt"
+runner.mappingListFilename = "mapping.${station}.txt"
+runner.resultsSubDir = "songs.${station}"
 
 runner.excludeAlreadyExist = true
 runner.excludeFailed = false
 runner.excludeSucceeded = true
 
-runner.songsOffset = 1000
-runner.songsCount = 10
+runner.songsOffset = 0
+runner.songsCount = 1000
 
-DistinctionEstimator.ignoreParentheses = false
-DistinctionEstimator.maxDiffFactor = 10
+DistinctionEstimator.ignoreParentheses = true
+DistinctionEstimator.maxDiffFactor = 5
 
 runner.run()

@@ -10,7 +10,7 @@ import groovy.transform.stc.FirstParam
  */
 class DistinctionEstimator {
 
-    private static char[] alphabet = "abcdefghijklmnopqrstuvwxyzàáâãäå¸æçèéêëìíîïğñòóôõö÷øùúüışÿ1234567890".toCharArray()
+    private static char[] alphabet = "abcdefghijklmnopqrstuvwxyzÑ‘Ğ¹Ñ†ÑƒĞºĞµĞ½Ğ³ÑˆÑ‰Ğ·Ñ…ÑŠÑ„Ñ‹Ğ²Ğ°Ğ¿Ñ€Ğ¾Ğ»Ğ´Ğ¶ÑÑÑ‡ÑĞ¼Ğ¸Ñ‚ÑŒĞ±Ñ1234567890".toCharArray()
 
     static Integer maxDiffFactor = 10;
 
