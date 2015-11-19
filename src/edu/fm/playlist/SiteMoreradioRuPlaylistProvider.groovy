@@ -1,4 +1,4 @@
-package edu.fm
+package edu.fm.playlist
 import groovy.util.logging.Slf4j
 import org.apache.http.client.utils.URIBuilder
 import org.jsoup.Jsoup
@@ -11,14 +11,14 @@ import java.text.SimpleDateFormat
  * Time: 12:38
  */
 @Slf4j
-class SiteMoreradioRuPlaylistProvider {
+class SiteMoreradioRuPlaylistProvider implements PlaylistProvider {
 
     public static final int MAX_TIMEOUT = 60 * 1000
     public static final String USER_AGENT = "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:41.0) Gecko/20100101 Firefox/41.0"
 
     public static Map<String, String> ids = [ "nashe" : "3" ]
 
-    public Set<String> fetchSongs(Date dateFrom, Date dateTo, String station) {
+    public Set<String> fetchPlaylist(Date dateFrom, Date dateTo, String station) {
         def songs = new TreeSet<String>()
 
         List<Date> days = getDaysInInterval(dateFrom, dateTo)

@@ -1,5 +1,6 @@
-package edu.fm
+package edu.fm.links
 
+import edu.fm.Context
 import groovy.util.logging.Slf4j
 import org.apache.http.client.utils.URIBuilder
 import org.jsoup.Jsoup
@@ -11,12 +12,12 @@ import org.jsoup.nodes.Element
  * Time: 9:48
  */
 @Slf4j
-class Site7bxRuDownloadProvider {
+class Site7BxRuLinkProvider implements LinkProvider {
 
     public static final int MAX_TIMEOUT = 60 * 1000
     public static final String USER_AGENT = "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:41.0) Gecko/20100101 Firefox/41.0"
 
-    static SongData fetchSong(String songName) {
+    LinkContainer fetchLink(String songName) {
 
         URIBuilder searchQueryUrlBuilder = new URIBuilder();
         searchQueryUrlBuilder.setScheme("http").setHost("7bx.ru").setPath("/mp3_search/")
@@ -28,7 +29,7 @@ class Site7bxRuDownloadProvider {
         def aTags = contentDiv.getElementsByTag("a")
 
         if (!aTags.isEmpty()) {
-            Element resultATag = DistinctionEstimator.getSimilar(aTags, songName, { it.text() })
+            Element resultATag = Context.get().distinctionEstimator.getSimilar(aTags, songName, { it.text() })
 
             String foundSongName = resultATag.text()
 
@@ -46,7 +47,7 @@ class Site7bxRuDownloadProvider {
                 def resultDownloadLinkATag = downloadLinkATags.get(0)
                 def downloadUrl = resultDownloadLinkATag.attr("href")
 
-                new SongData(foundSongName, songName, downloadUrl)
+                new LinkContainer(foundSongName, songName, downloadUrl)
             } else {
                 throw new Exception("download link tags not found")
             }

@@ -1,6 +1,7 @@
-package edu.fm
+package edu.fm.links
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import edu.fm.Context
 import groovy.util.logging.Slf4j
 import org.apache.http.client.utils.URIBuilder
 import org.jsoup.Jsoup
@@ -14,12 +15,12 @@ import org.jsoup.select.Elements
  * Time: 10:30
  */
 @Slf4j
-class SiteZaycevNetDownloadProvider {
+class SiteZaycevNetLinkProvider implements LinkProvider {
 
     public static final int MAX_TIMEOUT = 60 * 1000
     public static final String USER_AGENT = "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:41.0) Gecko/20100101 Firefox/41.0"
 
-    static SongData fetchSong(String songName) {
+    LinkContainer fetchLink(String songName) {
         URIBuilder searchQueryUrlBuilder = new URIBuilder();
         searchQueryUrlBuilder.setScheme("http").setHost("zaycev.net").setPath("/search.html")
                 .setParameter("query_search", songName.replaceAll("& ", ""));
@@ -30,7 +31,7 @@ class SiteZaycevNetDownloadProvider {
         if (!searchResultDivs.isEmpty()) {
             def children = searchResultDivs.get(0).children()
 
-            Element searchResultsDiv = DistinctionEstimator.getSimilar(children, songName, { it.child(0).text() })
+            Element searchResultsDiv = Context.get().distinctionEstimator.getSimilar(children, songName, { it.child(0).text() })
             Elements elements = searchResultsDiv.getElementsByAttribute("data-id")
 
             if (!elements.isEmpty()) {
@@ -58,7 +59,7 @@ class SiteZaycevNetDownloadProvider {
                     downloadUrl = downloadLink.getUrl()
                 }
 
-                new SongData(foundSongName, songName, downloadUrl)
+                new LinkContainer(foundSongName, songName, downloadUrl)
             } else {
                 throw new Exception("nothing found")
             }

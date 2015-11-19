@@ -1,4 +1,4 @@
-package edu.fm
+package edu.fm.dist
 
 import groovy.transform.stc.ClosureParams
 import groovy.transform.stc.FirstParam
@@ -16,7 +16,7 @@ class DistinctionEstimator {
 
     static boolean ignoreParentheses = false;
 
-    public static <T> boolean containsExact(Collection<T> els, String baseSongName, @ClosureParams(FirstParam.FirstGenericType.class) Closure<String> c) {
+    public <T> boolean containsExact(Collection<T> els, String baseSongName, @ClosureParams(FirstParam.FirstGenericType.class) Closure<String> c) {
         boolean contains;
         try {
             if (getExact(els, baseSongName, c) != null) {
@@ -30,7 +30,7 @@ class DistinctionEstimator {
         contains
     }
 
-    public static <T> T getSimilar(Collection<T> els, String baseSongName, @ClosureParams(FirstParam.FirstGenericType.class) Closure<String> c) {
+    public <T> T getSimilar(Collection<T> els, String baseSongName, @ClosureParams(FirstParam.FirstGenericType.class) Closure<String> c) {
         def mostSimilar = getMostSimilar(els, baseSongName, c)
 
         def foundName = c.call(mostSimilar)
@@ -42,7 +42,7 @@ class DistinctionEstimator {
         mostSimilar
     }
 
-    public static <T> T getExact(Collection<T> els, String baseSongName, @ClosureParams(FirstParam.FirstGenericType.class) Closure<String> c) {
+    public <T> T getExact(Collection<T> els, String baseSongName, @ClosureParams(FirstParam.FirstGenericType.class) Closure<String> c) {
         def mostSimilar = getMostSimilar(els, baseSongName, c)
 
         def foundName = c.call(mostSimilar)

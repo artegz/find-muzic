@@ -68,7 +68,7 @@ class FindMuzicRunner {
                 if (it.value) {
                     log.info("[${counter++}] searching for '${songName}'... ")
                     try {
-                        def song = Site7bxRuDownloadProvider.fetchSong(songName)
+                        def song = Context.get().linkProvider.fetchLink(songName)
                         DownloadTools.downloadFile(song.foundSongName, song.downloadUrl, resultFolder)
 
                         mapping.put(songName, song.foundSongName)
@@ -132,7 +132,7 @@ class FindMuzicRunner {
     private void filterAlreadyLoaded(Map<String, Boolean> songs, List<String> loadedSongs) {
         def List<String> filteredSongs  = new ArrayList<>()
         for (String songName : songs.keySet()) {
-            if (DistinctionEstimator.containsExact(loadedSongs, songName, { it })) {
+            if (Context.get().distinctionEstimator.containsExact(loadedSongs, songName, { it })) {
                 filteredSongs.add(songName)
             }
         }

@@ -1,4 +1,4 @@
-package edu.fm
+package edu.fm.playlist
 
 import groovy.util.logging.Slf4j
 import org.apache.http.HttpResponse
@@ -29,7 +29,7 @@ import java.text.SimpleDateFormat
  * Time: 10:55
  */
 @Slf4j
-class Site7bxRuPlaylistProvider {
+class Site7bxRuPlaylistProvider implements PlaylistProvider {
 
     private HttpClient httpsClient
 
@@ -37,7 +37,7 @@ class Site7bxRuPlaylistProvider {
         httpsClient = createSSLHttpClient()
     }
 
-    public Set<String> fetchSongs(Date dateFrom, Date dateTo, String station) {
+    public Set<String> fetchPlaylist(Date dateFrom, Date dateTo, String station) {
         def songs = new TreeSet<String>()
 
         List<Date> days = getDaysInInterval(dateFrom, dateTo)
