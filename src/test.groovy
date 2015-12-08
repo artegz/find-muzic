@@ -10,7 +10,9 @@ import edu.fm.dist.DistinctionEstimator
 
 DistinctionEstimator.ignoreParentheses = true
 
-println DistinctionEstimator.convert("Rainbow - Difficult To Cure")
-println DistinctionEstimator.convert("Rainbow - Difficult To Cure (Beethoven's Ninth)")
-println DistinctionEstimator.convert("Pink Floyd - Another Brick In The Wall, Pt 2 (2011 Remaster)")
-println DistinctionEstimator.convert("Rainbow - Starstruck (Los Angeles Mix)")
+//println DistinctionEstimator.convert("Rainbow - Difficult To Cure")
+//println DistinctionEstimator.convert("Rainbow - Difficult To Cure (Beethoven's Ninth)")
+//println DistinctionEstimator.convert("Pink Floyd - Another Brick In The Wall, Pt 2 (2011 Remaster)")
+//println DistinctionEstimator.convert("Rainbow - Starstruck (Los Angeles Mix)")
+
+println new Date(1350259200000)
