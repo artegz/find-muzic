@@ -1,5 +1,6 @@
 import edu.fm.Context
 import edu.fm.FindMuzicRunner
+import edu.fm.links.SiteHotChartsRuLinkProvider
 
 /**
  * User: artem.smirnov
@@ -10,9 +11,9 @@ import edu.fm.FindMuzicRunner
 String station = "nashe"
 def runner = new FindMuzicRunner()
 
-runner.argPath = "C:/TEMP/mdl-7bx/"
+runner.argPath = "C:/TEMP/find-music/"
 
-runner.loadListFilename = "playlist.${station}.txt"
+runner.loadListFilename = "chart-2015.${station}.txt"
 runner.failedListFilename = "failed.${station}.txt"
 runner.succeededListFilename = "succeeded.${station}.txt"
 runner.mappingListFilename = "mapping.${station}.txt"
@@ -25,11 +26,8 @@ runner.excludeSucceeded = true
 runner.songsOffset = 0
 runner.songsCount = 1000
 
+Context.get().linkProvider = new SiteHotChartsRuLinkProvider()
 Context.get().distinctionEstimator.ignoreParentheses = true
 Context.get().distinctionEstimator.maxDiffFactor = 5
-
-//DistinctionEstimator.maxDiffFactor = 99
-// todo: see http://hotcharts.ru
-
 
 runner.run()
