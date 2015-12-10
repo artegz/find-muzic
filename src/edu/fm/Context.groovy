@@ -21,6 +21,8 @@ class Context {
 
     PlaylistProvider playlistProvider = new Site7bxRuPlaylistProvider()
 
+    SongDescriptorMapper songDescriptorMapper = new SongDescriptorMapper()
+
     public static Context get() {
         instance
     }

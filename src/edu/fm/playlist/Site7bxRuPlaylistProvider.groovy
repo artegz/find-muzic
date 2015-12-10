@@ -1,5 +1,6 @@
 package edu.fm.playlist
-
+import edu.fm.Context
+import edu.fm.SongDescriptor
 import groovy.util.logging.Slf4j
 import org.apache.http.HttpResponse
 import org.apache.http.client.HttpClient
@@ -37,7 +38,7 @@ class Site7bxRuPlaylistProvider implements PlaylistProvider {
         httpsClient = createSSLHttpClient()
     }
 
-    public Set<String> fetchPlaylist(Date dateFrom, Date dateTo, String station) {
+    public Set<SongDescriptor> fetchPlaylist(Date dateFrom, Date dateTo, String station) {
         def songs = new TreeSet<String>()
 
         List<Date> days = getDaysInInterval(dateFrom, dateTo)
@@ -46,7 +47,8 @@ class Site7bxRuPlaylistProvider implements PlaylistProvider {
             songs.addAll(daySongs)
             sleep(100)
         }
-        songs
+
+        Context.get().songDescriptorMapper.parseList(songs)
     }
 
     /**

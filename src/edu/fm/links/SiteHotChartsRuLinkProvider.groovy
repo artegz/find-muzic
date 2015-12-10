@@ -1,5 +1,6 @@
 package edu.fm.links
 import edu.fm.Context
+import edu.fm.SongDescriptor
 import groovy.util.logging.Slf4j
 import org.apache.http.client.utils.URIBuilder
 import org.jsoup.Jsoup
@@ -16,11 +17,9 @@ class SiteHotChartsRuLinkProvider implements LinkProvider {
     public static final int MAX_TIMEOUT = 60 * 1000
     public static final String USER_AGENT = "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:41.0) Gecko/20100101 Firefox/41.0"
 
-    public static void main(String[] args) {
-        new SiteHotChartsRuLinkProvider().fetchLink("Мельница - Что Ты Знаешь")
-    }
+    LinkContainer fetchLink(SongDescriptor song) {
+        String songName = Context.get().songDescriptorMapper.formatSongDescriptor(song)
 
-    LinkContainer fetchLink(String songName) {
         def linkContainers = new ArrayList<LinkContainer>()
 
         URIBuilder searchQueryUrlBuilder = new URIBuilder(); // http://hotcharts.ru/mp3/?page=search
@@ -30,7 +29,7 @@ class SiteHotChartsRuLinkProvider implements LinkProvider {
         def doc = Jsoup.connect(searchQueryUrlBuilder.build().toASCIIString())
                 .timeout(MAX_TIMEOUT)
                 .userAgent(USER_AGENT)
-                .data("song", songName.replaceAll("& ", ""))
+                .data("song", prepareSearchValue(song))
                 .post()
 
         Elements songBoxDivs = doc.getElementsByAttributeValue("class", "song_box")
@@ -100,5 +99,9 @@ class SiteHotChartsRuLinkProvider implements LinkProvider {
         }
 
         linkContainers.get(0)
+    }
+
+    private String prepareSearchValue(SongDescriptor sd) {
+        sd.artist.replaceAll("& -", "") + " - " + sd.title.replaceAll("& -", "")
     }
 }

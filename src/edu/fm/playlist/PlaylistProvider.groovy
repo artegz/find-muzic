@@ -1,5 +1,7 @@
 package edu.fm.playlist
 
+import edu.fm.SongDescriptor
+
 /**
  * User: artem.smirnov
  * Date: 19.11.2015
@@ -7,6 +9,6 @@ package edu.fm.playlist
  */
 interface PlaylistProvider {
 
-    Set<String> fetchPlaylist(Date dateFrom, Date dateTo, String station)
+    Set<SongDescriptor> fetchPlaylist(Date dateFrom, Date dateTo, String station)
 
 }

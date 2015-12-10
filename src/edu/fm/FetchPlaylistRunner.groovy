@@ -25,7 +25,8 @@ class FetchPlaylistRunner {
 
         //def fetchedSongs = new SiteMoreradioRuPlaylistFetch().fetchPlaylist(dateFrom, dateTo, station)
         def fetchedSongs = Context.get().playlistProvider.fetchPlaylist(dateFrom, dateTo, station)
+        def songNames = Context.get().songDescriptorMapper.formatList(fetchedSongs)
 
-        FileTools.writeSongs(workDir, fetchedSongs, "${outputFilename}", true)
+        FileTools.writeSongs(workDir, songNames, "${outputFilename}", true)
     }
 }

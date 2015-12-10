@@ -1,5 +1,7 @@
 package edu.fm.links
 
+import edu.fm.SongDescriptor
+
 /**
  * User: artem.smirnov
  * Date: 19.11.2015
@@ -7,5 +9,5 @@ package edu.fm.links
  */
 interface LinkProvider {
 
-    LinkContainer fetchLink(String songName)
+    LinkContainer fetchLink(SongDescriptor song)
 }

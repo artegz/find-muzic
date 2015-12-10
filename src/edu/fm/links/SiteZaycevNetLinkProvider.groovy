@@ -2,6 +2,7 @@ package edu.fm.links
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import edu.fm.Context
+import edu.fm.SongDescriptor
 import groovy.util.logging.Slf4j
 import org.apache.http.client.utils.URIBuilder
 import org.jsoup.Jsoup
@@ -20,7 +21,9 @@ class SiteZaycevNetLinkProvider implements LinkProvider {
     public static final int MAX_TIMEOUT = 60 * 1000
     public static final String USER_AGENT = "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:41.0) Gecko/20100101 Firefox/41.0"
 
-    LinkContainer fetchLink(String songName) {
+    LinkContainer fetchLink(SongDescriptor song) {
+        String songName = Context.get().songDescriptorMapper.formatSongDescriptor(song)
+
         URIBuilder searchQueryUrlBuilder = new URIBuilder();
         searchQueryUrlBuilder.setScheme("http").setHost("zaycev.net").setPath("/search.html")
                 .setParameter("query_search", songName.replaceAll("& ", ""));

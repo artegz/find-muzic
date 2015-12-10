@@ -1,5 +1,6 @@
 package edu.fm.playlist
 
+import edu.fm.SongDescriptor
 import org.apache.http.client.utils.URIBuilder
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
@@ -27,8 +28,8 @@ class SiteHotChartsRuProvider implements PlaylistProvider {
         this.listType = listType
     }
 
-    public Set<String> fetchPlaylist(Date dateFrom, Date dateTo, String station) {
-        def songs = new TreeSet<String>()
+    public Set<SongDescriptor> fetchPlaylist(Date dateFrom, Date dateTo, String station) {
+        def songs = new TreeSet<SongDescriptor>()
 
         List<Date> days
         if (listType == ListType.history) {
@@ -37,15 +38,15 @@ class SiteHotChartsRuProvider implements PlaylistProvider {
             days = Collections.singletonList(new Date())
         }
         days.each {
-            Set<String> daySongs = getSongs(station, it)
+            Set<SongDescriptor> daySongs = getSongs(station, it)
             songs.addAll(daySongs)
             sleep(100)
         }
         songs
     }
 
-    private Set<String> getSongs(String station, Date dateOn) {
-        Set<String> foundSongNames = new TreeSet<>()
+    private Set<SongDescriptor> getSongs(String station, Date dateOn) {
+        Set<SongDescriptor> foundSongs = new TreeSet<>()
 
         URIBuilder urlBuilder = new URIBuilder();
         urlBuilder.setScheme("http")
@@ -62,10 +63,10 @@ class SiteHotChartsRuProvider implements PlaylistProvider {
         def songBoxes = doc.getElementsByClass("song_box")
 
         songBoxes.each {
-            foundSongNames.add("${it.child(1).child(0).text()} - ${it.child(1).child(1).text()}")
+            foundSongs.add(new SongDescriptor(it.child(1).child(0).text(), it.child(1).child(1).text()))
         }
 
-        foundSongNames
+        foundSongs
     }
 
     private ArrayList<Date> getDaysInInterval(Date dateFrom, Date dateTo) {

@@ -12,7 +12,7 @@ class DistinctionEstimator {
 
     private static char[] alphabet = "abcdefghijklmnopqrstuvwxyzёйцукенгшщзхъфывапролджэячсмитьбю1234567890".toCharArray()
 
-    static Integer maxDiffFactor = 10;
+    static Integer maxDiffFactor = 10; // tolerance?
 
     static boolean ignoreParentheses = false;
 

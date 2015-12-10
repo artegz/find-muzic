@@ -30,6 +30,7 @@ class FindMuzicRunner {
         File workDir = FileTools.getDir(argPath)
         File resultFolder = FileTools.getSubDir(workDir, resultsSubDir)
 
+        // todo asm: String -> SongDescriptor
         List<String> songNames = FileTools.readSongs(workDir, loadListFilename)
         List<String> loadedSongs = FileTools.getLoadedSongs(resultFolder)
 
@@ -68,7 +69,7 @@ class FindMuzicRunner {
                 if (it.value) {
                     log.info("[${counter++}] searching for '${songName}'... ")
                     try {
-                        def song = Context.get().linkProvider.fetchLink(songName)
+                        def song = Context.get().linkProvider.fetchLink(Context.get().songDescriptorMapper.parseSongDescriptor(songName))
                         DownloadTools.downloadFile(song.foundSongName, song.downloadUrl, resultFolder)
 
                         mapping.put(songName, song.foundSongName)
