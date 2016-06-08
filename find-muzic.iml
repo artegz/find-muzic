@@ -3,8 +3,8 @@
   <component name="NewModuleRootManager" inherit-compiler-output="true">
     <exclude-output />
     <content url="file://$MODULE_DIR$">
-      <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/resources" type="java-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/core/src/main/resources" type="java-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/core/src/main/groovy" isTestSource="false" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
@@ -244,6 +244,26 @@
       <library name="Grab:slf4j-api-1.7.5.jar">
         <CLASSES>
           <root url="jar://$USER_HOME$/.groovy/grapes/org.slf4j/slf4j-api/jars/slf4j-api-1.7.5.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Grab:jlibtorrent-1.1.0.31.jar">
+        <CLASSES>
+          <root url="jar://$USER_HOME$/.groovy/grapes/com.frostwire/jlibtorrent/jars/jlibtorrent-1.1.0.31.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$USER_HOME$/.ideaLibSources/jlibtorrent-1.1.0.31-sources.jar!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Grab:jlibtorrent-windows-1.1.0.31.jar">
+        <CLASSES>
+          <root url="jar://$USER_HOME$/.groovy/grapes/com.frostwire/jlibtorrent-windows/jars/jlibtorrent-windows-1.1.0.31.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />

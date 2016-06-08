@@ -1,5 +1,4 @@
-
-
+import com.frostwire.jlibtorrent.TorrentInfo
 import edu.fm.dist.DistinctionEstimator
 
 /**
@@ -16,3 +15,13 @@ DistinctionEstimator.ignoreParentheses = true
 //println DistinctionEstimator.convert("Rainbow - Starstruck (Los Angeles Mix)")
 
 println new Date(1350259200000)
+
+
+
+//def args = {"C:\\TEMP\\torrents\\test.torrent"};
+
+File torrentFile = new File("C:\\TEMP\\torrents\\test.torrent");
+
+TorrentInfo ti = new TorrentInfo(torrentFile);
+System.out.println("info-hash: " + ti.infoHash());
+System.out.println(ti.toEntry());

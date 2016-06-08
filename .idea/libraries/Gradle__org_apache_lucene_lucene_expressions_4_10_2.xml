@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Gradle: org.apache.lucene:lucene-expressions:4.10.2">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.apache.lucene/lucene-expressions/4.10.2/73a7b34699c28fa257c28110b94ea6d6f50d7a1f/lucene-expressions-4.10.2.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.apache.lucene/lucene-expressions/4.10.2/c16ef77ff11822d2788655396f7fd9914b59c87b/lucene-expressions-4.10.2-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

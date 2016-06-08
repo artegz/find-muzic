@@ -1,0 +1,41 @@
+group 'ru.asm'
+version '1.0-SNAPSHOT'
+
+apply plugin: 'groovy'
+apply plugin: 'java'
+apply plugin: 'application'
+
+sourceCompatibility = 1.5
+mainClassName = "edu.TorrentLoaderSample"
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile 'org.codehaus.groovy:groovy-all:2.3.11'
+    compile group: 'org.codehaus.gpars', name: 'gpars', version: '1.2.1'
+
+    compile 'commons-cli:commons-cli:1.3'
+    compile 'org.slf4j:slf4j-api:1.7.13'
+    compile 'ch.qos.logback:logback-classic:1.0.13'
+
+    compile group: 'org.codehaus.groovy.modules.http-builder', name: 'http-builder', version: '0.7'
+    compile group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5'
+    compile group: 'org.jsoup', name: 'jsoup', version: '1.8.3'
+    compile group: 'commons-io', name: 'commons-io', version: '2.4'
+    compile group: 'com.frostwire', name: 'jlibtorrent', version: '1.1.0.31'
+    compile group: 'com.frostwire', name: 'jlibtorrent-windows', version: '1.1.0.31'
+
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.7.4'
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.7.4'
+
+    compile group: 'org.elasticsearch', name: 'elasticsearch', version: '2.3.3'
+    compile group: 'org.apache.lucene', name: 'lucene-expressions', version: '4.10.2'
+    compile group: 'net.java.dev.jna', name: 'jna', version: '4.1.0'
+
+    compile group: 'org.springframework', name: 'spring-context', version: '4.2.6.RELEASE'
+    compile group: 'org.springframework.data', name: 'spring-data-elasticsearch', version: '2.0.1.RELEASE'
+
+    testCompile group: 'junit', name: 'junit', version: '4.11'
+}
