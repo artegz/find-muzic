@@ -1,9 +1,12 @@
 package edu.fm
 
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.SerializationFeature
+import com.fasterxml.jackson.databind.type.TypeFactory
+import com.fasterxml.jackson.module.jaxb.JaxbAnnotationIntrospector
 import groovy.util.logging.Slf4j
 import org.apache.commons.io.IOCase
 import org.apache.commons.io.filefilter.SuffixFileFilter
-
 /**
  * User: artem.smirnov
  * Date: 06.11.2015
@@ -94,6 +97,41 @@ class FileTools {
             }
         }
 
+    }
+
+    static void writeSongsJson(File workDir, Collection<SongDescriptor> songs, String filename, boolean override) {
+        def mapper = getObjectMapper()
+
+        def songsFile = new File(workDir, filename)
+        if (override) {
+            if (songsFile.exists()) {
+                songsFile.delete()
+            }
+            songsFile.createNewFile()
+        } else if (!songsFile.exists()) {
+            songsFile.createNewFile();
+        }
+
+        def container = new SongDescriptorsContainer(songs)
+
+        if (override) {
+            songsFile.withWriter { out ->
+                mapper.writeValue(out, container)
+            }
+        } else {
+            songsFile.withWriterAppend { out ->
+                mapper.writeValue(out, container)
+            }
+        }
+    }
+
+    private static ObjectMapper getObjectMapper() {
+        final ObjectMapper objectMapper = new ObjectMapper();
+
+        objectMapper.setAnnotationIntrospector(new JaxbAnnotationIntrospector(TypeFactory.defaultInstance()));
+        objectMapper.configure(SerializationFeature.INDENT_OUTPUT, true);
+
+        return objectMapper;
     }
 
     static void writeSongs(File workDir, Collection<String> songs, String filename, boolean override) {

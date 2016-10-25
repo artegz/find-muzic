@@ -1,10 +1,14 @@
 package edu.fm
 
+import javax.xml.bind.annotation.XmlAccessType
+import javax.xml.bind.annotation.XmlAccessorType
+
 /**
  * User: artem.smirnov
  * Date: 10.12.2015
  * Time: 12:21
  */
+@XmlAccessorType(XmlAccessType.FIELD)
 class SongDescriptor implements Comparable<SongDescriptor> {
 
     String artist

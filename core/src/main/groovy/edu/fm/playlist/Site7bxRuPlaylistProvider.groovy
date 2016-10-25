@@ -39,7 +39,7 @@ class Site7bxRuPlaylistProvider implements PlaylistProvider {
     }
 
     public Set<SongDescriptor> fetchPlaylist(Date dateFrom, Date dateTo, String station) {
-        def songs = new TreeSet<String>()
+        def songs = new TreeSet<SongDescriptor>()
 
         List<Date> days = getDaysInInterval(dateFrom, dateTo)
         days.each {

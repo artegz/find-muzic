@@ -1,5 +1,7 @@
 package edu.fm
 
+import groovy.util.logging.Slf4j
+
 import java.text.SimpleDateFormat
 
 /**
@@ -7,6 +9,7 @@ import java.text.SimpleDateFormat
  * Date: 19.11.2015
  * Time: 10:52
  */
+@Slf4j
 class FetchPlaylistRunner {
 
     String argDateFrom
@@ -25,8 +28,16 @@ class FetchPlaylistRunner {
 
         //def fetchedSongs = new SiteMoreradioRuPlaylistFetch().fetchPlaylist(dateFrom, dateTo, station)
         def fetchedSongs = Context.get().playlistProvider.fetchPlaylist(dateFrom, dateTo, station)
-        def songNames = Context.get().songDescriptorMapper.formatList(fetchedSongs)
 
-        FileTools.writeSongs(workDir, songNames, "${outputFilename}", true)
+        try {
+//            def songNames = Context.get().songDescriptorMapper.formatList(fetchedSongs)
+//            FileTools.writeSongs(workDir, songNames, "${outputFilename}", true)
+            FileTools.writeSongsJson(workDir, fetchedSongs, "${outputFilename}", true)
+        } catch (Throwable ignore) {
+            log.error("Fetched songs not saved: ")
+            for (SongDescriptor sd : fetchedSongs) {
+                log.error("           ${sd.artist} - ${sd.title}")
+            }
+        }
     }
 }
