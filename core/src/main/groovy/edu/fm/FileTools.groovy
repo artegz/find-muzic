@@ -12,6 +12,31 @@ import org.apache.commons.io.filefilter.SuffixFileFilter
 @Slf4j
 class FileTools {
 
+    static List<SongDescriptor> readCsv(File songsFile) {
+        def res = new TreeSet<SongDescriptor>()
+
+        if (songsFile.exists()) {
+            songsFile.withReader { r ->
+                r.eachLine {
+                    def parts = it.split(";")
+
+                    def artist = parts[0]
+                    def title = parts[1]
+
+                    if (artist.startsWith("\"")) {
+                        // unwrap from "exit
+                        res.add(new SongDescriptor(artist.substring(1, artist.size() - 1), title.substring(1, title.size() - 1)))
+                    } else {
+                        res.add(new SongDescriptor(artist, title))
+                    }
+                }
+            }
+        } else {
+            log.error("${songsFile.getName()} doesn't exsist")
+        }
+        new ArrayList<>(res)
+    }
+
     static File getDir(String dirName) {
         def dir = new File(dirName)
         if (!dir.exists()) {

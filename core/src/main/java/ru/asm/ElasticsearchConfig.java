@@ -13,8 +13,8 @@ import static org.elasticsearch.node.NodeBuilder.nodeBuilder;
 
 /**
  * User: artem.smirnov
- * Date: 06.06.2016
- * Time: 17:27
+ * Date: 17.06.2016
+ * Time: 9:28
  */
 @Configuration
 @EnableElasticsearchRepositories(basePackages = {
@@ -42,6 +42,11 @@ public class ElasticsearchConfig {
     public ElasticsearchOperations elasticsearchTemplate(Node node) {
         final Client client = node.client();
         return new ElasticsearchTemplate(client);
+    }
+
+    @Bean
+    public TorrentsDatabaseService getTorrentsDatabaseService() {
+        return new TorrentsDatabaseService();
     }
 
 }

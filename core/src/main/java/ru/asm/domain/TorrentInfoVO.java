@@ -41,7 +41,13 @@ public class TorrentInfoVO {
     private Date creationDate;
 
     @Field(type = FieldType.String)
-    private String category; // with sub categories separated with |
+    private String mainCategory;
+
+    @Field(type = FieldType.String)
+    private String subCategory;
+
+    @Field(type = FieldType.String)
+    private String folders;
 
     public TorrentInfoVO() {
     }
@@ -110,12 +116,28 @@ public class TorrentInfoVO {
         this.creationDate = creationDate;
     }
 
-    public String getCategory() {
-        return category;
+    public String getMainCategory() {
+        return mainCategory;
     }
 
-    public void setCategory(String category) {
-        this.category = category;
+    public void setMainCategory(String mainCategory) {
+        this.mainCategory = mainCategory;
+    }
+
+    public String getSubCategory() {
+        return subCategory;
+    }
+
+    public void setSubCategory(String subCategory) {
+        this.subCategory = subCategory;
+    }
+
+    public String getFolders() {
+        return folders;
+    }
+
+    public void setFolders(String folders) {
+        this.folders = folders;
     }
 
     @Override
@@ -129,7 +151,9 @@ public class TorrentInfoVO {
         sb.append(", hash='").append(hash).append('\'');
         sb.append(", downloads=").append(downloads);
         sb.append(", creationDate=").append(creationDate);
-        sb.append(", category='").append(category).append('\'');
+        sb.append(", mainCategory='").append(mainCategory).append('\'');
+        sb.append(", subCategory='").append(subCategory).append('\'');
+        sb.append(", folders=").append(folders);
         sb.append('}');
         return sb.toString();
     }
@@ -149,7 +173,9 @@ public class TorrentInfoVO {
         if (hash != null ? !hash.equals(that.hash) : that.hash != null) return false;
         if (downloads != null ? !downloads.equals(that.downloads) : that.downloads != null) return false;
         if (creationDate != null ? !creationDate.equals(that.creationDate) : that.creationDate != null) return false;
-        return category != null ? category.equals(that.category) : that.category == null;
+        if (mainCategory != null ? !mainCategory.equals(that.mainCategory) : that.mainCategory != null) return false;
+        if (subCategory != null ? !subCategory.equals(that.subCategory) : that.subCategory != null) return false;
+        return folders != null ? folders.equals(that.folders) : that.folders == null;
 
     }
 
@@ -163,7 +189,9 @@ public class TorrentInfoVO {
         result = 31 * result + (hash != null ? hash.hashCode() : 0);
         result = 31 * result + (downloads != null ? downloads.hashCode() : 0);
         result = 31 * result + (creationDate != null ? creationDate.hashCode() : 0);
-        result = 31 * result + (category != null ? category.hashCode() : 0);
+        result = 31 * result + (mainCategory != null ? mainCategory.hashCode() : 0);
+        result = 31 * result + (subCategory != null ? subCategory.hashCode() : 0);
+        result = 31 * result + (folders != null ? folders.hashCode() : 0);
         return result;
     }
 }
