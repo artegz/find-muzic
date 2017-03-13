@@ -17,10 +17,7 @@ import static org.elasticsearch.node.NodeBuilder.nodeBuilder;
  * Time: 9:28
  */
 @Configuration
-@EnableElasticsearchRepositories(basePackages = {
-        "org/springframework/data/elasticsearch/repositories",
-        "ru/asm/repositories"
-})
+@EnableElasticsearchRepositories(basePackages = ["org/springframework/data/elasticsearch/repositories", "ru/asm/repositories"])
 public class ElasticsearchConfig {
 
     @Bean

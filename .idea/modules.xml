@@ -5,7 +5,7 @@
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/core.iml" filepath="$PROJECT_DIR$/.idea/modules/core.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/core_main.iml" filepath="$PROJECT_DIR$/.idea/modules/core_main.iml" group="core" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/core_test.iml" filepath="$PROJECT_DIR$/.idea/modules/core_test.iml" group="core" />
-      <module fileurl="file://$PROJECT_DIR$/find-muzic.iml" filepath="$PROJECT_DIR$/find-muzic.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/find-muzic.iml" filepath="$PROJECT_DIR$/.idea/modules/find-muzic.iml" />
     </modules>
   </component>
 </project>

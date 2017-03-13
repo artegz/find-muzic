@@ -1,10 +1,15 @@
-package ru.asm
+package ru.asm.other
 
 import org.elasticsearch.cluster.health.ClusterHealthStatus
 import org.elasticsearch.node.Node
 import org.springframework.context.ApplicationContext
 import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations
+import ru.asm.CliUtils
+import ru.asm.DataStorageConfig
+import ru.asm.DataStorageService
+import ru.asm.ElasticsearchConfig
+import ru.asm.TorrentsDatabaseService
 import ru.asm.actions.DispatchResult
 /**
  * User: artem.smirnov

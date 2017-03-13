@@ -5,6 +5,7 @@ import org.elasticsearch.index.query.QueryBuilders
 import org.elasticsearch.search.sort.FieldSortBuilder
 import org.elasticsearch.search.sort.SortOrder
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder
 import org.springframework.stereotype.Component
@@ -20,7 +21,14 @@ import ru.asm.repositories.TorrentInfoRepository
 class TorrentsDatabaseService {
 
     @Autowired
-    private TorrentInfoRepository torrentInfoRepository;
+    private TorrentInfoRepository torrentInfoRepository
+
+    TorrentsDatabaseService() {
+    }
+
+    TorrentsDatabaseService(TorrentInfoRepository torrentInfoRepository) {
+        this.torrentInfoRepository = torrentInfoRepository
+    }
 
     public void printTotalCount() {
         def count = torrentInfoRepository.count()
@@ -72,6 +80,44 @@ class TorrentsDatabaseService {
             println "${index + 1}. [${entry.getMainCategory()} | ${entry.getSubCategory()} | ${entry.getFolders()}] ${entry.getTitle()}"
         }
         println("total: ${result.totalElements}")
+    }
+
+    public Page<TorrentInfoVO> findPage(String[] mainCategoryQuery, String[] subCategoryQuery, String[] foldersQuery, String titleQuery, Integer page) {
+        def searchQueryBuilder = new NativeSearchQueryBuilder()
+
+        final BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery()
+
+        if (mainCategoryQuery != null) {
+            boolQueryBuilder.must(QueryBuilders.termsQuery("mainCategory", toLowerAll(mainCategoryQuery)))
+        }
+        if (subCategoryQuery != null) {
+            boolQueryBuilder.must(QueryBuilders.termsQuery("subCategory", toLowerAll(subCategoryQuery)))
+        }
+        if (foldersQuery != null) {
+            boolQueryBuilder.must(QueryBuilders.termsQuery("folders", toLowerAll(foldersQuery)))
+        }
+
+        if (titleQuery != null) {
+            boolQueryBuilder.must(QueryBuilders.wildcardQuery("title", titleQuery))
+//            boolQueryBuilder.must(QueryBuilders.termsQuery("title", titleQuery))
+        }
+
+        searchQueryBuilder.withQuery(boolQueryBuilder)
+        searchQueryBuilder.withPageable(new PageRequest(page, 20))
+        searchQueryBuilder.withSort(new FieldSortBuilder("title").order(SortOrder.ASC))
+
+        Page<TorrentInfoVO> result = torrentInfoRepository.search(searchQueryBuilder.build())
+
+        result
+    }
+
+    private ArrayList<String> toLowerAll(String[] origVals) {
+        def result = new ArrayList<String>()
+        for (String origVal : origVals) {
+            result.add(origVal.toLowerCase())
+//            result.add(origVal)
+        }
+        result
     }
 
 }

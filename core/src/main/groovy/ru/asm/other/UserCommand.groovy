@@ -1,4 +1,4 @@
-package ru.asm
+package ru.asm.other
 
 /**
  * User: artem.smirnov

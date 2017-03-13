@@ -5,6 +5,8 @@ apply plugin: 'groovy'
 apply plugin: 'java'
 apply plugin: 'application'
 
+mainClassName='ru.asm.tools.FindMagnetTool'
+
 repositories {
     mavenCentral()
 }
@@ -37,9 +39,9 @@ dependencies {
 
     /* JSON support */
     compile group: 'org.jsoup', name: 'jsoup', version: '1.8.3'
-    compile group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.8.4'
-    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.8.4'
-    compile group: 'com.fasterxml.jackson.module', name: 'jackson-module-jaxb-annotations', version: '2.8.4'
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.6.6'
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.6.6'
+    compile group: 'com.fasterxml.jackson.module', name: 'jackson-module-jaxb-annotations', version: '2.6.6'
 
 
     /* elasticsearch */
