@@ -1,5 +1,6 @@
 package ru.asm.tools
 
+import edu.fm.SongDescriptor
 import org.elasticsearch.cluster.health.ClusterHealthStatus
 import org.springframework.context.ApplicationContext
 import org.springframework.context.annotation.AnnotationConfigApplicationContext
@@ -17,13 +18,26 @@ import ru.asm.torrent.TorrentClient.TorrentClientException
  */
 class FindMagnetTool {
 
+    void magicDownload(SongDescriptor songDescriptor) {
+        // 1. initialize torrents elasticsearch DB (add torrents archive into es)
+        // ...
+
+        // 2. index artists songs (separate elastic index)
+        // ... find files (mp3 + flac)
+
+        // 3. if mp3 => download;
+
+    }
+
     public static void main(String[] args) {
 //        String[] mainCategory = ["Рок-музыка"]
         String[] mainCategory = ["Музыка"]
 //        String[] mainCategory = null
 //        String[] subCategory = ["Отечественный Рок | Рок, Панк, Альтернатива (lossless)"]
         String[] subCategory = ["Отечественный"]
-        String[] folderQuery = ["lossless"]
+
+        // abc (lossy) / abc (lossless)
+        String[] folderQuery = null//["lossless"]
 //        String[] subCategory = null
 
         def artist = "Пикник"
