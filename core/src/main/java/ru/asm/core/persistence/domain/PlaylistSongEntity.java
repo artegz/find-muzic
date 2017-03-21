@@ -1,11 +1,11 @@
-package ru.asm.domain;
+package ru.asm.core.persistence.domain;
 
 /**
  * User: artem.smirnov
  * Date: 15.06.2016
  * Time: 10:28
  */
-public class SongVO {
+public class PlaylistSongEntity {
 
     private String artist;
 

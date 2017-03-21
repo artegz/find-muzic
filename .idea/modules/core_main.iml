@@ -4,13 +4,11 @@
     <output url="file://$MODULE_DIR$/../../core/build/classes/main" />
     <exclude-output />
     <content url="file://$MODULE_DIR$/../../core/src/main">
-      <sourceFolder url="file://$MODULE_DIR$/../../core/src/main/groovy" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/../../core/src/main/java" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/../../core/src/main/resources" type="java-resource" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="Gradle: org.codehaus.groovy:groovy-all:2.4.7" level="project" />
     <orderEntry type="library" name="Gradle: org.codehaus.gpars:gpars:1.2.1" level="project" />
     <orderEntry type="library" name="Gradle: ch.qos.logback:logback-classic:1.0.13" level="project" />
     <orderEntry type="library" name="Gradle: org.mybatis:mybatis:3.4.0" level="project" />
@@ -18,8 +16,8 @@
     <orderEntry type="library" name="Gradle: com.h2database:h2:1.4.192" level="project" />
     <orderEntry type="library" name="Gradle: org.codehaus.groovy.modules.http-builder:http-builder:0.7" level="project" />
     <orderEntry type="library" name="Gradle: org.apache.httpcomponents:httpclient:4.5" level="project" />
-    <orderEntry type="library" name="Gradle: com.frostwire:jlibtorrent:1.1.0.31" level="project" />
-    <orderEntry type="library" name="Gradle: com.frostwire:jlibtorrent-windows:1.1.0.31" level="project" />
+    <orderEntry type="library" name="Gradle: com.frostwire:jlibtorrent:1.2.0.6" level="project" />
+    <orderEntry type="library" name="Gradle: com.frostwire:jlibtorrent-windows:1.2.0.6" level="project" />
     <orderEntry type="library" name="Gradle: org.jsoup:jsoup:1.8.3" level="project" />
     <orderEntry type="library" name="Gradle: com.fasterxml.jackson.core:jackson-core:2.6.6" level="project" />
     <orderEntry type="library" name="Gradle: com.fasterxml.jackson.core:jackson-databind:2.6.6" level="project" />

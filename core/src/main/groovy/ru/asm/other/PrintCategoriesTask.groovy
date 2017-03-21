@@ -4,7 +4,7 @@ import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
 import org.joda.time.format.DateTimeFormatter
 import org.springframework.format.number.NumberStyleFormatter
-import ru.asm.domain.TorrentInfoVO
+import ru.asm.core.index.domain.TorrentInfoVO
 /**
  * User: artem.smirnov
  * Date: 07.06.2016

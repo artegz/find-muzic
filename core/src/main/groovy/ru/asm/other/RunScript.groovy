@@ -10,7 +10,7 @@ final ConsoleModeApp app = new ConsoleModeApp()
 app.init()
 
 List<String> list = [
-    "db sql 'select * from songs'",
+    "db sql 'select * FROM PLAYLIST_SONGS'",
     "exit"
 ]
 

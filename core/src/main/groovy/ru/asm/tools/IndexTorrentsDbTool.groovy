@@ -8,8 +8,8 @@ import org.joda.time.format.DateTimeFormatter
 import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations
 import org.springframework.format.number.NumberStyleFormatter
-import ru.asm.domain.TorrentInfoVO
-import ru.asm.repositories.TorrentInfoRepository
+import ru.asm.core.index.domain.TorrentInfoVO
+import ru.asm.core.index.repositories.TorrentInfoRepository
 /**
  * User: artem.smirnov
  * Date: 07.06.2016

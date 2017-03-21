@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Gradle: com.frostwire:jlibtorrent:1.2.0.6">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.frostwire/jlibtorrent/1.2.0.6/23cbfc767725e4e425c01534c2d7f3f788567c52/jlibtorrent-1.2.0.6.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.frostwire/jlibtorrent/1.2.0.6/50a973af2cb6cde41b92a7965c1cb536b1552fa5/jlibtorrent-1.2.0.6-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

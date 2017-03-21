@@ -1,7 +1,7 @@
-package ru.asm.repositories;
+package ru.asm.core.index.repositories;
 
 import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
-import ru.asm.domain.TorrentInfoVO;
+import ru.asm.core.index.domain.TorrentInfoVO;
 
 /**
  * User: artem.smirnov

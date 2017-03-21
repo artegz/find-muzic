@@ -6,10 +6,10 @@ import org.springframework.context.ApplicationContext
 import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations
 import ru.asm.TorrentsDatabaseService
-import ru.asm.domain.TorrentInfoVO
-import ru.asm.repositories.TorrentInfoRepository
-import ru.asm.torrent.TorrentClient
-import ru.asm.torrent.TorrentClient.TorrentClientException
+import ru.asm.core.index.domain.TorrentInfoVO
+import ru.asm.core.index.repositories.TorrentInfoRepository
+import ru.asm.core.torrent.TorrentClient
+import ru.asm.core.torrent.TorrentClient.TorrentClientException
 
 /**
  * User: artem.smirnov

@@ -1,4 +1,4 @@
-package edu.fm;
+package ru.asm.core;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
