@@ -15,6 +15,6 @@ public class ExecuteSelectSqlTool {
         ApplicationContext applicationContext = new AnnotationConfigApplicationContext("ru.asm.core.persistence");
         final DataStorageService dataStorageService = applicationContext.getBean("dataStorageService", DataStorageService.class);
 
-        dataStorageService.executeSql("select * FROM PLAYLIST_SONGS");
+        dataStorageService.executeSql("select t2.artist, t1.torrent_id, t1.status FROM ARTISTS t2 left join ARTIST_TORRENTS_STATUS t1 on t1.artist_id = t2.artist_id order by t2.artist_id");
     }
 }

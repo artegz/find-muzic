@@ -69,11 +69,9 @@ public class TorrentClient {
         s = null;
     }
 
-    public void download(String name,
-                         TorrentInfo ti,
+    public void download(TorrentInfo ti,
                          File saveDir,
-                         Priority[] priorities,
-                         File resumeFile) {
+                         Priority[] priorities) {
         try {
 
             System.out.println("Using libtorrent version: " + LibTorrent.version());
@@ -108,7 +106,7 @@ public class TorrentClient {
             };
 
             s.addListener(listener);
-            s.download(ti, saveDir);
+            s.download(ti, saveDir, null, priorities, null);
             signal.await();
             s.removeListener(listener);
 
@@ -139,12 +137,11 @@ public class TorrentClient {
                 return TorrentInfo.bdecode(data);
             } else {
                 System.out.println("Failed to retrieve the magnet");
-                throw new AssertionError();
+                throw new AssertionError("Failed to retrieve the magnet");
             }
         } catch (Throwable e) {
+            //logger.error(e.getMessage(), e);
             throw new TorrentClientException(ERR_MAGNET_RETRIEVAL_FAILED);
-        } finally {
-            s.stop();
         }
 
     }

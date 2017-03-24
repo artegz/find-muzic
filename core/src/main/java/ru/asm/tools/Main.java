@@ -31,7 +31,7 @@ public class Main {
         //          - for each song choose torrent for downloading
         //          - download torrent
         //          - [mp3] copy required song into result dir; [flac] convert into mp3 and copy required song into result dir
-        new ResolveArtistTorrentsTool();
+        new ResolveArtistMp3Tool();
 
         // 2. index artists songs (separate elastic index)
         // ... find files (mp3 + flac)

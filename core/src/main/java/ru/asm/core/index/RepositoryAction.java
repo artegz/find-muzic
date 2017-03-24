@@ -1,13 +1,15 @@
 package ru.asm.core.index;
 
-import ru.asm.core.index.repositories.TorrentInfoRepository;
+import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
+
+import java.io.Serializable;
 
 /**
  * User: artem.smirnov
  * Date: 16.03.2017
  * Time: 16:31
  */
-public interface RepositoryAction {
+public interface RepositoryAction<K, V extends Serializable> {
 
-    void doAction(TorrentInfoRepository repo);
+    void doAction(ElasticsearchRepository<K, V> repo);
 }

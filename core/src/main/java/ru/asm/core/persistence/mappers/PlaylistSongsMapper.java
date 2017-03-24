@@ -1,6 +1,7 @@
 package ru.asm.core.persistence.mappers;
 
 import org.apache.ibatis.annotations.*;
+import ru.asm.core.persistence.domain.PlaylistSongEntity;
 
 import java.util.List;
 
@@ -11,12 +12,12 @@ import java.util.List;
  */
 public interface PlaylistSongsMapper {
 
-//    @Results(id = "songResult", value = {
-//            @Result(property = "artist", column = "artist"),
-//            @Result(property = "title", column = "title")
-//    })
-//    @Select("SELECT * FROM PLAYLIST_SONGS WHERE artist = #{artist} AND title = #{title}")
-//    SongEntity getSong(@Param("artist") String artist, @Param("title") String title);
+    @Results(id = "songResult", value = {
+            @Result(property = "artist", column = "artist"),
+            @Result(property = "title", column = "title")
+    })
+    @Select("SELECT t2.artist, t3.TITLE FROM PLAYLIST_SONGS t1 join ARTISTS t2 on t1.artist_id = t2.artist_id join SONGS t3 on t3.song_id = t1.song_id")
+    List<PlaylistSongEntity> getSongs();
 
     @Select("SELECT distinct artist FROM ARTISTS")
     List<String> getAllArtists();
@@ -54,10 +55,10 @@ public interface PlaylistSongsMapper {
     void insertSong(@Param("songId") Integer songId, @Param("artistId") Integer artistId, @Param("title") String title);
 
 
-    @Delete("delete from ARTIST_TORRENTS")
+    @Delete("delete from ARTIST_TORRENTS_STATUS")
     void deleteAllArtistTorrent();
 
-    @Insert("insert into ARTIST_TORRENTS values (#{artistId}, #{torrentId})")
-    void insertArtistTorrent(@Param("artistId") Integer artistId, @Param("torrentId") String torrentId);
+    @Insert("insert into ARTIST_TORRENTS_STATUS values (#{artistId}, #{torrentId}, #{forumId}, #{status})")
+    void insertArtistTorrent(@Param("artistId") Integer artistId, @Param("torrentId") String torrentId, @Param("forumId") String forumId, @Param("status") String status);
 
 }

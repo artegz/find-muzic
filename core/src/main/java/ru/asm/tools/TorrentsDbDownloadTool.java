@@ -38,7 +38,7 @@ class TorrentsDbDownloadTool {
                 }
             }
 
-            torrentClient.download(name, torrentInfo, folder, null, resumeFile);
+            torrentClient.download(torrentInfo, folder, null);
         } finally {
             torrentClient.destroySession();
         }

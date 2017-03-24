@@ -26,4 +26,13 @@ public class PlaylistSongEntity {
     public void setTitle(String title) {
         this.title = title;
     }
+
+    @Override
+    public String toString() {
+        final StringBuffer sb = new StringBuffer("");
+        sb.append("").append(artist).append(": ");
+        sb.append("").append(title).append("");
+        sb.append("");
+        return sb.toString();
+    }
 }
