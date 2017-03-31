@@ -32,9 +32,8 @@ public class TorrentFilesVO {
     @Field(type = FieldType.String, index = FieldIndex.not_analyzed)
     private String magnet;
 
-
-    @Field(type = FieldType.Auto)
-    private List<String> fileNames;
+    @Field(type = FieldType.Nested)
+    private List<TorrentSongVO> torrentSongs;
 
     public String getTorrentId() {
         return torrentId;
@@ -68,19 +67,19 @@ public class TorrentFilesVO {
         this.forumId = forumId;
     }
 
-    public List<String> getFileNames() {
-        return fileNames;
-    }
-
-    public void setFileNames(List<String> fileNames) {
-        this.fileNames = fileNames;
-    }
-
     public String getMagnet() {
         return magnet;
     }
 
     public void setMagnet(String magnet) {
         this.magnet = magnet;
+    }
+
+    public List<TorrentSongVO> getTorrentSongs() {
+        return torrentSongs;
+    }
+
+    public void setTorrentSongs(List<TorrentSongVO> torrentSongs) {
+        this.torrentSongs = torrentSongs;
     }
 }

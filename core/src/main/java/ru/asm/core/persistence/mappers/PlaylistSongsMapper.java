@@ -55,10 +55,14 @@ public interface PlaylistSongsMapper {
     void insertSong(@Param("songId") Integer songId, @Param("artistId") Integer artistId, @Param("title") String title);
 
 
-    @Delete("delete from ARTIST_TORRENTS_STATUS")
-    void deleteAllArtistTorrent();
+    @Delete("delete from ARTIST_TORRENTS_STATUS WHERE format = #{format}")
+    void deleteAllArtistTorrent(@Param("format") String format);
 
-    @Insert("insert into ARTIST_TORRENTS_STATUS values (#{artistId}, #{torrentId}, #{forumId}, #{status})")
-    void insertArtistTorrent(@Param("artistId") Integer artistId, @Param("torrentId") String torrentId, @Param("forumId") String forumId, @Param("status") String status);
+    @Insert("insert into ARTIST_TORRENTS_STATUS values (#{artistId}, #{torrentId}, #{format}, #{forumId}, #{status})")
+    void insertArtistTorrent(@Param("artistId") Integer artistId,
+                             @Param("torrentId") String torrentId,
+                             @Param("format") String format,
+                             @Param("forumId") String forumId,
+                             @Param("status") String status);
 
 }

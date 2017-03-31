@@ -21,7 +21,17 @@ public class FFileDescriptor {
 
     private List<FTrackDescriptor> trackDescriptors;
 
-    public FFileDescriptor() {
+    private String relativePath;
+
+    private String fileName;
+
+    public FFileDescriptor(String relativePath, String fileName) {
+        this.relativePath = relativePath;
+        this.fileName = fileName;
+    }
+
+    public String getRelativePath() {
+        return relativePath;
     }
 
     public List<FTrackDescriptor> getTrackDescriptors() {

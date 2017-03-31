@@ -1,6 +1,7 @@
 package ru.asm.tools.dev;
 
 import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.NestedQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.sort.FieldSortBuilder;
 import org.elasticsearch.search.sort.SortOrder;
@@ -59,30 +60,31 @@ class FindSongsTool {
                 for (PlaylistSongEntity song : songs) {
                     final String[] artistTerms = asTerms(song.getArtist());
                     final String[] songTerms = asTerms(song.getTitle());
-                    final String[] forumIds = new String[]{
-                            "738"  // Рок, Панк, Альтернатива (lossy)
-                    };
 
                     logger.info(String.format("SEARCH %s (%s): %s (%s)", song.getArtist(), Arrays.asList(artistTerms), song.getTitle(), Arrays.asList(songTerms)));
 
-                    Page<TorrentFilesVO> page = findPage(forumIds, artistTerms, songTerms, 0, 10);
+                    Page<TorrentFilesVO> page = findPage(null, artistTerms, songTerms, 0, 10);
                     if (page.getNumberOfElements() > 0) {
                         found.add(song);
-                        logger.info("RESULT: found in {}", page.getTotalElements());
+                        logger.info("{} torrents found", page.getTotalElements());
 
                         {
                             final List<TorrentFilesVO> content = page.getContent();
                             for (TorrentFilesVO torrentFilesVO : content) {
-                                logger.info(torrentFilesVO.getTorrentId());
-                                for (String file : torrentFilesVO.getFileNames()) {
-                                    logger.info(" - " + file);
-                                }
+                                logger.info("- {} ({} files)", torrentFilesVO.getTorrentId(), torrentFilesVO.getTorrentSongs().size());
+//                                for (TorrentSongVO torrentSongVO : torrentFilesVO.getTorrentSongs()) {
+//                                    logger.info(" - " + torrentSongVO.getSongName());
+//                                }
+//
+//                                for (String file : torrentFilesVO.getFileNames()) {
+//                                    logger.info(" - " + file);
+//                                }
                             }
                             //break;
                         }
                     } else {
                         notFound.add(song);
-                        logger.warn("RESULT: not found");
+                        logger.warn("not found");
                     }
                 }
             });
@@ -118,16 +120,18 @@ class FindSongsTool {
         if (songTerms != null) {
             final BoolQueryBuilder builder = QueryBuilders.boolQuery();
             for (String term : songTerms) {
-                builder.should(QueryBuilders.wildcardQuery("fileNames", term));
+                builder.should(QueryBuilders.wildcardQuery("torrentSongs.songName", term));
             }
-            builder.minimumNumberShouldMatch(songTerms.length);
+            builder.minimumNumberShouldMatch(songTerms.length > 2 ? songTerms.length - 1 : songTerms.length);
 
-            boolQueryBuilder.must(builder);
+            final NestedQueryBuilder torrentSongs = QueryBuilders.nestedQuery("torrentSongs", builder);
+
+            boolQueryBuilder.must(torrentSongs);
         }
 
         searchQueryBuilder.withQuery(boolQueryBuilder);
         searchQueryBuilder.withPageable(new PageRequest(page, pageSize));
-        searchQueryBuilder.withSort(new FieldSortBuilder("fileNames").order(SortOrder.ASC));
+        searchQueryBuilder.withSort(new FieldSortBuilder("artist").order(SortOrder.ASC));
 
         Page<TorrentFilesVO> result = torrentFilesRepository.search(searchQueryBuilder.build());
 

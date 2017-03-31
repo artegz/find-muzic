@@ -11,14 +11,13 @@ import ru.asm.core.index.RepositoryTemplate;
 import ru.asm.core.index.TorrentsDatabaseService;
 import ru.asm.core.index.domain.TorrentFilesVO;
 import ru.asm.core.index.domain.TorrentInfoVO;
+import ru.asm.core.index.domain.TorrentSongVO;
 import ru.asm.core.index.repositories.TorrentFilesRepository;
 import ru.asm.core.index.repositories.TorrentInfoRepository;
 import ru.asm.core.persistence.mappers.PlaylistSongsMapper;
 import ru.asm.core.torrent.TorrentClient;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 /**
  * User: artem.smirnov
@@ -28,6 +27,7 @@ import java.util.List;
 class ResolveArtistMp3Tool {
 
     private static final Logger logger = LoggerFactory.getLogger(ResolveArtistMp3Tool.class);
+    public static final String FORMAT_MP3 = "MP3";
 
     private ApplicationContext applicationContext;
 
@@ -45,7 +45,7 @@ class ResolveArtistMp3Tool {
         playlistSongsMapper = applicationContext.getBean(PlaylistSongsMapper.class);
         torrentClient = new TorrentClient();
 
-        playlistSongsMapper.deleteAllArtistTorrent();
+        playlistSongsMapper.deleteAllArtistTorrent(FORMAT_MP3);
         final List<Integer> artistsIds = playlistSongsMapper.getAllArtistsIds();
 
         try {
@@ -86,13 +86,11 @@ class ResolveArtistMp3Tool {
         TorrentsDatabaseService torrentsDatabaseService = new TorrentsDatabaseService(torrentsInfoRepo);
 
         final String[] titleTerms = asTerms(artist);
-        final String[] forumIds = new String[]{
-                "738"  // Рок, Панк, Альтернатива (lossy)
-        };
+        final String forumId = "738"; // // Рок, Панк, Альтернатива (lossy)
 
         logger.info(String.format("ARTIST: %s (%s)", artist, Arrays.asList(titleTerms)));
 
-        Page<TorrentInfoVO> page = torrentsDatabaseService.findPage(forumIds, titleTerms, 0, 10);
+        Page<TorrentInfoVO> page = torrentsDatabaseService.findPage(new String[]{forumId}, titleTerms, 0, 50);
         if (page.getNumberOfElements() > 0) {
             found.add(artist);
         } else {
@@ -103,41 +101,44 @@ class ResolveArtistMp3Tool {
             final TorrentInfoVO entry = page.getContent().get(i);
             logger.info("{}. [{}] {}", i + 1, entry.getForum(), entry.getTitle());
 
-            final List<String> fileNames = new ArrayList<>();
             try {
                 TorrentInfo torrentInfo = torrentClient.findByMagnet(entry.getMagnet());
+                if (torrentInfo == null) {
+                    logger.warn("not found or timeout expired");
+                    continue;
+                }
+
                 // enlist files
+                final Set<TorrentSongVO> torrentSongs = new HashSet<>();
                 for (int j = 0; j < torrentInfo.files().numFiles(); j++) {
                     final FileStorage fileStorage = torrentInfo.files();
                     final String filePath = fileStorage.filePath(j);
-
-                    logger.info(filePath);
-
                     final String fileName = fileStorage.fileName(j);
-                    if (fileName.endsWith(".mp3")) {
-                        fileNames.add(fileName);
+
+                    if (fileName.toLowerCase().endsWith(".mp3")) {
+                        final String title = fileName.replace(".mp3", "").replace(".MP3", "");
+                        torrentSongs.add(new TorrentSongVO(title, fileName, filePath));
                     }
+                    logger.info(filePath);
                 }
 
                 final TorrentFilesVO torrentFilesVO = new TorrentFilesVO();
                 torrentFilesVO.setTorrentId(entry.getId());
                 torrentFilesVO.setArtist(artist);
                 torrentFilesVO.setArtistId(artistId);
-                torrentFilesVO.setForumId(forumIds[0]);
+                torrentFilesVO.setForumId(forumId);
                 torrentFilesVO.setMagnet(entry.getMagnet());
-                torrentFilesVO.setFileNames(fileNames);
-                // todo: add paths, entry.getTitle
-                // todo: increase timeout, use fork-join
+                torrentFilesVO.setTorrentSongs(new ArrayList<>(torrentSongs));
 
                 torrentFilesRepo.index(torrentFilesVO);
 
-                playlistSongsMapper.insertArtistTorrent(artistId, entry.getId(), forumIds[0], "OK");
+                playlistSongsMapper.insertArtistTorrent(artistId, entry.getId(), FORMAT_MP3, forumId, "OK");
             } catch (TorrentClient.TorrentClientException e) {
                 logger.error(e.getMessage());
-                playlistSongsMapper.insertArtistTorrent(artistId, entry.getId(), forumIds[0], e.getErrCode());
+                playlistSongsMapper.insertArtistTorrent(artistId, entry.getId(), FORMAT_MP3, forumId, e.getErrCode());
             } catch (Throwable e) {
                 logger.error(e.getMessage(), e);
-                playlistSongsMapper.insertArtistTorrent(artistId, entry.getId(), forumIds[0], "ERROR");
+                playlistSongsMapper.insertArtistTorrent(artistId, entry.getId(), FORMAT_MP3, forumId, "ERROR");
             }
         }
         logger.info("total: {}", page.getTotalElements());

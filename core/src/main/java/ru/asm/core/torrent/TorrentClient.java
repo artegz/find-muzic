@@ -5,6 +5,7 @@ import com.frostwire.jlibtorrent.alerts.Alert;
 import com.frostwire.jlibtorrent.alerts.AlertType;
 import com.frostwire.jlibtorrent.alerts.BlockFinishedAlert;
 import com.frostwire.jlibtorrent.alerts.TorrentAddedAlert;
+import org.apache.commons.lang.mutable.MutableFloat;
 import org.slf4j.*;
 
 import java.io.File;
@@ -31,7 +32,7 @@ public class TorrentClient {
 
     public void initializeSession() {
         try {
-            System.out.println("Using libtorrent version: " + LibTorrent.version());
+            logger.info("Using libtorrent version: " + LibTorrent.version());
 
             s = new SessionManager();
             s.start();
@@ -45,17 +46,17 @@ public class TorrentClient {
                     long nodes = s.stats().dhtNodes();
                     // wait for at least 10 nodes in the DHT.
                     if (nodes >= 10) {
-                        System.out.println("DHT contains " + nodes + " nodes");
+                        logger.info("DHT contains " + nodes + " nodes");
                         signal.countDown();
                         timer.cancel();
                     }
                 }
             }, 0, 1000);
 
-            System.out.println("Waiting for nodes in DHT (10 seconds)...");
+            logger.info("Waiting for nodes in DHT (10 seconds)...");
             boolean r = signal.await(10, TimeUnit.SECONDS);
             if (!r) {
-                System.out.println("DHT bootstrap timeout");
+                logger.info("DHT bootstrap timeout");
                 System.exit(0);
             }
         } catch (Throwable e) {
@@ -73,10 +74,9 @@ public class TorrentClient {
                          File saveDir,
                          Priority[] priorities) {
         try {
-
-            System.out.println("Using libtorrent version: " + LibTorrent.version());
-
             final CountDownLatch signal = new CountDownLatch(1);
+
+            final MutableFloat progress = new MutableFloat(0d);
             final AlertListener listener = new AlertListener() {
                 @Override
                 public int[] types() {
@@ -89,16 +89,20 @@ public class TorrentClient {
 
                     switch (type) {
                         case TORRENT_ADDED:
-                            System.out.println("Torrent added");
+                            logger.info("Torrent '{}' added", ti.name());
                             ((TorrentAddedAlert) alert).handle().resume();
                             break;
                         case BLOCK_FINISHED:
                             BlockFinishedAlert a = (BlockFinishedAlert) alert;
                             float p = (float) (a.handle().status().progress() * 100.0);
-                            System.out.printf("Progress: %.2f%% for torrent name: %s (total download: %s)%n", p, a.torrentName(), s.stats().totalDownload());
+                            final Float prevProgress = (Float) progress.getValue();
+                            if (p > prevProgress) {
+                                logger.info(String.format("Progress: %.2f%% for torrent '%s' (total download: %s)", p, a.torrentName(), s.stats().totalDownload()));
+                                progress.setValue(p);
+                            }
                             break;
                         case TORRENT_FINISHED:
-                            System.out.println("Torrent finished");
+                            logger.info("Torrent '{}' finished", ti.name());
                             signal.countDown();
                             break;
                     }
@@ -111,7 +115,7 @@ public class TorrentClient {
             s.removeListener(listener);
 
         } catch (Throwable e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
             throw new TorrentClientException(ERR_DOWNLOAD_ERROR);
         }
     }
@@ -130,17 +134,17 @@ public class TorrentClient {
 
     private TorrentInfo fetchMagnet(String uri) {
         try {
-            System.out.println("Fetching the magnet uri, please wait...");
+            logger.info("Fetching the magnet uri, please wait...");
             byte[] data = s.fetchMagnet(uri, 30);
 
             if (data != null) {
                 return TorrentInfo.bdecode(data);
             } else {
-                System.out.println("Failed to retrieve the magnet");
-                throw new AssertionError("Failed to retrieve the magnet");
+                logger.error("Failed to retrieve the magnet");
+                return null;
             }
         } catch (Throwable e) {
-            //logger.error(e.getMessage(), e);
+            logger.error(e.getMessage(), e);
             throw new TorrentClientException(ERR_MAGNET_RETRIEVAL_FAILED);
         }
 

@@ -6,6 +6,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import ru.asm.core.index.RepositoryTemplate;
 import ru.asm.core.index.domain.TorrentFilesVO;
+import ru.asm.core.index.domain.TorrentSongVO;
 import ru.asm.core.index.repositories.TorrentFilesRepository;
 
 /**
@@ -40,11 +41,16 @@ public class EnlistResolvedDbTool {
                     final StringBuffer sb = new StringBuffer();
                     sb.append(torrentFilesVO.getArtist())
                             .append(System.lineSeparator());
-                    for (String file : torrentFilesVO.getFileNames()) {
+                    for (TorrentSongVO songVO : torrentFilesVO.getTorrentSongs()) {
                         sb.append(" - ")
-                                .append(file)
+                                .append(songVO.getSongName())
                                 .append(System.lineSeparator());
                     }
+//                    for (String file : torrentFilesVO.getFileNames()) {
+//                        sb.append(" - ")
+//                                .append(file)
+//                                .append(System.lineSeparator());
+//                    }
                     logger.info(sb.toString());
                 }
             });
