@@ -2,6 +2,7 @@ package ru.asm.core.persistence.mappers;
 
 import org.apache.ibatis.annotations.*;
 import ru.asm.core.persistence.domain.PlaylistSongEntity;
+import ru.asm.core.persistence.domain.StatusEntity;
 
 import java.util.List;
 
@@ -11,6 +12,19 @@ import java.util.List;
  * Time: 10:27
  */
 public interface PlaylistSongsMapper {
+
+
+    @Results(id = "statusEntitiesResult", value = {
+            @Result(property = "artistId", column = "artistId"),
+            @Result(property = "artist", column = "artist"),
+            @Result(property = "torrentId", column = "torrentId"),
+            @Result(property = "format", column = "format"),
+            @Result(property = "status", column = "status"),
+    })
+    @Select("SELECT A.ARTIST_ID, A.ARTIST, ATS.TORRENT_ID, ATS.FORMAT, ATS.STATUS\n" +
+            "FROM ARTISTS A \n" +
+            "LEFT JOIN ARTIST_TORRENTS_STATUS ATS ON ATS.ARTIST_ID = A.ARTIST_ID")
+    List<StatusEntity> getStatuses();
 
     @Results(id = "songResult", value = {
             @Result(property = "artist", column = "artist"),
@@ -65,4 +79,14 @@ public interface PlaylistSongsMapper {
                              @Param("forumId") String forumId,
                              @Param("status") String status);
 
+    @Select("SELECT TORRENT_ID FROM ARTIST_TORRENTS_STATUS WHERE ARTIST_ID = #{artistId} AND FORMAT = #{format} AND STATUS = #{status}")
+    List<String> getArtistTorrents(@Param("artistId") Integer artistId,
+                                   @Param("format") String format,
+                                   @Param("status") String status);
+
+    @Update("UPDATE ARTIST_TORRENTS_STATUS SET STATUS = #{status} WHERE TORRENT_ID = #{torrentId} AND ARTIST_ID = #{artistId} AND FORMAT = #{format}")
+    void updateArtistTorrentStatus(@Param("artistId") Integer artistId,
+                                   @Param("format") String format,
+                                   @Param("torrentId") String torrentId,
+                                   @Param("status") String status);
 }

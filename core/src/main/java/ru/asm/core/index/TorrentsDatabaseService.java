@@ -85,6 +85,24 @@ public class TorrentsDatabaseService {
         System.out.println("total: ${result.totalElements}");
     }
 
+    public TorrentInfoVO findTorrent(String torrentId) {
+        NativeSearchQueryBuilder searchQueryBuilder = new NativeSearchQueryBuilder();
+
+        final BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
+
+        boolQueryBuilder.must(QueryBuilders.termsQuery("id", torrentId));
+
+        searchQueryBuilder.withQuery(boolQueryBuilder);
+        searchQueryBuilder.withPageable(new PageRequest(0, 10));
+        searchQueryBuilder.withSort(new FieldSortBuilder("title").order(SortOrder.ASC));
+
+        Page<TorrentInfoVO> result = torrentInfoRepository.search(searchQueryBuilder.build());
+
+        return result.getTotalElements() > 0
+                ? result.getContent().iterator().next()
+                : null;
+    }
+
     public Page<TorrentInfoVO> findPage(String[] forumQueries, String[] titleTerms, int page, int pageSize) {
         NativeSearchQueryBuilder searchQueryBuilder = new NativeSearchQueryBuilder();
 

@@ -10,10 +10,10 @@ import ru.asm.core.index.TorrentsDatabaseService;
 import ru.asm.core.index.domain.TorrentInfoVO;
 import ru.asm.core.index.repositories.TorrentInfoRepository;
 import ru.asm.core.persistence.mappers.PlaylistSongsMapper;
-import ru.asm.core.torrent.TorrentClient;
 import ru.asm.util.ElasticUtils;
+import ru.asm.util.MusicFormats;
+import ru.asm.util.ResolveStatuses;
 
-import java.nio.charset.Charset;
 import java.util.*;
 
 /**
@@ -23,36 +23,28 @@ import java.util.*;
  */
 public class ResolveArtistTorrentsTool {
 
-    private static final Logger logger = LoggerFactory.getLogger(ResolveArtistFlacTool.class);
-    public static final Charset ENCODING = Charset.forName("windows-1251");
-    public static final String FORMAT_FLAC = "FLAC";
-    public static final String STATUS_INTERNAL_ERROR = "ERROR";
-    public static final String STATUS_NOT_FOUND_OR_TIMEOUT_EXPIRED = "NULL";
-    public static final String STATUS_OK = "OK";
+    private static final Logger logger = LoggerFactory.getLogger(IndexArtistFlacTool.class);
 
     private ApplicationContext applicationContext;
 
     private PlaylistSongsMapper playlistSongsMapper;
 
-    private TorrentClient torrentClient;
-
 
     public static void main(String[] args) {
-        new ResolveArtistTorrentsTool().resolve();;
+        new ResolveArtistTorrentsTool().resolve();
     }
 
     public void resolve() {
         // init
         applicationContext = new AnnotationConfigApplicationContext("ru.asm");
         playlistSongsMapper = applicationContext.getBean(PlaylistSongsMapper.class);
-        torrentClient = new TorrentClient();
 
         final List<String> found = new ArrayList<>();
         final List<String> notFound = new ArrayList<>();
 
         final Map<String, String> forumFormats = new HashMap<>();
-        forumFormats.put("737", ResolveArtistFlacTool.FORMAT_FLAC); // Рок, Панк, Альтернатива (lossless)
-        forumFormats.put("738", ResolveArtistMp3Tool.FORMAT_MP3); // Рок, Панк, Альтернатива (lossy)
+        forumFormats.put("737", MusicFormats.FORMAT_FLAC); // Рок, Панк, Альтернатива (lossless)
+        forumFormats.put("738", MusicFormats.FORMAT_MP3); // Рок, Панк, Альтернатива (lossy)
 
         final TorrentInfoRepository torrentInfoRepository = applicationContext.getBean(TorrentInfoRepository.class);
 
@@ -79,7 +71,7 @@ public class ResolveArtistTorrentsTool {
 
                         for (int i = 0; i < page.getNumberOfElements(); i++) {
                             final TorrentInfoVO ti = page.getContent().get(i);
-                            playlistSongsMapper.insertArtistTorrent(artistId, ti.getId(), format, forumId, "UNKNOWN");
+                            playlistSongsMapper.insertArtistTorrent(artistId, ti.getId(), format, forumId, ResolveStatuses.STATUS_UNKNOWN);
                         }
                     } else {
                         notFound.add(artist);

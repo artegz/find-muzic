@@ -30,6 +30,10 @@ public class FFileDescriptor {
         this.fileName = fileName;
     }
 
+    public String getFileName() {
+        return fileName;
+    }
+
     public String getRelativePath() {
         return relativePath;
     }

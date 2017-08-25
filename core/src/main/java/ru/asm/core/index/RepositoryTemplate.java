@@ -2,6 +2,7 @@ package ru.asm.core.index;
 
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthResponse;
 import org.elasticsearch.cluster.health.ClusterHealthStatus;
+import org.elasticsearch.node.Node;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
@@ -19,39 +20,39 @@ public class RepositoryTemplate<K, V extends Serializable> {
 
     private static final Logger logger = LoggerFactory.getLogger(RepositoryTemplate.class);
 
-    org.elasticsearch.node.Node node;
-    ElasticsearchRepository<K, V> torrentInfoRepository;
-    ElasticsearchOperations elasticsearchOperations;
+    private ApplicationContext applicationContext;
+    private ElasticsearchRepository<K, V> torrentInfoRepository;
 
     public RepositoryTemplate(ApplicationContext applicationContext, ElasticsearchRepository<K, V> repository) {
-        this.node = applicationContext.getBean(org.elasticsearch.node.Node.class);
+        this.applicationContext = applicationContext;
         this.torrentInfoRepository = repository;
-        this.elasticsearchOperations = applicationContext.getBean(ElasticsearchOperations.class);
     }
 
     public void withRepository(RepositoryAction<K, V> r) {
         try {
-            // await at least for yellow status
-            final ClusterHealthResponse response = elasticsearchOperations.getClient()
-                    .admin()
-                    .cluster()
-                    .prepareHealth()
-                    .setWaitForGreenStatus()
-                    .get();
-            if (response.getStatus() != ClusterHealthStatus.YELLOW) {
-                throw new IllegalStateException("repository is not initialized");
-            }
-
-            Long count = torrentInfoRepository.count();
-            if (count <= 0) {
-                logger.info("repository is empty");
-            } else {
-                logger.info("{} entries in repository", count);
-            }
-
+            initializeRepos(applicationContext);
             r.doAction(torrentInfoRepository);
         } finally {
-            node.close();
+            destroyRepos(applicationContext);
+        }
+    }
+
+    public static void destroyRepos(ApplicationContext applicationContext) {
+        final Node node = applicationContext.getBean(Node.class);
+        node.close();
+    }
+
+    public static void initializeRepos(ApplicationContext applicationContext) {
+        // await at least for yellow status
+        final ElasticsearchOperations elasticsearchOperations = applicationContext.getBean(ElasticsearchOperations.class);
+        final ClusterHealthResponse response = elasticsearchOperations.getClient()
+                .admin()
+                .cluster()
+                .prepareHealth()
+                .setWaitForGreenStatus()
+                .get();
+        if (response.getStatus() != ClusterHealthStatus.YELLOW) {
+            throw new IllegalStateException("repository is not initialized");
         }
     }
 

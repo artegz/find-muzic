@@ -8,33 +8,28 @@ package ru.asm.tools;
 public class Main {
 
     public static void main(String[] args) {
-        // Step 1: download fresh torrents DB
-        new TorrentsDbDownloadTool();
+        // Step 1.1: download fresh torrents DB
+        new DownloadTorrentsDbTool();
+        // todo: extract zip
+        // Step 1.2: index downloaded torrents DB
+        new IndexTorrentsDbTool();
 
-        // Step 2: index downloaded torrents DB
-        new TorrentsDbIndexTool();
-
-        // Step 2.1: print categories
-        new TorrentsDbPrintCategoriesTool();
-
-        // Step 3: fetch desired playlist
         // todo
-
-        // Step 3.1: import playlist into DB
+        // Step 2.1: download (fetch) desired playlist
+        // Step 2.2: import playlist into DB
         new ImportPlaylistTool();
 
-
-        // Step 3.9: resolve artist torrents
+        // Step 3: resolve artist torrents
         new ResolveArtistTorrentsTool();
 
-        // Step 4: resolve torrents
+        // Step 4: index artist songs from torrents
         // search for playlist artist songs in torrents (mp3 and flac files) and index them
-        new ResolveArtistMp3Tool();
-        new ResolveArtistFlacTool();
+        new IndexArtistMp3Tool();
+        new IndexArtistFlacTool();
 
-        // 2. index artists songs (separate elastic index)
-        // ... find files (mp3 + flac)
+        // Step 5: resolve playlist songs
 
-        // 3. if mp3 => download;
+        // Step 6: download playlist songs
+
     }
 }
