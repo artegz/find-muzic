@@ -7,6 +7,7 @@ import org.apache.cxf.bus.spring.SpringBus;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.springframework.context.annotation.*;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 import ru.asm.api.rest.AppRestService;
 import ru.asm.api.rest.JaxRsApiApplication;
 
@@ -20,8 +21,9 @@ import java.util.Arrays;
  */
 @Configuration
 @ComponentScan(
-        basePackages = "ru.asm.core.persistence"
+        basePackages = "ru.asm.core"
 )
+@EnableTransactionManagement
 public class AppConfig {
 
     @Bean(destroyMethod = "shutdown")

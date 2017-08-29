@@ -18,6 +18,7 @@ import { removeNgStyles, createNewHosts } from '@angularclass/hmr';
 import {NgxPaginationModule} from "ngx-pagination/dist/ngx-pagination";
 import {TorrentDbsComponent} from "./torrent-dbs/torrent-dbs.component";
 import {MyStatusesComponent} from "./statuses/statuses.component";
+import {MyFoundSongsComponent} from './songs/songs.component';
 
 @NgModule({
   imports: [
@@ -34,7 +35,8 @@ import {MyStatusesComponent} from "./statuses/statuses.component";
     // ArtistsListComponent,
     MyTestComponent,
     TorrentDbsComponent,
-    MyStatusesComponent
+    MyStatusesComponent,
+    MyFoundSongsComponent
   ],
   providers: [
     ApiService,

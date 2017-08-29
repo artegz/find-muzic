@@ -5,6 +5,7 @@ import { AboutComponent } from './about/about.component';
 import {MyTestComponent} from "./test/test.component";
 import {TorrentDbsComponent} from "./torrent-dbs/torrent-dbs.component";
 import {MyStatusesComponent} from "./statuses/statuses.component";
+import {MyFoundSongsComponent} from "./songs/songs.component";
 // import { ArtistsListComponent } from "./artists-list/artists-list.component";
 
 const routes: Routes = [
@@ -13,7 +14,8 @@ const routes: Routes = [
   // { path: 'artists', component: ArtistsListComponent},
   { path: 'test', component: MyTestComponent},
   { path: 'torrentDbs', component: TorrentDbsComponent},
-  { path: 'statuses', component: MyStatusesComponent}
+  { path: 'statuses', component: MyStatusesComponent},
+  { path: 'foundSongs', component: MyFoundSongsComponent}
 ];
 
 export const routing = RouterModule.forRoot(routes);

@@ -1,4 +1,4 @@
-package ru.asm.tools;
+package ru.asm.core;
 
 import org.slf4j.LoggerFactory;
 import ru.asm.core.index.domain.TorrentFilesVO;

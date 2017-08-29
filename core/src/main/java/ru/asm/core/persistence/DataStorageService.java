@@ -67,7 +67,7 @@ public class DataStorageService {
 //    }
 //
 //    public void listSongs(String artist, String playlist) {
-//        SongVO songs = findSongs(artist, playlist)
+//        SongVO songs = resolveSongs(artist, playlist)
 //
 //        int i = 1;
 //
@@ -77,7 +77,7 @@ public class DataStorageService {
 //    }
 //
 //    public void listArtists(String playlist) {
-//        SongVO songs = findSongs(null, playlist)
+//        SongVO songs = resolveSongs(null, playlist)
 //
 //        def artists = new HashSet<String>()
 //
@@ -105,7 +105,7 @@ public class DataStorageService {
 //    }
 //
 //
-//    private SongVO findSongs(String artist, String playlist) {
+//    private SongVO resolveSongs(String artist, String playlist) {
 //        def songs
 //        if (artist != null && playlist != null) {
 //            songs = songMapper.findSongsByPlaylistAndArtist(playlist, artist)

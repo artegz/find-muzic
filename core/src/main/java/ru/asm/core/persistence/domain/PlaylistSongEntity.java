@@ -7,7 +7,11 @@ package ru.asm.core.persistence.domain;
  */
 public class PlaylistSongEntity {
 
+    private Integer artistId;
+
     private String artist;
+
+    private Integer songId;
 
     private String title;
 
@@ -25,6 +29,22 @@ public class PlaylistSongEntity {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public Integer getArtistId() {
+        return artistId;
+    }
+
+    public void setArtistId(Integer artistId) {
+        this.artistId = artistId;
+    }
+
+    public Integer getSongId() {
+        return songId;
+    }
+
+    public void setSongId(Integer songId) {
+        this.songId = songId;
     }
 
     @Override

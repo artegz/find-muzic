@@ -25,7 +25,7 @@ import java.sql.Driver;
 @EnableTransactionManagement
 public class DataStorageConfig {
 
-    private static final String INIT_SCHEMA_LOCATION = "schema/schema.sql";
+    private static final String INIT_SCHEMA_LOCATION = "schema/schema2.sql";
     private static final String DB_URL = "jdbc:h2:file:C:\\TEMP\\find-music\\h2\\fmdb";
 
     @Bean

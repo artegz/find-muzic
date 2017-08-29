@@ -3,6 +3,7 @@ import {Headers, URLSearchParams, Http} from '@angular/http';
 import { Observable } from 'rxjs';
 import 'rxjs/add/operator/map';
 import {StatusEntity} from "./status-entity";
+import {SongsSearchResult} from "./songs-search-result";
 
 @Injectable()
 export class RestService {
@@ -38,6 +39,19 @@ export class RestService {
 
   getArtists(): Observable<string[]> {
     let url = 'rest/' + 'artists';
+
+    let params = new URLSearchParams();
+    let headers = new Headers();
+
+    let res = this.http.get(
+      url,
+      {search: params, headers: headers}
+    );
+    return res.map(response => response.json());
+  }
+
+  getFoundSongs(): Observable<SongsSearchResult> {
+    let url = 'rest/' + 'results/songs';
 
     let params = new URLSearchParams();
     let headers = new Headers();

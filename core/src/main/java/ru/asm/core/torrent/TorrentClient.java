@@ -21,6 +21,9 @@ import java.util.concurrent.TimeUnit;
  */
 public class TorrentClient {
 
+
+    // todo asm: make methods async with return future
+
     public static final int TIMEOUT = 30;
     public static final Logger logger = LoggerFactory.getLogger(TorrentClient.class);
 
@@ -134,13 +137,14 @@ public class TorrentClient {
 
     private TorrentInfo fetchMagnet(String uri) {
         try {
-            logger.info("Fetching the magnet uri, please wait...");
+            logger.debug("Fetching the magnet uri, please wait... ({})", uri);
             byte[] data = s.fetchMagnet(uri, 30);
 
             if (data != null) {
+                logger.debug("Magnet retrieved");
                 return TorrentInfo.bdecode(data);
             } else {
-                logger.error("Failed to retrieve the magnet");
+                logger.debug("Failed to retrieve the magnet");
                 return null;
             }
         } catch (Throwable e) {

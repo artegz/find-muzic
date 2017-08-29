@@ -19,7 +19,7 @@ public class Main {
         // Step 2.2: import playlist into DB
         new ImportPlaylistTool();
 
-        // Step 3: resolve artist torrents
+        // Step 3: resolve artist torrents (find artists in torrents DB)
         new ResolveArtistTorrentsTool();
 
         // Step 4: index artist songs from torrents
@@ -27,7 +27,7 @@ public class Main {
         new IndexArtistMp3Tool();
         new IndexArtistFlacTool();
 
-        // Step 5: resolve playlist songs
+        // Step 5: resolve playlist songs (find desired sons in index)
 
         // Step 6: download playlist songs
 

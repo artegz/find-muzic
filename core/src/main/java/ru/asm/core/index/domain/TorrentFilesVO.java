@@ -5,8 +5,11 @@ import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldIndex;
 import org.springframework.data.elasticsearch.annotations.FieldType;
+import ru.asm.core.persistence.domain.ArtistEntity;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * User: artem.smirnov
@@ -34,6 +37,17 @@ public class TorrentFilesVO {
 
     @Field(type = FieldType.Nested)
     private List<TorrentSongVO> torrentSongs;
+
+    public static TorrentFilesVO create(TorrentInfoVO torrent, ArtistEntity artistEntity, Set<TorrentSongVO> torrentSongs) {
+        final TorrentFilesVO torrentFilesVO = new TorrentFilesVO();
+        torrentFilesVO.setTorrentId(torrent.getId());
+        torrentFilesVO.setArtist(artistEntity.getArtist());
+        torrentFilesVO.setArtistId(artistEntity.getArtistId());
+        torrentFilesVO.setForumId(torrent.getForumId());
+        torrentFilesVO.setMagnet(torrent.getMagnet());
+        torrentFilesVO.setTorrentSongs(new ArrayList<>(torrentSongs));
+        return torrentFilesVO;
+    }
 
     public String getTorrentId() {
         return torrentId;

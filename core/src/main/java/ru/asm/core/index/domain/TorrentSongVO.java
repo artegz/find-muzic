@@ -1,5 +1,7 @@
 package ru.asm.core.index.domain;
 
+import org.springframework.data.annotation.Id;
+import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldIndex;
 import org.springframework.data.elasticsearch.annotations.FieldType;
@@ -9,7 +11,19 @@ import org.springframework.data.elasticsearch.annotations.FieldType;
  * Date: 24.03.2017
  * Time: 17:15
  */
+@Document(indexName = "torrentsong")
 public class TorrentSongVO {
+
+    @Id
+    @Field(type = FieldType.String, index = FieldIndex.not_analyzed)
+    private String id;
+
+    @Field(type = FieldType.String, index = FieldIndex.not_analyzed)
+    private String torrentId;
+
+
+    @Field(type = FieldType.String)
+    private String artistName;
 
     @Field(type = FieldType.String)
     private String songName;
@@ -44,20 +58,38 @@ public class TorrentSongVO {
     public TorrentSongVO() {
     }
 
-    public TorrentSongVO(String songName, String mp3FileName, String mp3FilePath) {
+    public TorrentSongVO(String torrentId, String songName, String artistName, String mp3FileName, String mp3FilePath) {
         this.songName = songName;
+        this.artistName = artistName;
         this.mp3FileName = mp3FileName;
         this.mp3FilePath = mp3FilePath;
         this.type = "MP3";
+        this.torrentId = torrentId;
+        this.id = String.format("%s_%s_%s", torrentId, mp3FilePath.hashCode(), mp3FileName);
     }
 
-    public TorrentSongVO(String songName, String cueFileName, String cueFilePath, String trackNum, String indexTime) {
+    public TorrentSongVO(String torrentId, String songName, String artistName, String cueFileName, String cueFilePath, String trackNum, String indexTime) {
         this.songName = songName;
+        this.artistName = artistName;
         this.cueFileName = cueFileName;
         this.cueFilePath = cueFilePath;
         this.indexTime = indexTime;
         this.trackNum = trackNum;
         this.type = "FLAC";
+        this.torrentId = torrentId;
+        this.id = String.format("%s_%s_%s#%s", torrentId, cueFilePath.hashCode(), cueFilePath, trackNum);
+    }
+
+    public String getArtistName() {
+        return artistName;
+    }
+
+    public String getTorrentId() {
+        return torrentId;
+    }
+
+    public String getId() {
+        return id;
     }
 
     public String getTrackNum() {
