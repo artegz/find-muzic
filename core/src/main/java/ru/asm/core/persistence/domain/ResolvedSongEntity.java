@@ -5,7 +5,7 @@ package ru.asm.core.persistence.domain;
  * Date: 29.08.2017
  * Time: 16:41
  */
-public class ResolvedSongEntity extends PlaylistSongEntity {
+public class ResolvedSongEntity extends PlaylistSongEntity implements Comparable<ResolvedSongEntity> {
 
     private String torrentId;
 
@@ -25,5 +25,10 @@ public class ResolvedSongEntity extends PlaylistSongEntity {
 
     public void setFileId(String fileId) {
         this.fileId = fileId;
+    }
+
+    @Override
+    public int compareTo(ResolvedSongEntity o) {
+        return fileId.compareTo(o.fileId);
     }
 }

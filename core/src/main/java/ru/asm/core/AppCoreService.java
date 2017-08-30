@@ -124,6 +124,10 @@ public class AppCoreService {
         logger.info("destroying complete");
     }
 
+    public TorrentClient getTorrentClient() {
+        return torrentClient;
+    }
+
     public void downloadTorrent(File folder, String magnet) {
         if (!folder.exists()) folder.mkdirs();
 
@@ -256,6 +260,49 @@ public class AppCoreService {
         return foundSongs;
     }
 
+    public void downloadFoundSongs_mp3(Integer offset, Integer limit) {
+        List<ResolvedSongEntity> foundSongs = playlistSongsMapper.getFoundSongs();
+        foundSongs = page(foundSongs, offset, limit);
+        
+        logger.info("downloading {} songs...", foundSongs.size());
+        
+        foundSongs.forEach(songEntity -> {
+            final String torrentId = songEntity.getTorrentId();
+
+            // find dump torrent info (with magnet)
+            final TorrentInfoVO dumpTorrentInfo = findTorrent(torrentId);
+            assert (dumpTorrentInfo != null);
+
+            // find song file indexed entity
+            final TorrentSongVO torrentSong = findTorrentSong(torrentId, songEntity.getFileId());
+            assert (torrentSong != null);
+
+            logger.info("[{}: {}] resolving magnet", torrentSong.getArtistName(), torrentSong.getSongName());
+            getByMagnetAsync(dumpTorrentInfo.getMagnet())
+                    .thenAcceptAsync(torrentInfo -> {
+                        final String mp3FilePath = torrentSong.getMp3FilePath();
+
+                        logger.info("[{}: {}] magnet resolved, downloading '{}'", torrentSong.getArtistName(), torrentSong.getSongName(), mp3FilePath);
+
+                        final Priority[] priorities = getSingleFilePriorities(torrentInfo, mp3FilePath);
+
+                        final File saveDir = new File(AppConfiguration.DOWNLOADED_SONGS_STORAGE);
+                        if (!saveDir.exists()) //noinspection ResultOfMethodCallIgnored
+                            saveDir.mkdirs();
+                        torrentClient.download(torrentInfo, saveDir, priorities);
+
+                        final File downloadedSong = new File(saveDir, mp3FilePath);
+                        if (downloadedSong.exists()) {
+                            playlistSongsMapper.insertDownloadedSong(songEntity.getSongId(), mp3FilePath);
+                            logger.info("[{}: {}] download complete", torrentSong.getArtistName(), torrentSong.getSongName(), mp3FilePath);
+                        } else {
+                            logger.warn("[{}: {}] download failed", torrentSong.getArtistName(), torrentSong.getSongName(), mp3FilePath);
+                        }
+                    });
+
+        });
+    }
+
     @Transactional
     public void resolveArtists() {
         final List<String> found = new ArrayList<>();
@@ -385,7 +432,7 @@ public class AppCoreService {
                     if (!torrentIds.isEmpty()) {
                         found.add(artist);
                         for (String torrentId : torrentIds) {
-                            final TorrentInfoVO dumpTorrentInfo = torrentsDatabaseService.findTorrent(torrentId);
+                            final TorrentInfoVO dumpTorrentInfo = findTorrent(torrentId);
                             if (dumpTorrentInfo == null) {
                                 throw new AssertionError();
                             }
@@ -502,8 +549,8 @@ public class AppCoreService {
         try {
             for (PlaylistSongEntity song : songs) {
 
-                final String[] artistTerms = asTerms2(song.getArtist());
-                final String[] songTerms = asTerms2(song.getTitle());
+                final String[] artistTerms = ElasticUtils.asTerms3(song.getArtist());
+                final String[] songTerms = ElasticUtils.asTerms3(song.getTitle());
 
                 logger.info(String.format("SEARCH %s (%s): %s (%s)", song.getArtist(), Arrays.asList(artistTerms), song.getTitle(), Arrays.asList(songTerms)));
 
@@ -642,38 +689,6 @@ public class AppCoreService {
         return terms.toArray(new String[terms.size()]);
     }
 
-    private static String[] asTerms2(String artist) {
-        final String lowerCase = artist.toLowerCase();
-
-        final String[] parts = lowerCase.replace("/", " ")
-                .replace("'", " ")
-                .replace("&", " ")
-                .replace("*", "?")
-                .replace(".", "")
-                .replace("-", " ")
-                .replace("!", " ")
-                .replace("_", " ")
-                .replace("(", " ")
-                .replace(")", " ")
-                .replace(",", " ")
-                .split(" ");
-
-        final ArrayList<String> terms = new ArrayList<>();
-        for (String part : parts) {
-            if (part != null && !part.isEmpty()) {
-                final String trimPart = part.trim();
-                if (trimPart.equals("и")
-                        || trimPart.equals("feat")) {
-                    continue;
-                }
-
-                terms.add(trimPart);
-            }
-        }
-
-        return terms.toArray(new String[terms.size()]);
-    }
-
 
     private boolean isAlreadyDownloaded(File torrentDir) {
         //noinspection ConstantConditions
@@ -790,15 +805,16 @@ public class AppCoreService {
         return terms.toArray(new String[terms.size()]);
     }
 
-    private static List<Integer> page(List<Integer> artistsIds, Integer offset, Integer limit) {
-        artistsIds.sort(Integer::compareTo);
-        if (offset != null && offset < artistsIds.size()) {
-            artistsIds = artistsIds.subList(offset, artistsIds.size());
+    private static <T extends Comparable> List<T> page(List<? extends T> artistsIds, Integer offset, Integer limit) {
+        List<T> result = new ArrayList<>(artistsIds);
+        result.sort(Comparable::compareTo);
+        if (offset != null && offset < result.size()) {
+            result = result.subList(offset, result.size());
         }
         if (limit != null) {
-            artistsIds = artistsIds.subList(0, Math.min(limit, artistsIds.size()));
+            result = result.subList(0, Math.min(limit, result.size()));
         }
-        return artistsIds;
+        return result;
     }
 
 
@@ -830,7 +846,7 @@ public class AppCoreService {
                 if (!torrentIds.isEmpty()) {
                     found.add(artist);
                     for (String torrentId : torrentIds) {
-                        final TorrentInfoVO torrent = torrentsDatabaseService.findTorrent(torrentId);
+                        final TorrentInfoVO torrent = findTorrent(torrentId);
                         if (torrent == null) {
                             throw new AssertionError();
                         }
@@ -852,6 +868,43 @@ public class AppCoreService {
         return resolveResult;
     }
 
+    public TorrentSongVO findTorrentSong(String torrentId, String fileId) {
+        NativeSearchQueryBuilder searchQueryBuilder = new NativeSearchQueryBuilder();
+
+        final BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
+
+        boolQueryBuilder.must(QueryBuilders.termsQuery("torrentId", torrentId));
+        boolQueryBuilder.must(QueryBuilders.termsQuery("id", fileId));
+
+        searchQueryBuilder.withQuery(boolQueryBuilder);
+        searchQueryBuilder.withPageable(new PageRequest(0, 10));
+//        searchQueryBuilder.withSort(new FieldSortBuilder("title").order(SortOrder.ASC));
+
+        Page<TorrentSongVO> result = torrentSongRepository.search(searchQueryBuilder.build());
+
+        return result.getTotalElements() > 0
+                ? result.getContent().iterator().next()
+                : null;
+    }
+
+    public TorrentInfoVO findTorrent(String torrentId) {
+        NativeSearchQueryBuilder searchQueryBuilder = new NativeSearchQueryBuilder();
+
+        final BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
+
+        boolQueryBuilder.must(QueryBuilders.termsQuery("id", torrentId));
+
+        searchQueryBuilder.withQuery(boolQueryBuilder);
+        searchQueryBuilder.withPageable(new PageRequest(0, 10));
+        searchQueryBuilder.withSort(new FieldSortBuilder("title").order(SortOrder.ASC));
+
+        Page<TorrentInfoVO> result = torrentInfoRepository.search(searchQueryBuilder.build());
+
+        return result.getTotalElements() > 0
+                ? result.getContent().iterator().next()
+                : null;
+    }
+
     // todo asm: async!!!
     private TorrentInfo getByMagnet(String magnet) {
         return torrentClient.findByMagnet(magnet);
@@ -865,6 +918,20 @@ public class AppCoreService {
             targetFolder.mkdirs();
         torrentClient.download(torrentInfo, targetFolder, priorities);
         return targetFolder;
+    }
+
+
+    private Priority[] getSingleFilePriorities(TorrentInfo torrentInfo, String filePath) {
+        final FileStorage files = torrentInfo.files();
+        final Priority[] priorities = getPriorities(files.numFiles());
+
+        for (int i = 0; i < files.numFiles(); i++) {
+            if (files.filePath(i).equals(filePath)) {
+                priorities[i] = Priority.NORMAL;
+                break;
+            }
+        }
+        return priorities;
     }
 
     private static void logInfo(String message, Object... args) {

@@ -147,4 +147,14 @@ public interface PlaylistSongsMapper {
                                    @Param("format") String format,
                                    @Param("torrentId") String torrentId,
                                    @Param("status") String status);
+
+
+
+    @Insert("insert into SONGS_STORAGE values (#{songId}, #{downloadPath})")
+    void insertDownloadedSong(@Param("songId") Integer songId,
+                              @Param("downloadPath") String downloadPath);
+
+    @Select("SELECT A.ARTIST||': '||S.TITLE FROM SONGS S JOIN ARTISTS A ON A.ARTIST_ID = S.ARTIST_ID JOIN SONGS_STORAGE SS ON S.SONG_ID = S.SONG_ID")
+    List<String> getDownloadedSongsNames();
+
 }

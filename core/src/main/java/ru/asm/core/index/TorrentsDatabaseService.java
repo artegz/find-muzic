@@ -11,8 +11,7 @@ import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilde
 import org.springframework.stereotype.Component;
 import ru.asm.core.index.domain.TorrentInfoVO;
 import ru.asm.core.index.repositories.TorrentInfoRepository;
-
-import java.util.ArrayList;
+import ru.asm.util.ElasticUtils;
 
 /**
  * User: artem.smirnov
@@ -109,7 +108,7 @@ public class TorrentsDatabaseService {
         final BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
 
         if (forumQueries != null) {
-            boolQueryBuilder.must(QueryBuilders.termsQuery("forumId", toLowerAll(forumQueries)));
+            boolQueryBuilder.must(QueryBuilders.termsQuery("forumId", ElasticUtils.toLowerAll(forumQueries)));
         }
         if (titleTerms != null) {
 //            boolQueryBuilder.must(QueryBuilders.termsQuery("title", titleQuery));
@@ -138,13 +137,13 @@ public class TorrentsDatabaseService {
         final BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
 
         if (mainCategoryQuery != null) {
-            boolQueryBuilder.must(QueryBuilders.termsQuery("mainCategory", toLowerAll(mainCategoryQuery)));
+            boolQueryBuilder.must(QueryBuilders.termsQuery("mainCategory", ElasticUtils.toLowerAll(mainCategoryQuery)));
         }
         if (subCategoryQuery != null) {
-            boolQueryBuilder.must(QueryBuilders.termsQuery("subCategory", toLowerAll(subCategoryQuery)));
+            boolQueryBuilder.must(QueryBuilders.termsQuery("subCategory", ElasticUtils.toLowerAll(subCategoryQuery)));
         }
         if (foldersQuery != null) {
-            boolQueryBuilder.must(QueryBuilders.termsQuery("folders", toLowerAll(foldersQuery)));
+            boolQueryBuilder.must(QueryBuilders.termsQuery("folders", ElasticUtils.toLowerAll(foldersQuery)));
         }
 
         if (titleQuery != null) {
@@ -158,15 +157,6 @@ public class TorrentsDatabaseService {
 
         Page<TorrentInfoVO> result = torrentInfoRepository.search(searchQueryBuilder.build());
 
-        return result;
-    }
-
-    private ArrayList<String> toLowerAll(String[] origVals) {
-        ArrayList<String> result = new ArrayList<String>();
-        for (String origVal : origVals) {
-            result.add(origVal.toLowerCase());
-//            result.add(origVal)
-        }
         return result;
     }
 

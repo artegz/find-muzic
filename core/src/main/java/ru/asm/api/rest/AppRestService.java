@@ -4,6 +4,11 @@ import com.google.common.collect.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
 import ru.asm.core.AppConfiguration;
 import ru.asm.core.AppCoreService;
+import ru.asm.core.dev.model.Artist;
+import ru.asm.core.dev.model.SearchService;
+import ru.asm.core.dev.model.Song;
+import ru.asm.core.dev.model.SongSource;
+import ru.asm.core.persistence.domain.PlaylistSongEntity;
 import ru.asm.core.persistence.domain.ResolvedSongEntity;
 import ru.asm.core.persistence.domain.StatusEntity;
 import ru.asm.core.persistence.mappers.PlaylistSongsMapper;
@@ -22,6 +27,9 @@ import java.util.List;
  */
 @Path("/")
 public class AppRestService {
+
+    @Autowired
+    private SearchService searchService;
 
     @Autowired
     private PlaylistSongsMapper playlistSongsMapper;
@@ -130,6 +138,7 @@ public class AppRestService {
     @Path("/songs/download")
     public void downloadSongs() {
         // todo
+        appCoreService.downloadFoundSongs_mp3(0, 10);
     }
 
 
@@ -177,5 +186,37 @@ public class AppRestService {
     public List<ResolvedSongEntity> getResolvedSongs() {
         return getFoundSongs();
     }
+
+
+
+
+    @GET
+    @Produces("application/json; charset=UTF-8")
+    @Path("/alt/songs/{songId}/sources")
+    public List<SongSource> getSongSources(@PathParam("songId") Integer songId) {
+        PlaylistSongEntity foundSong = null;
+
+        final List<PlaylistSongEntity> songs = this.playlistSongsMapper.getSongs();
+        for (PlaylistSongEntity song : songs) {
+            if (song.getSongId().equals(songId)) {
+                foundSong = song;
+            }
+        }
+
+        if (foundSong != null) {
+            final Artist artist = new Artist();
+            artist.setArtistId(foundSong.getArtistId());
+            artist.setArtistName(foundSong.getArtist());
+            final Song song = new Song();
+            song.setSongId(foundSong.getSongId());
+            song.setTitle(foundSong.getTitle());
+            song.setArtist(artist);
+
+            return this.searchService.search(song);
+        } else {
+            return null;
+        }
+    }
+
 
 }
