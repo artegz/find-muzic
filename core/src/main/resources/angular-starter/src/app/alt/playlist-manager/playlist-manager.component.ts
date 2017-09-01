@@ -17,6 +17,8 @@ export class PlaylistManagerComponent implements OnInit {
   // downloadedFiles: DownloadedFile[];
 
   p: number = 1;
+  sp: number = 1;
+  fp: number = 1;
 
   constructor(private rest: RestService) {}
 
@@ -39,23 +41,27 @@ export class PlaylistManagerComponent implements OnInit {
     return false;
   }
 
-  selectAllForResolve() {
+  selectAllForResolve(): boolean {
     this.resolvableSongs.forEach(value => value.resolve = true);
+    return false;
   }
 
-  unselectAllForResolve() {
+  unselectAllForResolve(): boolean {
     this.resolvableSongs.forEach(value => value.resolve = false);
+    return false;
   }
 
-  selectAllForFetch() {
+  selectAllForFetch(): boolean {
     this.downloadableSources.forEach(value => value.download = true);
+    return false;
   }
 
-  unselectAllForFetch() {
+  unselectAllForFetch(): boolean {
     this.downloadableSources.forEach(value => value.download = false);
+    return false;
   }
 
-  resolveSources() {
+  resolveSources(): boolean {
     let ids = this.resolvableSongs.filter(s => s.resolve && !s.inProgress)
       .map(s => {
         s.inProgress = true;
@@ -68,9 +74,10 @@ export class PlaylistManagerComponent implements OnInit {
       }).subscribe(res => {
       this.resolvableSongs = res.map(info => new ResolvableSong(info));
     });
+    return false;
   }
 
-  fetchFiles() {
+  fetchFiles(): boolean {
     let sources: {[key:number]:string[]} = {};
 
     this.resolvableSongs.forEach(s => {
@@ -80,7 +87,15 @@ export class PlaylistManagerComponent implements OnInit {
         }
         sources[s.id].push(ss.sourceId);
       })
-    })
+    });
 
+    this.rest.fetchSongs(sources)
+      .switchMap(() => {
+        return this.rest.getSongs("nashe-test");
+      }).subscribe(res => {
+      this.resolvableSongs = res.map(info => new ResolvableSong(info));
+    });
+
+    return false;
   }
 }

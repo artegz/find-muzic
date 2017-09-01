@@ -1,7 +1,7 @@
 package ru.asm.core.dev.model;
 
 import ru.asm.core.dev.model.ddb.FileDocument;
-import ru.asm.core.dev.model.torrent.Mp3TorrentSongSource;
+import ru.asm.core.dev.model.torrent.TorrentSongSource;
 
 import java.util.List;
 
@@ -14,7 +14,7 @@ public class SongInfo {
 
     private Song song;
 
-    private List<Mp3TorrentSongSource> sources;
+    private List<TorrentSongSource> sources;
 
     private List<FileDocument> files;
 
@@ -34,11 +34,11 @@ public class SongInfo {
         this.song = song;
     }
 
-    public List<Mp3TorrentSongSource> getSources() {
+    public List<TorrentSongSource> getSources() {
         return sources;
     }
 
-    public void setSources(List<Mp3TorrentSongSource> sources) {
+    public void setSources(List<TorrentSongSource> sources) {
         this.sources = sources;
     }
 }

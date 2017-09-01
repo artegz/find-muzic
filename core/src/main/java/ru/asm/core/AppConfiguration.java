@@ -10,12 +10,17 @@ import java.io.File;
 public class AppConfiguration {
 
     public static final String DOWNLOADED_SONGS_STORAGE = "C:\\TEMP\\find-music\\storage";
+    public static final boolean DOWNLOAD_ALLOWED = true;
     private static final AppConfiguration instance = new AppConfiguration();
 
     private File torrentDbsStorageLocation = new File("C:\\TEMP\\find-music\\rutracker_org_db");
 
     public static AppConfiguration getInstance() {
         return instance;
+    }
+
+    public static int getFetchMagnetTimeout() {
+        return 30;
     }
 
     public File getTorrentDbsStorageLocation() {

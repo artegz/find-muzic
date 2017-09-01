@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 import ru.asm.core.dev.model.ddb.FileDocument;
-import ru.asm.core.dev.model.torrent.Mp3TorrentSongSource;
+import ru.asm.core.dev.model.torrent.TorrentSongSource;
 import ru.asm.core.dev.model.torrent.TorrentSearcher;
 
 import javax.annotation.PostConstruct;
@@ -39,16 +39,22 @@ public class SearchServiceImpl implements SearchService {
     }
 
     @Override
-    public List<Mp3TorrentSongSource> getSongSources(Song song) {
-        final List<Mp3TorrentSongSource> songSources = new ArrayList<>();
+    public List<TorrentSongSource> getSongSources(Song song) {
+        List<TorrentSongSource> resultSources = null;
         for (Searcher searcher : searchers) {
-            songSources.addAll(searcher.getSongSources(song));
+            final List<TorrentSongSource> songSources = searcher.getSongSources(song);
+            if (songSources != null) {
+                if (resultSources == null) {
+                    resultSources = new ArrayList<>();
+                }
+                resultSources.addAll(songSources);
+            }
         }
-        return songSources;
+        return resultSources;
     }
 
     @Override
-    public void downloadSongs(Song song, List<Mp3TorrentSongSource> sources) {
+    public void downloadSongs(Song song, List<TorrentSongSource> sources) {
         for (Searcher searcher : searchers) {
             searcher.downloadSongs(song, sources);
         }

@@ -1,6 +1,5 @@
 package ru.asm.core.dev.model.torrent;
 
-import org.dizitart.no2.NitriteId;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.slf4j.Logger;
@@ -82,13 +81,12 @@ public class IndexedArtistsService {
             }
         }
 
-        dataStorage.saveArtist(artistDoc);
+        dataStorage.insertArtist(artistDoc);
     }
 
     private ArtistDocument createArtistDocument(Artist artist) {
         ArtistDocument artistDoc;
         artistDoc = new ArtistDocument();
-        artistDoc.setId(NitriteId.newId().getIdValue());
         artistDoc.setArtistId(artist.getArtistId());
         artistDoc.setArtistName(artist.getArtistName());
         artistDoc.setArtistTorrentIds(new ArrayList<>());
@@ -97,7 +95,6 @@ public class IndexedArtistsService {
 
     private TorrentDocument createTorrentDocument(TorrentInfoVO ti, String format) {
         final TorrentDocument torrentDocument = new TorrentDocument();
-        torrentDocument.setId(NitriteId.newId().getIdValue());
         torrentDocument.setTorrentId(ti.getId());
         torrentDocument.setFormat(format);
         torrentDocument.setStatus(ResolveStatuses.STATUS_UNKNOWN);

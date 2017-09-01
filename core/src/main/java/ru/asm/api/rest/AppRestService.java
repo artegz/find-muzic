@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import ru.asm.core.AppConfiguration;
 import ru.asm.core.AppCoreService;
 import ru.asm.core.dev.model.*;
-import ru.asm.core.dev.model.torrent.Mp3TorrentSongSource;
+import ru.asm.core.dev.model.torrent.TorrentSongSource;
 import ru.asm.core.persistence.domain.PlaylistSongEntity;
 import ru.asm.core.persistence.domain.ResolvedSongEntity;
 import ru.asm.core.persistence.domain.StatusEntity;
@@ -286,7 +286,7 @@ public class AppRestService {
     @Produces("application/json; charset=UTF-8")
     @Path("/alt/songs/sources/resolve")
     public void resolveSongSources(List<Integer> songIds) {
-        logger.info("resoling {} songs", songIds.size());
+        logger.info("resolving {} songs", songIds.size());
         int complete = 0;
         for (Integer songId : songIds) {
             final Song song = findSongById(songId);
@@ -310,10 +310,11 @@ public class AppRestService {
         final Song song = findSongById(songId);
 
         if (song != null) {
-            final List<Mp3TorrentSongSource> songSources = this.searchService.getSongSources(song);
-            final List<Mp3TorrentSongSource> specifiedSources = filter(songSources, downloadInfo.getSourcesIds());
-
-            this.searchService.downloadSongs(song, specifiedSources);
+            final List<TorrentSongSource> songSources = this.searchService.getSongSources(song);
+            if (songSources != null) {
+                final List<TorrentSongSource> specifiedSources = filter(songSources, downloadInfo.getSourcesIds());
+                this.searchService.downloadSongs(song, specifiedSources);
+            }
         }
     }
     @POST
@@ -329,9 +330,11 @@ public class AppRestService {
             if (song != null) {
                 logger.info("downloading {} ({}) from {} sources...", song.getFullName(), song.getSongId(), downloadInfo.size());
 
-                final List<Mp3TorrentSongSource> songSources = this.searchService.getSongSources(song);
-                final List<Mp3TorrentSongSource> specifiedSources = filter(songSources, downloadInfo);
-                this.searchService.downloadSongs(song, specifiedSources);
+                final List<TorrentSongSource> songSources = this.searchService.getSongSources(song);
+                if (songSources != null) {
+                    final List<TorrentSongSource> specifiedSources = filter(songSources, downloadInfo);
+                    this.searchService.downloadSongs(song, specifiedSources);
+                }
 
                 complete++;
                 logger.info("resolving complete ({} / {})", complete, songsDownloadInfos.size());
@@ -348,9 +351,9 @@ public class AppRestService {
 
 
 
-    private List<Mp3TorrentSongSource> filter(List<Mp3TorrentSongSource> songSources, List<String> sourcesIds) {
-        final List<Mp3TorrentSongSource> specifiedSources = new ArrayList<>();
-        for (Mp3TorrentSongSource songSource : songSources) {
+    private List<TorrentSongSource> filter(List<TorrentSongSource> songSources, List<String> sourcesIds) {
+        final List<TorrentSongSource> specifiedSources = new ArrayList<>();
+        for (TorrentSongSource songSource : songSources) {
             if (sourcesIds.contains(songSource.getSourceId())) {
                 specifiedSources.add(songSource);
             }

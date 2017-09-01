@@ -2,7 +2,7 @@ package ru.asm.core.dev.model.ddb;
 
 import org.dizitart.no2.objects.Id;
 import ru.asm.core.dev.model.Song;
-import ru.asm.core.dev.model.torrent.Mp3TorrentSongSource;
+import ru.asm.core.dev.model.torrent.TorrentSongSource;
 
 import java.util.List;
 
@@ -20,7 +20,7 @@ public class SongDocument {
 
     private Song song;
 
-    private List<Mp3TorrentSongSource> songSources;
+    private List<TorrentSongSource> songSources;
 
     public Long getId() {
         return id;
@@ -34,7 +34,7 @@ public class SongDocument {
         return song;
     }
 
-    public List<Mp3TorrentSongSource> getSongSources() {
+    public List<TorrentSongSource> getSongSources() {
         return songSources;
     }
 
@@ -50,7 +50,7 @@ public class SongDocument {
         this.song = song;
     }
 
-    public void setSongSources(List<Mp3TorrentSongSource> songSources) {
+    public void setSongSources(List<TorrentSongSource> songSources) {
         this.songSources = songSources;
     }
 }

@@ -7,6 +7,7 @@ import com.frostwire.jlibtorrent.alerts.BlockFinishedAlert;
 import com.frostwire.jlibtorrent.alerts.TorrentAddedAlert;
 import org.apache.commons.lang.mutable.MutableFloat;
 import org.slf4j.*;
+import ru.asm.core.AppConfiguration;
 
 import java.io.File;
 import java.util.Timer;
@@ -24,7 +25,6 @@ public class TorrentClient {
 
     // todo asm: make methods async with return future
 
-    public static final int TIMEOUT = 30;
     public static final Logger logger = LoggerFactory.getLogger(TorrentClient.class);
 
     static {
@@ -138,7 +138,7 @@ public class TorrentClient {
     private TorrentInfo fetchMagnet(String uri) {
         try {
             logger.debug("Fetching the magnet uri, please wait... ({})", uri);
-            byte[] data = s.fetchMagnet(uri, 30);
+            byte[] data = s.fetchMagnet(uri, AppConfiguration.getFetchMagnetTimeout());
 
             if (data != null) {
                 logger.debug("Magnet retrieved");

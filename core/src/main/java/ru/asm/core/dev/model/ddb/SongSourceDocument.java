@@ -1,6 +1,6 @@
 package ru.asm.core.dev.model.ddb;
 
-import ru.asm.core.dev.model.torrent.Mp3TorrentSongSource;
+import ru.asm.core.dev.model.torrent.TorrentSongSource;
 
 /**
  * User: artem.smirnov
@@ -15,7 +15,7 @@ public class SongSourceDocument {
 
     private String sourceId;
 
-    private Mp3TorrentSongSource songSource;
+    private TorrentSongSource songSource;
 
     public Long getId() {
         return id;
@@ -41,11 +41,11 @@ public class SongSourceDocument {
         this.sourceId = sourceId;
     }
 
-    public Mp3TorrentSongSource getSongSource() {
+    public TorrentSongSource getSongSource() {
         return songSource;
     }
 
-    public void setSongSource(Mp3TorrentSongSource songSource) {
+    public void setSongSource(TorrentSongSource songSource) {
         this.songSource = songSource;
     }
 }
