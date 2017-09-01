@@ -2,9 +2,6 @@ package ru.asm.core.dev.model.ddb;
 
 import org.dizitart.no2.objects.Id;
 import ru.asm.core.index.domain.TorrentInfoVO;
-import ru.asm.core.index.domain.TorrentSongVO;
-
-import java.util.List;
 
 /**
  * User: artem.smirnov
@@ -24,7 +21,7 @@ public class TorrentDocument {
 
     private String status;
 
-    private List<TorrentSongVO> torrentSongs;
+    //private List<TorrentSongVO> torrentSongs;
 
     public Long getId() {
         return id;
@@ -66,11 +63,11 @@ public class TorrentDocument {
         this.status = status;
     }
 
-    public List<TorrentSongVO> getTorrentSongs() {
-        return torrentSongs;
-    }
-
-    public void setTorrentSongs(List<TorrentSongVO> torrentSongs) {
-        this.torrentSongs = torrentSongs;
-    }
+//    public List<TorrentSongVO> getTorrentSongs() {
+//        return torrentSongs;
+//    }
+//
+//    public void setTorrentSongs(List<TorrentSongVO> torrentSongs) {
+//        this.torrentSongs = torrentSongs;
+//    }
 }

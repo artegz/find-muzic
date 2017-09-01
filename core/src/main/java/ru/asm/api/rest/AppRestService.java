@@ -1,13 +1,13 @@
 package ru.asm.api.rest;
 
 import com.google.common.collect.Lists;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import ru.asm.core.AppConfiguration;
 import ru.asm.core.AppCoreService;
-import ru.asm.core.dev.model.Artist;
-import ru.asm.core.dev.model.SearchService;
-import ru.asm.core.dev.model.Song;
-import ru.asm.core.dev.model.SongSource;
+import ru.asm.core.dev.model.*;
+import ru.asm.core.dev.model.torrent.Mp3TorrentSongSource;
 import ru.asm.core.persistence.domain.PlaylistSongEntity;
 import ru.asm.core.persistence.domain.ResolvedSongEntity;
 import ru.asm.core.persistence.domain.StatusEntity;
@@ -17,8 +17,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import java.io.File;
 import java.io.InputStream;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 /**
  * User: artem.smirnov
@@ -28,6 +27,7 @@ import java.util.List;
 @Path("/")
 public class AppRestService {
 
+    public static final Logger logger = LoggerFactory.getLogger(AppRestService.class);
     @Autowired
     private SearchService searchService;
 
@@ -82,9 +82,9 @@ public class AppRestService {
     @Produces("application/json; charset=UTF-8")
     @Path("/playlists/import")
     public void importPlaylist() {
-        final String playlist = "nashe";
+        final String playlist = "nashe-test";
         final String comment = "test";
-        final File file = new File("C:\\IdeaProjects\\find-muzic\\core\\src\\main\\resources\\playlists/102015.nashe.playlist.txt");
+        final File file = new File("C:\\IdeaProjects\\find-muzic\\core\\src\\main\\resources\\playlists/test.nashe.playlist.txt");
 
         appCoreService.importPlaylist(playlist, comment, file);
     }
@@ -190,33 +190,222 @@ public class AppRestService {
 
 
 
+//    @GET
+//    @Produces("application/json; charset=UTF-8")
+//    @Path("/alt/artists")
+//    public List<Artist> getArtistsAll() {
+//        final Set<Artist> artists = new HashSet<>();
+//        final List<PlaylistSongEntity> songs = this.playlistSongsMapper.getSongs("nashe-test");
+//        for (PlaylistSongEntity song : songs) {
+//            artists.add(getArtist(song));
+//        }
+//        return new ArrayList<>(artists);
+//    }
+//
+//    @GET
+//    @Produces("application/json; charset=UTF-8")
+//    @Path("/alt/artists/{artistId}/songs")
+//    public List<Song> getArtistSongs(@PathParam("artistId") Integer artistId) {
+//        final Set<Song> songs = new HashSet<>();
+//        final List<PlaylistSongEntity> songEntities = this.playlistSongsMapper.getSongs("nashe-test");
+//        for (PlaylistSongEntity songEntity : songEntities) {
+//            if (songEntity.getArtistId().equals(artistId)) {
+//                final Song song = getSong(songEntity);
+//                songs.add(song);
+//            }
+//        }
+//        return new ArrayList<>(songs);
+//    }
+//
+//    @GET
+//    @Produces("application/json; charset=UTF-8")
+//    @Path("/alt/songs")
+//    public List<Song> getAllSongs() {
+//        final Set<Song> songs = new HashSet<>();
+//        final List<PlaylistSongEntity> songEntities = this.playlistSongsMapper.getSongs("nashe-test");
+//        for (PlaylistSongEntity songEntity : songEntities) {
+//            final Song song = getSong(songEntity);
+//            songs.add(song);
+//        }
+//        return new ArrayList<>(songs);
+//    }
+//
+//    @GET
+//    @Produces("application/json; charset=UTF-8")
+//    @Path("/alt/playlists/{playlistId}/songs")
+//    public List<Song> getPlaylistSongs(@QueryParam("playlistId") String playlistId) {
+//        return getPlaylistSongs(playlistId);
+//    }
+
+//    @GET
+//    @Produces("application/json; charset=UTF-8")
+//    @Path("/alt/songs/{songId}/sources")
+//    public List<Mp3TorrentSongSource> getSongSources(@PathParam("songId") Integer songId) {
+//        PlaylistSongEntity foundSong = findSong(songId);
+//
+//        if (foundSong != null) {
+//            final Song song = getSong(foundSong);
+//            return this.searchService.getSongSources(song);
+//        } else {
+//            return null;
+//        }
+//    }
+
+
+
+
+    // Step 1: see playlist
     @GET
     @Produces("application/json; charset=UTF-8")
-    @Path("/alt/songs/{songId}/sources")
-    public List<SongSource> getSongSources(@PathParam("songId") Integer songId) {
+    @Path("/alt/playlists/{playlistId}/songs")
+    public List<SongInfo> getPlaylistSongs2(@PathParam("playlistId") String playlistId) {
+        final List<Song> songs = getPlaylistSongsImpl(playlistId);
+
+        final List<SongInfo> songInfos = Lists.transform(songs, s -> {
+            final SongInfo songInfo = new SongInfo();
+            songInfo.setSong(s);
+            songInfo.setSources(this.searchService.getSongSources(s));
+            songInfo.setFiles(this.searchService.getDownloadedSongs(s));
+            return songInfo;
+        });
+
+        return songInfos;
+    }
+
+    // Step 2: resolve sources
+    @POST
+    @Produces("application/json; charset=UTF-8")
+    @Path("/alt/songs/{songId}/sources/resolve")
+    public void resolveSongSources(@PathParam("songId") Integer songId) {
+        final Song song = findSongById(songId);
+        if (song != null) {
+            this.searchService.resolveSongSources(song);
+        }
+    }
+    @POST
+    @Produces("application/json; charset=UTF-8")
+    @Path("/alt/songs/sources/resolve")
+    public void resolveSongSources(List<Integer> songIds) {
+        logger.info("resoling {} songs", songIds.size());
+        int complete = 0;
+        for (Integer songId : songIds) {
+            final Song song = findSongById(songId);
+            if (song != null) {
+                logger.info("resolving {} ({})...", song.getFullName(), song.getSongId());
+                this.searchService.resolveSongSources(song);
+                complete++;
+                logger.info("resolving complete ({} / {})", complete, songIds.size());
+            } else {
+                complete++;
+                logger.error("song {} not found", songId);
+            }
+        }
+    }
+
+    // Step 3: download
+    @POST
+    @Produces("application/json; charset=UTF-8")
+    @Path("/alt/songs/{songId}/sources/download")
+    public void downloadSongs(@PathParam("songId") Integer songId, DownloadInfo downloadInfo) {
+        final Song song = findSongById(songId);
+
+        if (song != null) {
+            final List<Mp3TorrentSongSource> songSources = this.searchService.getSongSources(song);
+            final List<Mp3TorrentSongSource> specifiedSources = filter(songSources, downloadInfo.getSourcesIds());
+
+            this.searchService.downloadSongs(song, specifiedSources);
+        }
+    }
+    @POST
+    @Produces("application/json; charset=UTF-8")
+    @Path("/alt/songs/sources/download")
+    public void downloadSongs(Map<Integer, List<String>> songsDownloadInfos) {
+        logger.info("downloading {} songs", songsDownloadInfos.size());
+        int complete = 0;
+        for (Integer songId : songsDownloadInfos.keySet()) {
+            final Song song = findSongById(songId);
+            final List<String> downloadInfo = songsDownloadInfos.get(songId);
+
+            if (song != null) {
+                logger.info("downloading {} ({}) from {} sources...", song.getFullName(), song.getSongId(), downloadInfo.size());
+
+                final List<Mp3TorrentSongSource> songSources = this.searchService.getSongSources(song);
+                final List<Mp3TorrentSongSource> specifiedSources = filter(songSources, downloadInfo);
+                this.searchService.downloadSongs(song, specifiedSources);
+
+                complete++;
+                logger.info("resolving complete ({} / {})", complete, songsDownloadInfos.size());
+            } else {
+                complete++;
+                logger.error("song {} not found", songId);
+            }
+        }
+    }
+
+
+
+
+
+
+
+    private List<Mp3TorrentSongSource> filter(List<Mp3TorrentSongSource> songSources, List<String> sourcesIds) {
+        final List<Mp3TorrentSongSource> specifiedSources = new ArrayList<>();
+        for (Mp3TorrentSongSource songSource : songSources) {
+            if (sourcesIds.contains(songSource.getSourceId())) {
+                specifiedSources.add(songSource);
+            }
+        }
+        return specifiedSources;
+    }
+
+
+    private PlaylistSongEntity findSong(Integer songId) {
         PlaylistSongEntity foundSong = null;
 
-        final List<PlaylistSongEntity> songs = this.playlistSongsMapper.getSongs();
+        final List<PlaylistSongEntity> songs = this.playlistSongsMapper.getSongs("nashe-test");
         for (PlaylistSongEntity song : songs) {
             if (song.getSongId().equals(songId)) {
                 foundSong = song;
             }
         }
+        return foundSong;
+    }
 
-        if (foundSong != null) {
-            final Artist artist = new Artist();
-            artist.setArtistId(foundSong.getArtistId());
-            artist.setArtistName(foundSong.getArtist());
-            final Song song = new Song();
-            song.setSongId(foundSong.getSongId());
-            song.setTitle(foundSong.getTitle());
-            song.setArtist(artist);
+    private Song getSong(PlaylistSongEntity foundSong) {
+        final Song song = new Song();
+        final Artist artist = getArtist(foundSong);
+        song.setSongId(foundSong.getSongId());
+        song.setTitle(foundSong.getTitle());
+        song.setArtist(artist);
+        return song;
+    }
 
-            return this.searchService.search(song);
-        } else {
-            return null;
-        }
+    private Artist getArtist(PlaylistSongEntity foundSong) {
+        final Artist artist = new Artist();
+        artist.setArtistId(foundSong.getArtistId());
+        artist.setArtistName(foundSong.getArtist());
+        return artist;
     }
 
 
+    private List<Song> getPlaylistSongsImpl(String playlistId) {
+        final Set<Song> songs = new HashSet<>();
+        final List<PlaylistSongEntity> songEntities = this.playlistSongsMapper.getSongs(playlistId);
+        for (PlaylistSongEntity songEntity : songEntities) {
+            final Song song = getSong(songEntity);
+            songs.add(song);
+        }
+        return new ArrayList<>(songs);
+    }
+
+    private Song findSongById(Integer songId) {
+        final Song song;
+        PlaylistSongEntity foundSong = findSong(songId);
+        if (foundSong != null) {
+            song = getSong(foundSong);
+        } else {
+            song = null;
+        }
+        return song;
+    }
 }

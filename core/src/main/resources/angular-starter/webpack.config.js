@@ -95,10 +95,10 @@ module.exports = function makeWebpackConfig() {
       },
 
       // copy those assets to output
-      {
-        test: /\.(png|jpe?g|gif|svg|woff|woff2|ttf|eot|ico)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
-        loader: 'file-loader?name=fonts/[name].[hash].[ext]?'
-      },
+      // {
+      //   test: /\.(png|jpe?g|gif|svg|woff|woff2|ttf|eot|ico)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
+      //   loader: 'file-loader?name=fonts/[name].[hash].[ext]?'
+      // },
 
       // Support for *.json files.
       {test: /\.json$/, loader: 'json-loader'},
@@ -127,7 +127,12 @@ module.exports = function makeWebpackConfig() {
 
       // support for .html as raw text
       // todo: change the loader to something that adds a hash to images
-      {test: /\.html$/, loader: 'raw-loader',  exclude: root('src', 'public')}
+      {test: /\.html$/, loader: 'raw-loader',  exclude: root('src', 'public')},
+
+      // the url-loader uses DataUrls.
+      // the file-loader emits files.
+      { test: /\.woff(2)?(\?v=[0-9]\.[0-9]\.[0-9])?$/, loader: "url-loader?limit=10000&mimetype=application/font-woff" },
+      { test: /\.(ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/, loader: "file-loader" }
     ]
   };
 

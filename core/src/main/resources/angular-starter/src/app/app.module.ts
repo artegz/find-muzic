@@ -19,6 +19,7 @@ import {NgxPaginationModule} from "ngx-pagination/dist/ngx-pagination";
 import {TorrentDbsComponent} from "./torrent-dbs/torrent-dbs.component";
 import {MyStatusesComponent} from "./statuses/statuses.component";
 import {MyFoundSongsComponent} from './songs/songs.component';
+import {PlaylistManagerComponent} from "./alt/playlist-manager/playlist-manager.component";
 
 @NgModule({
   imports: [
@@ -36,7 +37,8 @@ import {MyFoundSongsComponent} from './songs/songs.component';
     MyTestComponent,
     TorrentDbsComponent,
     MyStatusesComponent,
-    MyFoundSongsComponent
+    MyFoundSongsComponent,
+    PlaylistManagerComponent
   ],
   providers: [
     ApiService,

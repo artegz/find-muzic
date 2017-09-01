@@ -7,6 +7,7 @@ import org.dizitart.no2.objects.filters.ObjectFilters;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import java.util.List;
 
 /**
  * User: artem.smirnov
@@ -20,6 +21,9 @@ public class DataStorage {
 
     private ObjectRepository<ArtistDocument> artistRepo;
     private ObjectRepository<TorrentDocument> torrentRepo;
+    private ObjectRepository<SongDocument> songRepo;
+    private ObjectRepository<FileDocument> filesRepo;
+    private ObjectRepository<SongSourceDocument> songSourceRepo;
 
     @PostConstruct
     public void postConstruct() {
@@ -29,6 +33,9 @@ public class DataStorage {
                 .openOrCreate("user", "password");
         artistRepo = db.getRepository(ArtistDocument.class);
         torrentRepo = db.getRepository(TorrentDocument.class);
+        songRepo = db.getRepository(SongDocument.class);
+        filesRepo = db.getRepository(FileDocument.class);
+        songSourceRepo = db.getRepository(SongSourceDocument.class);
     }
 
     public ArtistDocument getArtist(Integer artistId) {
@@ -50,6 +57,50 @@ public class DataStorage {
     }
 
     public void updateTorrent(TorrentDocument torrentDocument) {
-        torrentRepo.update(ObjectFilters.eq("torrentId", torrentDocument.getTorrentId()), torrentDocument);
+//        final Long id = torrentDocument.getId();
+        torrentRepo.update(torrentDocument);
+
+//        torrentRepo.update(ObjectFilters.eq("torrentId", torrentDocument.getTorrentId()), torrentDocument);
+    }
+
+    public SongDocument getSong(Integer songId) {
+        final Cursor<SongDocument> songDocuments = songRepo.find(ObjectFilters.eq("songId", songId));
+        return songDocuments.firstOrDefault();
+    }
+
+    public void insertSong(SongDocument songDocument) {
+        songRepo.insert(songDocument);
+    }
+
+    public void updateSong(SongDocument songDocument) {
+        songRepo.update(ObjectFilters.eq("songId", songDocument.getSongId()), songDocument);
+    }
+
+    public FileDocument getFileBySource(String sourceId) {
+        final Cursor<FileDocument> fileDocuments = filesRepo.find(ObjectFilters.eq("sourceId", sourceId));
+        return fileDocuments.firstOrDefault();
+    }
+
+    public List<FileDocument> getFiles(Integer songId) {
+        final Cursor<FileDocument> fileDocuments = filesRepo.find(ObjectFilters.eq("songId", songId));
+        return fileDocuments.toList();
+    }
+
+    public void insertFile(FileDocument fileDocument) {
+        filesRepo.insert(fileDocument);
+    }
+
+    public List<SongSourceDocument> getSongSources(Integer songId) {
+        final Cursor<SongSourceDocument> songSourceDocuments = songSourceRepo.find(ObjectFilters.eq("songId", songId));
+        return songSourceDocuments.toList();
+    }
+
+    public SongSourceDocument getSongSource(String sourceId) {
+        final Cursor<SongSourceDocument> songSourceDocuments = songSourceRepo.find(ObjectFilters.eq("sourceId", sourceId));
+        return songSourceDocuments.firstOrDefault();
+    }
+
+    public void insertSongSource(SongSourceDocument songSourceDocument) {
+        songSourceRepo.insert(songSourceDocument);
     }
 }

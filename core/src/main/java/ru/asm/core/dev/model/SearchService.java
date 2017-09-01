@@ -1,5 +1,8 @@
 package ru.asm.core.dev.model;
 
+import ru.asm.core.dev.model.ddb.FileDocument;
+import ru.asm.core.dev.model.torrent.Mp3TorrentSongSource;
+
 import java.util.List;
 
 /**
@@ -9,7 +12,11 @@ import java.util.List;
  */
 public interface SearchService {
 
-    List<SongSource> search(Song song);
+    void resolveSongSources(Song song);
 
-    SongResult fetch(List<SongSource> songSources);
+    List<Mp3TorrentSongSource> getSongSources(Song song);
+
+    void downloadSongs(Song song, List<Mp3TorrentSongSource> sources);
+
+    List<FileDocument> getDownloadedSongs(Song song);
 }

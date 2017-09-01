@@ -4,11 +4,55 @@ import { Observable } from 'rxjs';
 import 'rxjs/add/operator/map';
 import {StatusEntity} from "./status-entity";
 import {SongsSearchResult} from "./songs-search-result";
+import {SongInfo} from "./dto/song-info";
 
 @Injectable()
 export class RestService {
 
   constructor(private http: Http) {}
+
+
+
+  getSongs(playlistId: string): Observable<SongInfo[]> {
+    let url = 'rest/' + 'alt/playlists/' + playlistId + '/songs';
+    let params = new URLSearchParams();
+    let headers = new Headers();
+    let res = this.http.get(
+      url,
+      {search: params, headers: headers}
+    );
+    return res.map(response => response.json());
+  }
+  resolveSongs(songIds: number[]): Observable<void> {
+    let url = 'rest/' + 'alt/songs/sources/resolve';
+
+    let params = new URLSearchParams();
+    let headers = new Headers();
+
+    let res = this.http.post(
+      url,
+      songIds,
+      {search: params, headers: headers}
+    );
+    return res.map(response => response.json());
+  }
+  fetchSongs(songSources: {[key: number]: string[]}): Observable<void> {
+    let url = 'rest/' + 'alt/songs/sources/download';
+
+    let params = new URLSearchParams();
+    let headers = new Headers();
+
+    let res = this.http.post(
+      url,
+      songSources,
+      {search: params, headers: headers}
+    );
+    return res.map(response => response.json());
+  }
+
+
+
+
 
   downloadDb(magnet: string): Observable<void>{
     let url = 'rest/' + 'torrentDbs/download';

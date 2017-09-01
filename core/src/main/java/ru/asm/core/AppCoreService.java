@@ -175,7 +175,7 @@ public class AppCoreService {
                 assert (songId != null);
 
 
-                playlistSongsMapper.insertPlaylistSong(artistId, songId, playlistName, comment);
+                playlistSongsMapper.insertPlaylistSong(artistId, songId, playlistName, comment, i);
                 logger.info("{}. [{}] '{}' into '{}' with comment: '{}'", i++, song.getArtist(), song.getTitle(), playlistName, comment);
             } else {
                 logger.warn("{}. null", i++);
@@ -540,7 +540,7 @@ public class AppCoreService {
 
     @Transactional
     public SongsSearchResult resolveSongs() {
-        final List<PlaylistSongEntity> songs = playlistSongsMapper.getSongs();
+        final List<PlaylistSongEntity> songs = playlistSongsMapper.getSongs("nashe");
 //        for (PlaylistSongEntity song : songs) {
 //            System.out.println(song);
 //        }
