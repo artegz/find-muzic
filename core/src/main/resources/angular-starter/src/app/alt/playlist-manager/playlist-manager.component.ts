@@ -82,10 +82,12 @@ export class PlaylistManagerComponent implements OnInit {
 
     this.resolvableSongs.forEach(s => {
       s.sources.forEach(ss => {
-        if (!sources[s.id]) {
-          sources[s.id] = [];
+        if (ss.download) {
+          if (!sources[s.id]) {
+            sources[s.id] = [];
+          }
+          sources[s.id].push(ss.sourceId);
         }
-        sources[s.id].push(ss.sourceId);
       })
     });
 

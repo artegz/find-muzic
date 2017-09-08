@@ -96,6 +96,16 @@ public class DataStorage {
         return songSourceDocuments.toList();
     }
 
+    public List<SongSourceDocument> getSongSourcesByTorrentAndCuePath(String torrentId, String cuePath) {
+        final Cursor<SongSourceDocument> songSourceDocuments = songSourceRepo.find(
+                ObjectFilters.and(
+                        ObjectFilters.eq("songSource.indexSong.torrentId", torrentId),
+                        ObjectFilters.eq("songSource.indexSong.cueFilePath", cuePath)
+                )
+        );
+        return songSourceDocuments.toList();
+    }
+
     public SongSourceDocument getSongSource(String sourceId) {
         final Cursor<SongSourceDocument> songSourceDocuments = songSourceRepo.find(ObjectFilters.eq("sourceId", sourceId));
         return songSourceDocuments.firstOrDefault();
