@@ -48,7 +48,7 @@
     <orderEntry type="library" name="Gradle: org.springframework:spring-tx:4.3.0.RELEASE" level="project" />
     <orderEntry type="library" name="Gradle: org.springframework:spring-web:4.3.0.RELEASE" level="project" />
     <orderEntry type="library" name="Gradle: org.springframework:spring-core:4.3.0.RELEASE" level="project" />
-    <orderEntry type="library" name="Gradle: net.bramp.ffmpeg:ffmpeg:0.6.1" level="project" />
+    <orderEntry type="library" name="Gradle: commons-io:commons-io:2.4" level="project" />
     <orderEntry type="library" name="Gradle: org.multiverse:multiverse-core:0.7.0" level="project" />
     <orderEntry type="library" name="Gradle: org.codehaus.jsr166-mirror:jsr166y:1.7.0" level="project" />
     <orderEntry type="library" name="Gradle: ch.qos.logback:logback-core:1.0.13" level="project" />
@@ -70,6 +70,7 @@
     <orderEntry type="library" name="Gradle: org.apache.lucene:lucene-suggest:5.5.4" level="project" />
     <orderEntry type="library" name="Gradle: org.apache.lucene:lucene-join:5.5.4" level="project" />
     <orderEntry type="library" name="Gradle: org.apache.lucene:lucene-spatial:5.5.4" level="project" />
+    <orderEntry type="library" name="Gradle: com.google.guava:guava:18.0" level="project" />
     <orderEntry type="library" name="Gradle: org.elasticsearch:securesm:1.0" level="project" />
     <orderEntry type="library" name="Gradle: com.carrotsearch:hppc:0.7.1" level="project" />
     <orderEntry type="library" name="Gradle: joda-time:joda-time:2.9.5" level="project" />
@@ -101,9 +102,6 @@
     <orderEntry type="library" name="Gradle: org.springframework:spring-beans:4.3.0.RELEASE" level="project" />
     <orderEntry type="library" name="Gradle: org.springframework:spring-aop:4.3.0.RELEASE" level="project" />
     <orderEntry type="library" name="Gradle: commons-logging:commons-logging:1.2" level="project" />
-    <orderEntry type="library" name="Gradle: org.apache.commons:commons-lang3:3.5" level="project" />
-    <orderEntry type="library" name="Gradle: com.google.code.gson:gson:2.8.0" level="project" />
-    <orderEntry type="library" name="Gradle: org.modelmapper:modelmapper:0.7.7" level="project" />
     <orderEntry type="library" name="Gradle: com.squareup.okio:okio:1.11.0" level="project" />
     <orderEntry type="library" name="Gradle: commons-beanutils:commons-beanutils:1.8.0" level="project" />
     <orderEntry type="library" name="Gradle: commons-collections:commons-collections:3.2.1" level="project" />
@@ -124,8 +122,6 @@
     <orderEntry type="library" name="Gradle: org.apache.lucene:lucene-grouping:5.5.4" level="project" />
     <orderEntry type="library" name="Gradle: org.apache.lucene:lucene-spatial3d:5.5.4" level="project" />
     <orderEntry type="library" name="Gradle: com.spatial4j:spatial4j:0.5" level="project" />
-    <orderEntry type="library" name="Gradle: com.google.guava:guava:20.0" level="project" />
-    <orderEntry type="library" name="Gradle: commons-io:commons-io:2.5" level="project" />
     <orderEntry type="library" name="Gradle: org.eclipse.jetty:jetty-util:9.2.18.v20160721" level="project" />
   </component>
 </module>

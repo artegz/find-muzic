@@ -12,6 +12,10 @@ import ru.asm.core.persistence.domain.PlaylistSongEntity;
 import ru.asm.core.persistence.domain.ResolvedSongEntity;
 import ru.asm.core.persistence.domain.StatusEntity;
 import ru.asm.core.persistence.mappers.PlaylistSongsMapper;
+import ru.asm.core.progress.ProgressInfo;
+import ru.asm.core.progress.ProgressListener;
+import ru.asm.core.progress.ProgressService;
+import ru.asm.core.progress.Task;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -28,6 +32,10 @@ import java.util.*;
 public class AppRestService {
 
     public static final Logger logger = LoggerFactory.getLogger(AppRestService.class);
+
+    public static final String TASK_RESOLVE_SOURCES = "resolveSources";
+    public static final String TASK_DOWNLOAD_SONGS = "downloadSongs";
+
     @Autowired
     private SearchService searchService;
 
@@ -36,6 +44,9 @@ public class AppRestService {
 
     @Autowired
     private AppCoreService appCoreService;
+
+    @Autowired
+    private ProgressService progressService;
 
 
     // Step 1.1: download fresh torrents DB
@@ -279,7 +290,9 @@ public class AppRestService {
     public void resolveSongSources(@PathParam("songId") Integer songId) {
         final Song song = findSongById(songId);
         if (song != null) {
-            this.searchService.resolveSongSources(song);
+            final ProgressListener progressListener = progressService.taskStarted(song, TASK_RESOLVE_SOURCES);
+            this.searchService.resolveSongSources(song, false, progressListener);
+            progressService.taskEnded(song);
         }
     }
     @POST
@@ -291,10 +304,12 @@ public class AppRestService {
         for (Integer songId : songIds) {
             final Song song = findSongById(songId);
             if (song != null) {
+                final ProgressListener progressListener = progressService.taskStarted(song, TASK_RESOLVE_SOURCES);
                 logger.info("resolving {} ({})...", song.getFullName(), song.getSongId());
-                this.searchService.resolveSongSources(song);
+                this.searchService.resolveSongSources(song, false, progressListener);
                 complete++;
                 logger.info("resolving complete ({} / {})", complete, songIds.size());
+                progressService.taskEnded(song);
             } else {
                 complete++;
                 logger.error("song {} not found", songId);
@@ -310,11 +325,13 @@ public class AppRestService {
         final Song song = findSongById(songId);
 
         if (song != null) {
+            final ProgressListener progressListener = progressService.taskStarted(song, TASK_DOWNLOAD_SONGS);
             final List<TorrentSongSource> songSources = this.searchService.getSongSources(song);
             if (songSources != null) {
                 final List<TorrentSongSource> specifiedSources = filter(songSources, downloadInfo.getSourcesIds());
-                this.searchService.downloadSongs(song, specifiedSources);
+                this.searchService.downloadSongs(song, specifiedSources, false, progressListener);
             }
+            progressService.taskEnded(song);
         }
     }
     @POST
@@ -330,11 +347,13 @@ public class AppRestService {
             if (song != null) {
                 logger.info("downloading {} ({}) from {} sources...", song.getFullName(), song.getSongId(), downloadInfo.size());
 
+                final ProgressListener progressListener = progressService.taskStarted(song, TASK_DOWNLOAD_SONGS);
                 final List<TorrentSongSource> songSources = this.searchService.getSongSources(song);
                 if (songSources != null) {
                     final List<TorrentSongSource> specifiedSources = filter(songSources, downloadInfo);
-                    this.searchService.downloadSongs(song, specifiedSources);
+                    this.searchService.downloadSongs(song, specifiedSources, false, progressListener);
                 }
+                progressService.taskEnded(song);
 
                 complete++;
                 logger.info("resolving complete ({} / {})", complete, songsDownloadInfos.size());
@@ -347,7 +366,18 @@ public class AppRestService {
 
 
 
-
+    @GET
+    @Produces("application/json; charset=UTF-8")
+    @Path("/progresses")
+    public ProgressInfo getProgressInfo() {
+        final Map<PlaylistSongEntity, Task> progresses = new HashMap<>();
+        final Map<Integer, Task> tasksInProgress = progressService.getTasksInProgress();
+        for (Integer songId : tasksInProgress.keySet()) {
+            final PlaylistSongEntity songEntity = this.playlistSongsMapper.getSong(songId);
+            progresses.put(songEntity, tasksInProgress.get(songId));
+        }
+        return new ProgressInfo(progresses.keySet(), tasksInProgress);
+    }
 
 
 

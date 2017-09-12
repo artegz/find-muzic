@@ -1,0 +1,100 @@
+<div class="row">
+  <div class="col-xs-12">
+    <table *ngIf="!!progressInfo" class="table table-bordered">
+      <tr>
+        <th>Song</th>
+        <th>Task name</th>
+        <th>Stage</th>
+        <th>Steps</th>
+        <th>In progress</th>
+        <th>Sub stage</th>
+        <th>Steps</th>
+        <th>In progress</th>
+      </tr>
+      <tr *ngFor="let song of progressInfo.songs">
+        <td>
+          {{song.artist}}: {{song.title}}
+        </td>
+        <td>
+          <!-- task name -->
+          {{progressInfo.songProgresses[song.songId].name}}
+        </td>
+        <td>
+          <!-- stage -->
+          <ng-container *ngIf="!!progressInfo.songProgresses[song.songId].currentStage">
+            {{progressInfo.songProgresses[song.songId].currentStage.name}}
+            {{progressInfo.songProgresses[song.songId].currentStage.description}}
+          </ng-container>
+        </td>
+        <td>
+          <!-- steps -->
+          <ng-container
+            *ngIf="!!progressInfo.songProgresses[song.songId].currentStage && !!progressInfo.songProgresses[song.songId].currentStage.stageSteps">
+            {{progressInfo.songProgresses[song.songId].currentStage.completeStageSteps.length}} /
+            {{progressInfo.songProgresses[song.songId].currentStage.stageSteps.length}}
+          </ng-container>
+        </td>
+        <td>
+          <!-- in progress -->
+          <ng-container *ngIf="!!progressInfo.songProgresses[song.songId].currentStage">
+            <ul *ngIf="!!progressInfo.songProgresses[song.songId].currentStage.inProgressStageSteps">
+              <li *ngFor="let step of progressInfo.songProgresses[song.songId].currentStage.inProgressStageSteps">
+                {{step.name}}
+              </li>
+            </ul>
+
+
+            <div class="progress"
+                 *ngIf="!!progressInfo.songProgresses[song.songId].currentStage.progressBar && progressInfo.songProgresses[song.songId].currentStage.progressBar.progress">
+              <div class="progress-bar" role="progressbar"
+                   [attr.aria-valuenow]="progressInfo.songProgresses[song.songId].currentStage.progressBar.progress"
+                   aria-valuemin="0" aria-valuemax="1"
+                   [style.width]="progressInfo.songProgresses[song.songId].currentStage.progressBar.progress*100 + '%'">
+                {{progressInfo.songProgresses[song.songId].currentStage.progressBar.progress*100}}%
+              </div>
+            </div>
+
+          </ng-container>
+        </td>
+        <td>
+          <ng-container
+            *ngIf="!!progressInfo.songProgresses[song.songId].currentStage && !!progressInfo.songProgresses[song.songId].currentStage.subStage">
+            <!-- sub stage -->
+            {{progressInfo.songProgresses[song.songId].currentStage.subStage.name}}
+            {{progressInfo.songProgresses[song.songId].currentStage.subStage.description}}
+          </ng-container>
+        </td>
+        <td>
+          <ng-container
+            *ngIf="!!progressInfo.songProgresses[song.songId].currentStage && !!progressInfo.songProgresses[song.songId].currentStage.subStage && !!progressInfo.songProgresses[song.songId].currentStage.subStage.stageSteps">
+            <!-- sub stage steps -->
+            {{progressInfo.songProgresses[song.songId].currentStage.subStage.completeStageSteps.length}} /
+            {{progressInfo.songProgresses[song.songId].currentStage.subStage.stageSteps.length}}
+          </ng-container>
+        </td>
+        <td>
+          <ng-container
+            *ngIf="!!progressInfo.songProgresses[song.songId].currentStage && !!progressInfo.songProgresses[song.songId].currentStage.subStage">
+            <!-- in progress -->
+            <ul *ngIf="!!progressInfo.songProgresses[song.songId].currentStage.subStage.inProgressStageSteps">
+              <li
+                *ngFor="let step of progressInfo.songProgresses[song.songId].currentStage.subStage.inProgressStageSteps">
+                {{step.name}}
+              </li>
+            </ul>
+
+            <div class="progress" *ngIf="!!progressInfo.songProgresses[song.songId].currentStage.subStage.progressBar && progressInfo.songProgresses[song.songId].currentStage.subStage.progressBar.progress">
+              <div class="progress-bar" role="progressbar"
+                   [attr.aria-valuenow]="progressInfo.songProgresses[song.songId].currentStage.subStage.progressBar.progress"
+                   aria-valuemin="0" aria-valuemax="1"
+                   [style.width]="progressInfo.songProgresses[song.songId].currentStage.subStage.progressBar.progress*100 + '%'">
+                {{progressInfo.songProgresses[song.songId].currentStage.subStage.progressBar.progress*100}}%
+              </div>
+            </div>
+
+          </ng-container>
+        </td>
+      </tr>
+    </table>
+  </div>
+</div>

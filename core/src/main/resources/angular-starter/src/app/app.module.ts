@@ -20,6 +20,7 @@ import {TorrentDbsComponent} from "./torrent-dbs/torrent-dbs.component";
 import {MyStatusesComponent} from "./statuses/statuses.component";
 import {MyFoundSongsComponent} from './songs/songs.component';
 import {PlaylistManagerComponent} from "./alt/playlist-manager/playlist-manager.component";
+import {ProgressInfoComponent} from "./alt/progress-info/progress-info.component";
 
 @NgModule({
   imports: [
@@ -38,7 +39,8 @@ import {PlaylistManagerComponent} from "./alt/playlist-manager/playlist-manager.
     TorrentDbsComponent,
     MyStatusesComponent,
     MyFoundSongsComponent,
-    PlaylistManagerComponent
+    PlaylistManagerComponent,
+    ProgressInfoComponent
   ],
   providers: [
     ApiService,

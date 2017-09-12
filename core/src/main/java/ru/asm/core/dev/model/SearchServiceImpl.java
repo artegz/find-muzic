@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 import ru.asm.core.dev.model.ddb.FileDocument;
 import ru.asm.core.dev.model.torrent.TorrentSongSource;
 import ru.asm.core.dev.model.torrent.TorrentSearcher;
+import ru.asm.core.progress.ProgressListener;
 
 import javax.annotation.PostConstruct;
 import java.util.ArrayList;
@@ -27,45 +28,50 @@ public class SearchServiceImpl implements SearchService {
     @PostConstruct
     public void postConstruct() {
         searchers.add(
-                applicationContext.getBean(TorrentSearcher.class)
+                getTorrentSearcher()
         );
     }
 
+    private TorrentSearcher getTorrentSearcher() {
+        return applicationContext.getBean(TorrentSearcher.class);
+    }
+
     @Override
-    public void resolveSongSources(Song song) {
-        for (Searcher searcher : searchers) {
-            searcher.resolveSongSources(song);
-        }
+    public void resolveSongSources(Song song, boolean async, ProgressListener progressListener) {
+        getTorrentSearcher().resolveSongSources(song, async, progressListener);
     }
 
     @Override
     public List<TorrentSongSource> getSongSources(Song song) {
-        List<TorrentSongSource> resultSources = null;
-        for (Searcher searcher : searchers) {
-            final List<TorrentSongSource> songSources = searcher.getSongSources(song);
-            if (songSources != null) {
-                if (resultSources == null) {
-                    resultSources = new ArrayList<>();
-                }
-                resultSources.addAll(songSources);
-            }
-        }
-        return resultSources;
+//        List<TorrentSongSource> resultSources = null;
+//        for (Searcher searcher : searchers) {
+//            final List<TorrentSongSource> songSources = searcher.getSongSources(song);
+//            if (songSources != null) {
+//                if (resultSources == null) {
+//                    resultSources = new ArrayList<>();
+//                }
+//                resultSources.addAll(songSources);
+//            }
+//        }
+//        return resultSources;
+        return getTorrentSearcher().getSongSources(song);
     }
 
     @Override
-    public void downloadSongs(Song song, List<TorrentSongSource> sources) {
-        for (Searcher searcher : searchers) {
-            searcher.downloadSongs(song, sources);
-        }
+    public void downloadSongs(Song song, List<TorrentSongSource> sources, boolean async, ProgressListener progressListener) {
+//        for (Searcher searcher : searchers) {
+//            searcher.downloadSongs(song, sources, async);
+//        }
+        getTorrentSearcher().downloadSongs(song, sources, async, progressListener);
     }
 
     @Override
     public List<FileDocument> getDownloadedSongs(Song song) {
-        final List<FileDocument> songSources = new ArrayList<>();
-        for (Searcher searcher : searchers) {
-            songSources.addAll(searcher.getDownloadedSongs(song));
-        }
-        return songSources;
+//        final List<FileDocument> songSources = new ArrayList<>();
+//        for (Searcher searcher : searchers) {
+//            songSources.addAll(searcher.getDownloadedSongs(song));
+//        }
+//        return songSources;
+        return getTorrentSearcher().getDownloadedSongs(song);
     }
 }

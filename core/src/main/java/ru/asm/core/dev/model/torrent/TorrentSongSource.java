@@ -47,4 +47,12 @@ public class TorrentSongSource implements SongSource {
     public boolean isMp3() {
         return indexSong.getType().toUpperCase().equals(MusicFormats.FORMAT_MP3);
     }
+
+    public String getName() {
+        if (isMp3()) {
+            return String.format("%s: %s (%s)", indexSong.getArtistName(), indexSong.getSongName(), indexSong.getMp3FilePath());
+        } else {
+            return String.format("%s: %s (%s #%s)", indexSong.getArtistName(), indexSong.getSongName(), indexSong.getCueFilePath(), indexSong.getTrackNum());
+        }
+    }
 }

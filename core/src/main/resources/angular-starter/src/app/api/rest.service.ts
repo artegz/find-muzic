@@ -5,13 +5,23 @@ import 'rxjs/add/operator/map';
 import {StatusEntity} from "./status-entity";
 import {SongsSearchResult} from "./songs-search-result";
 import {SongInfo} from "./dto/song-info";
+import {ProgressInfo} from "./progress-info";
 
 @Injectable()
 export class RestService {
 
   constructor(private http: Http) {}
 
-
+  getProgressInfo(): Observable<ProgressInfo> {
+    let url = 'rest/' + 'progresses';
+    let params = new URLSearchParams();
+    let headers = new Headers();
+    let res = this.http.get(
+      url,
+      {search: params, headers: headers}
+    );
+    return res.map(response => response.json());
+  }
 
   getSongs(playlistId: string): Observable<SongInfo[]> {
     let url = 'rest/' + 'alt/playlists/' + playlistId + '/songs';

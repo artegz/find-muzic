@@ -35,6 +35,7 @@ import ru.asm.core.persistence.domain.ArtistEntity;
 import ru.asm.core.persistence.domain.PlaylistSongEntity;
 import ru.asm.core.persistence.domain.ResolvedSongEntity;
 import ru.asm.core.persistence.mappers.PlaylistSongsMapper;
+import ru.asm.core.progress.ProgressBar;
 import ru.asm.core.torrent.TorrentClient;
 import ru.asm.core.ttdb.TorrentsDbParser;
 import ru.asm.tools.CueParser;
@@ -145,7 +146,7 @@ public class AppCoreService {
                 }
             }
 
-            torrentClient.download(torrentInfo, folder, null);
+            torrentClient.download(torrentInfo, folder, null, new ProgressBar());
         } finally {
         }
     }
@@ -289,7 +290,7 @@ public class AppCoreService {
                         final File saveDir = new File(AppConfiguration.DOWNLOADED_SONGS_STORAGE);
                         if (!saveDir.exists()) //noinspection ResultOfMethodCallIgnored
                             saveDir.mkdirs();
-                        torrentClient.download(torrentInfo, saveDir, priorities);
+                        torrentClient.download(torrentInfo, saveDir, priorities, new ProgressBar());
 
                         final File downloadedSong = new File(saveDir, mp3FilePath);
                         if (downloadedSong.exists()) {
@@ -916,7 +917,7 @@ public class AppCoreService {
     private File downloadCue(TorrentInfo torrentInfo, Priority[] priorities, File targetFolder) {
         if (!targetFolder.exists()) //noinspection ResultOfMethodCallIgnored
             targetFolder.mkdirs();
-        torrentClient.download(torrentInfo, targetFolder, priorities);
+        torrentClient.download(torrentInfo, targetFolder, priorities, new ProgressBar());
         return targetFolder;
     }
 

@@ -42,6 +42,18 @@ public interface PlaylistSongsMapper {
             "order by t1.order_id")
     List<PlaylistSongEntity> getSongs(@Param("playlist") String playlist);
 
+    @Results(id = "songResult3", value = {
+            @Result(property = "artist", column = "artist"),
+            @Result(property = "artistId", column = "artist_id"),
+            @Result(property = "title", column = "title"),
+            @Result(property = "songId", column = "song_id"),
+    })
+    @Select("SELECT t2.artist, t2.artist_id, t3.TITLE, t3.song_id " +
+            "FROM ARTISTS t2 " +
+            "join SONGS t3 on t3.artist_id = t2.artist_id " +
+            "where t3.song_id = #{songId} ")
+    PlaylistSongEntity getSong(@Param("songId") Integer songId);
+
     @Select("SELECT distinct artist FROM ARTISTS")
     List<String> getAllArtists();
 

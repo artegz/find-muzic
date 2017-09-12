@@ -8,6 +8,7 @@ import com.frostwire.jlibtorrent.alerts.TorrentAddedAlert;
 import org.apache.commons.lang.mutable.MutableFloat;
 import org.slf4j.*;
 import ru.asm.core.AppConfiguration;
+import ru.asm.core.progress.ProgressBar;
 
 import java.io.File;
 import java.util.Timer;
@@ -75,7 +76,8 @@ public class TorrentClient {
 
     public void download(TorrentInfo ti,
                          File saveDir,
-                         Priority[] priorities) {
+                         Priority[] priorities,
+                         ProgressBar progressBar) {
         try {
             final CountDownLatch signal = new CountDownLatch(1);
 
@@ -92,20 +94,23 @@ public class TorrentClient {
 
                     switch (type) {
                         case TORRENT_ADDED:
-                            logger.info("Torrent '{}' added", ti.name());
+                            logger.debug("Torrent '{}' added", ti.name());
                             ((TorrentAddedAlert) alert).handle().resume();
+                            progressBar.reset();
                             break;
                         case BLOCK_FINISHED:
                             BlockFinishedAlert a = (BlockFinishedAlert) alert;
                             float p = (float) (a.handle().status().progress() * 100.0);
                             final Float prevProgress = (Float) progress.getValue();
                             if (p > prevProgress) {
-                                logger.info(String.format("Progress: %.2f%% for torrent '%s' (total download: %s)", p, a.torrentName(), s.stats().totalDownload()));
+                                logger.debug(String.format("Progress: %.2f%% for torrent '%s' (total download: %s)", p, a.torrentName(), s.stats().totalDownload()));
                                 progress.setValue(p);
+                                progressBar.setProgress((double) p);
                             }
                             break;
                         case TORRENT_FINISHED:
-                            logger.info("Torrent '{}' finished", ti.name());
+                            logger.debug("Torrent '{}' finished", ti.name());
+                            progressBar.complete();
                             signal.countDown();
                             break;
                     }

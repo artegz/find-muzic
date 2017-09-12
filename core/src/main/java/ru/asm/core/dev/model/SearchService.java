@@ -2,6 +2,7 @@ package ru.asm.core.dev.model;
 
 import ru.asm.core.dev.model.ddb.FileDocument;
 import ru.asm.core.dev.model.torrent.TorrentSongSource;
+import ru.asm.core.progress.ProgressListener;
 
 import java.util.List;
 
@@ -12,11 +13,11 @@ import java.util.List;
  */
 public interface SearchService {
 
-    void resolveSongSources(Song song);
+    void resolveSongSources(Song song, boolean async, ProgressListener progressListener);
 
     List<TorrentSongSource> getSongSources(Song song);
 
-    void downloadSongs(Song song, List<TorrentSongSource> sources);
+    void downloadSongs(Song song, List<TorrentSongSource> sources, boolean async, ProgressListener progressListener);
 
     List<FileDocument> getDownloadedSongs(Song song);
 }
