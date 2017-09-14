@@ -16,6 +16,10 @@ public class ProgressService {
 
     private Map<Integer, Task> tasksInProgress = new HashMap<>();
 
+    public boolean isInProgress() {
+        return !tasksInProgress.isEmpty();
+    }
+
     public ProgressListener taskStarted(Song song, String taskName) {
         final Task newTask = new Task(taskName);
         tasksInProgress.put(song.getSongId(), newTask);

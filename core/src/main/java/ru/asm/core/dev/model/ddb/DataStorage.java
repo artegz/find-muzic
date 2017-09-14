@@ -1,10 +1,12 @@
 package ru.asm.core.dev.model.ddb;
 
 import org.dizitart.no2.Nitrite;
+import org.dizitart.no2.UpdateOptions;
 import org.dizitart.no2.objects.Cursor;
 import org.dizitart.no2.objects.ObjectRepository;
 import org.dizitart.no2.objects.filters.ObjectFilters;
 import org.springframework.stereotype.Component;
+import ru.asm.core.dev.model.SongResolveReport;
 
 import javax.annotation.PostConstruct;
 import java.util.List;
@@ -25,6 +27,8 @@ public class DataStorage {
     private ObjectRepository<FileDocument> filesRepo;
     private ObjectRepository<SongSourceDocument> songSourceRepo;
 
+    private ObjectRepository<SongResolveReport> songResolveReportRepo;
+
     @PostConstruct
     public void postConstruct() {
         //java initialization
@@ -36,19 +40,28 @@ public class DataStorage {
 //        songRepo = db.getRepository(SongDocument.class);
         filesRepo = db.getRepository(FileDocument.class);
         songSourceRepo = db.getRepository(SongSourceDocument.class);
+        songResolveReportRepo = db.getRepository(SongResolveReport.class);
     }
+
+    public SongResolveReport getSongResolveReport(Integer songId) {
+        final Cursor<SongResolveReport> cursor = songResolveReportRepo.find(ObjectFilters.eq("songId", songId));
+        return cursor.firstOrDefault();
+    }
+
+    public void saveSongResolveReport(Integer songId, SongResolveReport report) {
+        songResolveReportRepo.update(ObjectFilters.eq("songId", songId), report);
+    }
+
 
     public ArtistDocument getArtist(Integer artistId) {
         final Cursor<ArtistDocument> artistDocuments = artistRepo.find(ObjectFilters.eq("artistId", artistId));
         return artistDocuments.firstOrDefault();
     }
 
-    public void insertArtist(ArtistDocument artist) {
-        artistRepo.insert(artist);
-    }
-
     public void updateArtist(ArtistDocument artist) {
-        artistRepo.update(artist);
+        final UpdateOptions updateOptions = new UpdateOptions();
+        updateOptions.setUpsert(true);
+        artistRepo.update(ObjectFilters.eq("artistId", artist.getArtistId()), artist, updateOptions);
     }
 
     public TorrentDocument getTorrent(String torrentId) {
@@ -56,26 +69,11 @@ public class DataStorage {
         return artistDocuments.firstOrDefault();
     }
 
-    public void insertTorrent(TorrentDocument torrentDocument) {
-        torrentRepo.insert(torrentDocument);
-    }
-
     public void updateTorrent(TorrentDocument torrentDocument) {
-        torrentRepo.update(torrentDocument);
+        final UpdateOptions updateOptions = new UpdateOptions();
+        updateOptions.setUpsert(true);
+        torrentRepo.update(ObjectFilters.eq("torrentId", torrentDocument.getTorrentId()), torrentDocument, updateOptions);
     }
-
-//    public SongDocument getSong(Integer songId) {
-//        final Cursor<SongDocument> songDocuments = songRepo.find(ObjectFilters.eq("songId", songId));
-//        return songDocuments.firstOrDefault();
-//    }
-//
-//    public void insertSong(SongDocument songDocument) {
-//        songRepo.insert(songDocument);
-//    }
-//
-//    public void updateSong(SongDocument songDocument) {
-//        songRepo.update(ObjectFilters.eq("songId", songDocument.getSongId()), songDocument);
-//    }
 
     public FileDocument getFileBySource(String sourceId) {
         final Cursor<FileDocument> fileDocuments = filesRepo.find(ObjectFilters.eq("sourceId", sourceId));
@@ -111,7 +109,9 @@ public class DataStorage {
         return songSourceDocuments.firstOrDefault();
     }
 
-    public void insertSongSource(SongSourceDocument songSourceDocument) {
-        songSourceRepo.insert(songSourceDocument);
+    public void updateSongSource(SongSourceDocument songSourceDocument) {
+        final UpdateOptions updateOptions = new UpdateOptions();
+        updateOptions.setUpsert(true);
+        songSourceRepo.update(ObjectFilters.eq("sourceId", songSourceDocument.getSourceId()), songSourceDocument, updateOptions);
     }
 }

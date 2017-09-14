@@ -72,7 +72,7 @@ public class IndexedArtistsService {
                     final TorrentInfoVO ti = page.getContent().get(i);
 
                     final TorrentDocument torrentDocument = createTorrentDocument(ti, format);
-                    dataStorage.insertTorrent(torrentDocument);
+                    dataStorage.updateTorrent(torrentDocument);
 
                     artistDoc.getArtistTorrentIds().add(torrentDocument.getTorrentId());
                 }
@@ -81,7 +81,7 @@ public class IndexedArtistsService {
             }
         }
 
-        dataStorage.insertArtist(artistDoc);
+        dataStorage.updateArtist(artistDoc);
     }
 
     private ArtistDocument createArtistDocument(Artist artist) {

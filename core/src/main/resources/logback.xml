@@ -15,6 +15,10 @@
         </encoder>
     </appender>
 
+    <logger name="org.elasticsearch.cluster.routing.allocation.decider" level="WARN">
+        <appender-ref ref="STDOUT"/>
+    </logger>
+
     <root level="info">
         <appender-ref ref="STDOUT" />
         <appender-ref ref="FILE" />

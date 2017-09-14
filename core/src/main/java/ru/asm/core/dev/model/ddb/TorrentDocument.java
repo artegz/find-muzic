@@ -1,6 +1,5 @@
 package ru.asm.core.dev.model.ddb;
 
-import org.dizitart.no2.objects.Id;
 import ru.asm.core.index.domain.TorrentInfoVO;
 
 /**
@@ -10,8 +9,6 @@ import ru.asm.core.index.domain.TorrentInfoVO;
  */
 public class TorrentDocument {
 
-    @Id
-    private Long id;
 
     private String torrentId;
 
@@ -23,13 +20,6 @@ public class TorrentDocument {
 
     //private List<TorrentSongVO> torrentSongs;
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
 
     public String getTorrentId() {
         return torrentId;

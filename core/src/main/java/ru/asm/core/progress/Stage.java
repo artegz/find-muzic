@@ -34,6 +34,22 @@ public class Stage {
         return stage;
     }
 
+    public List<Step> getStageSteps() {
+        return stageSteps;
+    }
+
+    public List<Step> getInProgressStageSteps() {
+        return inProgressStageSteps;
+    }
+
+    public List<Step> getCompleteStageSteps() {
+        return completeStageSteps;
+    }
+
+    public ProgressBar getProgressBar() {
+        return progressBar;
+    }
+
     public String getName() {
         return name;
     }

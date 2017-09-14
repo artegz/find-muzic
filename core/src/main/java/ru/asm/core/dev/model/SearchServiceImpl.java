@@ -37,8 +37,8 @@ public class SearchServiceImpl implements SearchService {
     }
 
     @Override
-    public void resolveSongSources(Song song, boolean async, ProgressListener progressListener) {
-        getTorrentSearcher().resolveSongSources(song, async, progressListener);
+    public void resolveSongSources(Song song, ProgressListener progressListener) {
+        getTorrentSearcher().resolveSongSources(song, progressListener);
     }
 
     @Override
@@ -55,6 +55,11 @@ public class SearchServiceImpl implements SearchService {
 //        }
 //        return resultSources;
         return getTorrentSearcher().getSongSources(song);
+    }
+
+    @Override
+    public SongResolveReport getLastSongResolveReport(Song song) {
+        return getTorrentSearcher().getLastSongResolveReport(song);
     }
 
     @Override

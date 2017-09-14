@@ -11,6 +11,10 @@ public class DownloadInfo {
 
     private List<String> sourcesIds;
 
+    public void setSourcesIds(List<String> sourcesIds) {
+        this.sourcesIds = sourcesIds;
+    }
+
     public List<String> getSourcesIds() {
         return sourcesIds;
     }

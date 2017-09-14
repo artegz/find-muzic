@@ -20,7 +20,7 @@ export class ProgressInfoComponent implements OnInit, OnDestroy {
         .subscribe(res => {
           this.progressInfo = res;
         });
-    }, 1000);
+    }, 2500);
   }
 
 

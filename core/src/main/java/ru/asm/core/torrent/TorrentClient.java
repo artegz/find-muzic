@@ -6,6 +6,9 @@ import com.frostwire.jlibtorrent.alerts.AlertType;
 import com.frostwire.jlibtorrent.alerts.BlockFinishedAlert;
 import com.frostwire.jlibtorrent.alerts.TorrentAddedAlert;
 import org.apache.commons.lang.mutable.MutableFloat;
+import org.joda.time.DateTime;
+import org.joda.time.MutableDateTime;
+import org.joda.time.Seconds;
 import org.slf4j.*;
 import ru.asm.core.AppConfiguration;
 import ru.asm.core.progress.ProgressBar;
@@ -81,6 +84,8 @@ public class TorrentClient {
         try {
             final CountDownLatch signal = new CountDownLatch(1);
 
+            final MutableDateTime lastActivity = new MutableDateTime(new DateTime());
+
             final MutableFloat progress = new MutableFloat(0d);
             final AlertListener listener = new AlertListener() {
                 @Override
@@ -96,6 +101,7 @@ public class TorrentClient {
                         case TORRENT_ADDED:
                             logger.debug("Torrent '{}' added", ti.name());
                             ((TorrentAddedAlert) alert).handle().resume();
+                            lastActivity.setDate(new DateTime());
                             progressBar.reset();
                             break;
                         case BLOCK_FINISHED:
@@ -107,10 +113,12 @@ public class TorrentClient {
                                 progress.setValue(p);
                                 progressBar.setProgress((double) p);
                             }
+                            lastActivity.setDate(new DateTime());
                             break;
                         case TORRENT_FINISHED:
                             logger.debug("Torrent '{}' finished", ti.name());
                             progressBar.complete();
+                            lastActivity.setDate(new DateTime());
                             signal.countDown();
                             break;
                     }
@@ -119,7 +127,22 @@ public class TorrentClient {
 
             s.addListener(listener);
             s.download(ti, saveDir, null, priorities, null);
-            signal.await();
+
+            while (true) {
+                final boolean finished = signal.await(60, TimeUnit.SECONDS);
+                if (finished) {
+                    break;
+                }
+
+                final Seconds seconds = Seconds.secondsBetween(lastActivity, DateTime.now());
+                if (seconds.getSeconds() > 120) {
+                    final TorrentHandle torrentHandle = s.find(ti.infoHash());
+                    s.remove(torrentHandle);
+                    logger.warn("torrent {} downloading interrupted due to time out expired", ti.name());
+                    break;
+                }
+            }
+
             s.removeListener(listener);
 
         } catch (Throwable e) {

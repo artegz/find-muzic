@@ -9,21 +9,11 @@ import ru.asm.core.dev.model.torrent.TorrentSongSource;
  */
 public class SongSourceDocument {
 
-    private Long id;
-
     private Integer songId;
 
     private String sourceId;
 
     private TorrentSongSource songSource;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
 
     public Integer getSongId() {
         return songId;

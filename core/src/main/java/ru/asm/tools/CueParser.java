@@ -281,9 +281,9 @@ public class CueParser {
 
         //System.out.println(charset);
         if (confidence != null) {
-            logger.info("file \"{}\" encoding is \"{}\" (confidence {}%)", file.getAbsolutePath(), charset, confidence);
+            logger.debug("file \"{}\" encoding is \"{}\" (confidence {}%)", file.getAbsolutePath(), charset, confidence);
         } else {
-            logger.info("file \"{}\" encoding is \"{}\"", file.getAbsolutePath(), charset);
+            logger.debug("file \"{}\" encoding is \"{}\"", file.getAbsolutePath(), charset);
         }
 
         return Charset.forName(charset);

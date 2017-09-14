@@ -13,9 +13,11 @@ import java.util.List;
  */
 public interface Searcher {
 
-    void resolveSongSources(Song song, boolean async, ProgressListener progressListener);
+    void resolveSongSources(Song song, ProgressListener progressListener);
 
     List<TorrentSongSource> getSongSources(Song song);
+
+    SongResolveReport getLastSongResolveReport(Song song);
 
     void downloadSongs(Song song, List<TorrentSongSource> sources, boolean async, ProgressListener progressListener);
 

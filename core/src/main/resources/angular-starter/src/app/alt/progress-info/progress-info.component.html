@@ -22,7 +22,7 @@
         <td>
           <!-- stage -->
           <ng-container *ngIf="!!progressInfo.songProgresses[song.songId].currentStage">
-            {{progressInfo.songProgresses[song.songId].currentStage.name}}
+            <!--{{progressInfo.songProgresses[song.songId].currentStage.name}}-->
             {{progressInfo.songProgresses[song.songId].currentStage.description}}
           </ng-container>
         </td>
@@ -34,14 +34,14 @@
             {{progressInfo.songProgresses[song.songId].currentStage.stageSteps.length}}
           </ng-container>
         </td>
-        <td>
+        <td style="width: 300px">
           <!-- in progress -->
           <ng-container *ngIf="!!progressInfo.songProgresses[song.songId].currentStage">
-            <ul *ngIf="!!progressInfo.songProgresses[song.songId].currentStage.inProgressStageSteps">
-              <li *ngFor="let step of progressInfo.songProgresses[song.songId].currentStage.inProgressStageSteps">
+            <ng-container *ngIf="!!progressInfo.songProgresses[song.songId].currentStage.inProgressStageSteps">
+              <span *ngFor="let step of progressInfo.songProgresses[song.songId].currentStage.inProgressStageSteps">
                 {{step.name}}
-              </li>
-            </ul>
+              </span>
+            </ng-container>
 
 
             <div class="progress"
@@ -60,7 +60,7 @@
           <ng-container
             *ngIf="!!progressInfo.songProgresses[song.songId].currentStage && !!progressInfo.songProgresses[song.songId].currentStage.subStage">
             <!-- sub stage -->
-            {{progressInfo.songProgresses[song.songId].currentStage.subStage.name}}
+            <!--{{progressInfo.songProgresses[song.songId].currentStage.subStage.name}}-->
             {{progressInfo.songProgresses[song.songId].currentStage.subStage.description}}
           </ng-container>
         </td>
@@ -72,16 +72,16 @@
             {{progressInfo.songProgresses[song.songId].currentStage.subStage.stageSteps.length}}
           </ng-container>
         </td>
-        <td>
+        <td style="width: 300px">
           <ng-container
             *ngIf="!!progressInfo.songProgresses[song.songId].currentStage && !!progressInfo.songProgresses[song.songId].currentStage.subStage">
             <!-- in progress -->
-            <ul *ngIf="!!progressInfo.songProgresses[song.songId].currentStage.subStage.inProgressStageSteps">
-              <li
+            <ng-container *ngIf="!!progressInfo.songProgresses[song.songId].currentStage.subStage.inProgressStageSteps">
+              <span
                 *ngFor="let step of progressInfo.songProgresses[song.songId].currentStage.subStage.inProgressStageSteps">
                 {{step.name}}
-              </li>
-            </ul>
+              </span>
+            </ng-container>
 
             <div class="progress" *ngIf="!!progressInfo.songProgresses[song.songId].currentStage.subStage.progressBar && progressInfo.songProgresses[song.songId].currentStage.subStage.progressBar.progress">
               <div class="progress-bar" role="progressbar"

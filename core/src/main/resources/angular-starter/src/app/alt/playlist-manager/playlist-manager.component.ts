@@ -3,6 +3,7 @@ import {RestService} from "../../api/rest.service";
 import {ResolvableSong} from "./resolvable-song";
 import {DownloadableSource} from "./downloadable-source";
 import {DownloadedFile} from "./downloaded-file";
+import {Router} from "@angular/router";
 
 @Component({
   selector: 'app-playlist-manager',
@@ -20,10 +21,12 @@ export class PlaylistManagerComponent implements OnInit {
   sp: number = 1;
   fp: number = 1;
 
-  constructor(private rest: RestService) {}
+  constructor(private rest: RestService,
+              // private route: ActivatedRoute,
+              private router: Router) {}
 
   ngOnInit(): void {
-    this.rest.getSongs("nashe-test")
+    this.rest.getSongs("nashe")
       .subscribe(res => {
         this.resolvableSongs = res.map(info => new ResolvableSong(info));
       });
@@ -68,12 +71,16 @@ export class PlaylistManagerComponent implements OnInit {
         return s;
       })
       .map(s => s.id);
+    // this.rest.resolveSongs(ids)
+    //   .switchMap(() => {
+    //     return this.rest.getSongs("nashe");
+    //   }).subscribe(res => {
+    //   this.resolvableSongs = res.map(info => new ResolvableSong(info));
+    // });
     this.rest.resolveSongs(ids)
-      .switchMap(() => {
-        return this.rest.getSongs("nashe-test");
-      }).subscribe(res => {
-      this.resolvableSongs = res.map(info => new ResolvableSong(info));
-    });
+      .subscribe(() => {
+        this.router.navigate(["/progress"])
+      });
     return false;
   }
 
@@ -93,7 +100,7 @@ export class PlaylistManagerComponent implements OnInit {
 
     this.rest.fetchSongs(sources)
       .switchMap(() => {
-        return this.rest.getSongs("nashe-test");
+        return this.rest.getSongs("nashe");
       }).subscribe(res => {
       this.resolvableSongs = res.map(info => new ResolvableSong(info));
     });

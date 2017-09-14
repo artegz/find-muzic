@@ -18,6 +18,16 @@ public class SongInfo {
 
     private List<FileDocument> files;
 
+    private SongResolveReport lastResolveReport;
+
+    public SongResolveReport getLastResolveReport() {
+        return lastResolveReport;
+    }
+
+    public void setLastResolveReport(SongResolveReport lastResolveReport) {
+        this.lastResolveReport = lastResolveReport;
+    }
+
     public List<FileDocument> getFiles() {
         return files;
     }

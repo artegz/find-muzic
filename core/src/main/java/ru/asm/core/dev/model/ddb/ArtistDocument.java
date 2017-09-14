@@ -1,7 +1,5 @@
 package ru.asm.core.dev.model.ddb;
 
-import org.dizitart.no2.objects.Id;
-
 import java.util.List;
 
 /**
@@ -11,22 +9,11 @@ import java.util.List;
  */
 public class ArtistDocument {
 
-    @Id
-    private Long id;
-
     private Integer artistId;
 
     private String artistName;
 
     private List<String> artistTorrentIds;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
 
     public Integer getArtistId() {
         return artistId;
