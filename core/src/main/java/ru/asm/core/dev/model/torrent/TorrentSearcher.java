@@ -35,7 +35,6 @@ import ru.asm.util.ResolveStatuses;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.*;
 import java.util.function.Supplier;
 
 /**
@@ -118,7 +117,6 @@ public class TorrentSearcher implements Searcher {
     @Override
     public void downloadSongs(Song song,
                               List<TorrentSongSource> sources,
-                              boolean async,
                               ProgressListener progressListener) {
         progressListener.initStage(ProgressListener.STAGE_DOWNLOAD,
                 Lists.transform(sources, TorrentSongSource::getName),
@@ -136,24 +134,20 @@ public class TorrentSearcher implements Searcher {
             }
         }
 
-        final List<CompletableFuture<List<FileDocument>>> downloadingFiles = new ArrayList<>();
+        final Map<String, List<FileDocument>> downloadingFiles = new HashMap<>();
         if (!mp3Sources.isEmpty()) {
-            downloadingFiles.addAll(downloadMp3Songs(song, mp3Sources, async, progressListener));
+            downloadingFiles.putAll(downloadMp3Songs(song, mp3Sources, progressListener));
         }
         if (!flacSources.isEmpty()) {
-            downloadingFiles.addAll(downloadFlacSongs(song, flacSources, async, progressListener));
+            downloadingFiles.putAll(downloadFlacSongs(song, flacSources, progressListener));
         }
 
-        for (CompletableFuture<List<FileDocument>> torrentFiles : downloadingFiles) {
-            final List<FileDocument> fileDocuments;
-            try {
-                fileDocuments = torrentFiles.get();
-            } catch (InterruptedException | ExecutionException e) {
-                throw new RuntimeException(e);
-            }
+        for (Map.Entry<String, List<FileDocument>> entry : downloadingFiles.entrySet()) {
+            final String sourceId = entry.getKey();
+            final List<FileDocument> fileDocuments = entry.getValue();
 
             for (FileDocument fileDocument : fileDocuments) {
-                logger.info("{} downloaded", fileDocument.getFsLocation());
+                logger.info("[{}] {} downloaded", sourceId, fileDocument.getFsLocation());
             }
         }
 
@@ -280,128 +274,139 @@ public class TorrentSearcher implements Searcher {
         return songSources;
     }
 
-    private List<CompletableFuture<List<FileDocument>>> downloadFlacSongs(Song song,
-                                                                          List<TorrentSongSource> flacSources,
-                                                                          boolean async,
-                                                                          ProgressListener progressListener) {
-        final List<CompletableFuture<List<FileDocument>>> downloadingFiles = new ArrayList<>();
+    private Map<String, List<FileDocument>> downloadFlacSongs(Song song,
+                                                              List<TorrentSongSource> flacSources,
+                                                              ProgressListener progressListener) {
+        final Map<String, List<FileDocument>> downloadingFiles = new HashMap<>();
 
         final Map<String, List<TorrentSongSource>> groupedFlacSources = groupPerTorrent(flacSources);
         final Set<String> flacTorrentIds = groupedFlacSources.keySet();
 
         flacTorrentIds.forEach(torrentId -> {
-            final List<TorrentSongSource> requestedSongSources = groupedFlacSources.get(torrentId);
-            final TorrentDocument torrent = dataStorage.getTorrent(torrentId);
+            final List<TorrentSongSource> torrentSources = groupedFlacSources.get(torrentId);
+            final List<TorrentSongSource> requiredSources = new ArrayList<>(torrentSources);
+            final List<FileDocument> alreadyExistingFiles = filterAlreadyExisting(requiredSources);
 
-            final List<String> startedSteps = Lists.transform(requestedSongSources, TorrentSongSource::getName);
-            progressListener.start(startedSteps);
+            final List<FileDocument> fileDocuments;
 
-            final Supplier<List<FileDocument>> filesSupplier = () -> {
-                progressListener.initSubStage(
-                        ProgressListener.SUB_STAGE_DOWNLOAD_FLAC_SOURCE,
-                        Arrays.asList(STEP_RESOLVE_MAGNET, STEP_DOWNLOAD_FILES, STEP_CONVERT_TO_MP_3, STEP_SAVE_RESULTS),
-                        String.format("proceeding %s torrent", torrentId)
-                );
+            if (!requiredSources.isEmpty()) {
+                final TorrentDocument torrent = dataStorage.getTorrent(torrentId);
 
-                final List<FileDocument> results = new ArrayList<>();
+                final List<String> startedSteps = Lists.transform(requiredSources, TorrentSongSource::getName);
+                progressListener.start(startedSteps);
 
-                final File saveDir = new File(new File(AppConfiguration.DOWNLOADED_SONGS_STORAGE), torrentId);
-                if (!saveDir.exists()) //noinspection ResultOfMethodCallIgnored
-                    saveDir.mkdirs();
+                final Supplier<List<FileDocument>> filesSupplier = () -> {
+                    progressListener.initSubStage(
+                            ProgressListener.SUB_STAGE_DOWNLOAD_FLAC_SOURCE,
+                            Arrays.asList(STEP_RESOLVE_MAGNET, STEP_DOWNLOAD_FILES, STEP_CONVERT_TO_MP_3, STEP_SAVE_RESULTS),
+                            String.format("downloading %s torrent files (flac)", torrentId)
+                    );
 
-                final List<String> requestedCues = getCueFiles(requestedSongSources);
-                boolean allExist = isAllAlreadyDownloaded(saveDir, requestedCues);
-                if (!allExist) {
-                    // 1. resolve magnet
-                    progressListener.subStageStart(Collections.singletonList(STEP_RESOLVE_MAGNET));
-                    final String magnet = torrent.getTorrentInfo().getMagnet();
-                    logger.info("resoling torrent {} info by magnet {}", torrentId, magnet);
-                    final TorrentInfo torrentInfo = getByMagnet(magnet);
-                    progressListener.subStageComplete(Collections.singletonList(STEP_RESOLVE_MAGNET));
+                    final List<FileDocument> results = new ArrayList<>();
 
-                    logger.info("[{}: {}] magnet resolved, downloading...", song.getArtist().getArtistName(), song.getTitle());
+                    final File saveDir = new File(new File(AppConfiguration.DOWNLOADED_SONGS_STORAGE), torrentId);
+                    if (!saveDir.exists()) //noinspection ResultOfMethodCallIgnored
+                        saveDir.mkdirs();
 
-                    // 2. download
-                    if (torrentInfo != null) {
-                        progressListener.subStageStart(Collections.singletonList(STEP_DOWNLOAD_FILES));
-                        final ProgressBar progressBar = progressListener.initSubStageStepProgressBar();
-                        final Priority[] priorities = getAllFilesPriorities(torrentInfo, requestedSongSources);
-                        appCoreService.getTorrentClient().download(torrentInfo, saveDir, priorities, progressBar);
-                        logger.info("downloading complete: {}", saveDir.getAbsolutePath());
-                        progressListener.subStageComplete(Collections.singletonList(STEP_DOWNLOAD_FILES));
-                    } else {
-                        progressListener.subStageSkip(Collections.singletonList(STEP_DOWNLOAD_FILES));
-                    }
-                } else {
-                    // skip steps
-                    progressListener.subStageSkip(Arrays.asList(STEP_RESOLVE_MAGNET, STEP_DOWNLOAD_FILES));
-                }
+                    final List<String> requestedCues = getCueFiles(requiredSources);
+                    boolean allExist = isAllAlreadyDownloaded(saveDir, requestedCues);
+                    if (!allExist) {
+                        // 1. resolve magnet
+                        progressListener.subStageStart(Collections.singletonList(STEP_RESOLVE_MAGNET));
+                        final String magnet = torrent.getTorrentInfo().getMagnet();
+                        logger.info("resoling torrent {} info by magnet {}", torrentId, magnet);
+                        final TorrentInfo torrentInfo = getByMagnet(magnet);
+                        progressListener.subStageComplete(Collections.singletonList(STEP_RESOLVE_MAGNET));
 
-                // 3. flac -> mp3[]
-                progressListener.subStageStart(Collections.singletonList(STEP_CONVERT_TO_MP_3));
-                final FlacMp3Converter flacMp3Converter = new FlacMp3Converter();
-                for (String downloadedCueFile : requestedCues) {
-                    final File compositionFilesFolder = getCompositionFilesFolder(saveDir, downloadedCueFile);
-                    //noinspection ConstantConditions
-                    if (compositionFilesFolder.exists()
-                            && compositionFilesFolder.listFiles() != null
-                            && compositionFilesFolder.listFiles().length > 0) {
-                        continue; // already split
-                    }
+                        logger.info("[{}: {}] magnet resolved, downloading...", song.getArtist().getArtistName(), song.getTitle());
 
-                    final String folder = getFolder(downloadedCueFile);
-                    final String compositionName = getCompositionName(downloadedCueFile);
-
-                    final File directory = new File(saveDir, folder);
-                    flacMp3Converter.convert(directory, compositionName);
-                }
-                progressListener.subStageComplete(Collections.singletonList(STEP_CONVERT_TO_MP_3));
-
-                // 4. update resolved sources
-                progressListener.subStageStart(Collections.singletonList(STEP_SAVE_RESULTS));
-                for (String downloadedCueFile : requestedCues) {
-
-                    // find all sources points to this cue
-                    final List<SongSourceDocument> cueBasedSources = this.dataStorage.getSongSourcesByTorrentAndCuePath(torrentId, downloadedCueFile);
-
-                    for (SongSourceDocument cueBasedSource : cueBasedSources) {
-                        final String cueFilePath = cueBasedSource.getSongSource().getIndexSong().getCueFilePath();
-                        final File folder = getCompositionFilesFolder(saveDir, cueFilePath);
-
-                        final String trackNum = cueBasedSource.getSongSource().getIndexSong().getTrackNum();
-                        final String songName = cueBasedSource.getSongSource().getIndexSong().getSongName();
-
-                        final File mp3SongFile = new File(folder, String.format("%s. %s.mp3", trackNum, songName));
-
-                        if (mp3SongFile.exists()) {
-                            FileDocument fileDocument = createFileDocument(song, cueBasedSource.getSongSource(), mp3SongFile);
-                            dataStorage.insertFile(fileDocument);
-                            logger.info("[{}: {}] download complete", song.getArtist().getArtistName(), song.getTitle());
-                            results.add(fileDocument);
+                        // 2. download
+                        if (torrentInfo != null) {
+                            progressListener.subStageStart(Collections.singletonList(STEP_DOWNLOAD_FILES));
+                            final ProgressBar progressBar = progressListener.initSubStageStepProgressBar();
+                            final Priority[] priorities = getAllFilesPriorities(torrentInfo, requiredSources);
+                            appCoreService.getTorrentClient().download(torrentInfo, saveDir, priorities, progressBar);
+                            logger.info("downloading complete: {}", saveDir.getAbsolutePath());
+                            progressListener.subStageComplete(Collections.singletonList(STEP_DOWNLOAD_FILES));
                         } else {
-                            logger.warn("[{}: {}] download failed", song.getArtist().getArtistName(), song.getTitle());
+                            progressListener.subStageSkip(Collections.singletonList(STEP_DOWNLOAD_FILES));
+                        }
+                    } else {
+                        // skip steps
+                        progressListener.subStageSkip(Arrays.asList(STEP_RESOLVE_MAGNET, STEP_DOWNLOAD_FILES));
+                    }
+
+                    // 3. flac -> mp3[]
+                    progressListener.subStageStart(Collections.singletonList(STEP_CONVERT_TO_MP_3));
+                    final FlacMp3Converter flacMp3Converter = new FlacMp3Converter();
+                    for (String downloadedCueFile : requestedCues) {
+                        final File compositionFilesFolder = getCompositionFilesFolder(saveDir, downloadedCueFile);
+                        //noinspection ConstantConditions
+                        if (compositionFilesFolder.exists()
+                                && compositionFilesFolder.listFiles() != null
+                                && compositionFilesFolder.listFiles().length > 0) {
+                            continue; // already split
+                        }
+
+                        final String folder = getFolder(downloadedCueFile);
+                        final String compositionName = getCompositionName(downloadedCueFile);
+
+                        final File directory = new File(saveDir, folder);
+                        flacMp3Converter.convert(directory, compositionName);
+                    }
+                    progressListener.subStageComplete(Collections.singletonList(STEP_CONVERT_TO_MP_3));
+
+                    // 4. update resolved sources
+                    progressListener.subStageStart(Collections.singletonList(STEP_SAVE_RESULTS));
+                    for (String downloadedCueFile : requestedCues) {
+
+                        // find all sources points to this cue
+                        final List<SongSourceDocument> cueBasedSources = this.dataStorage.getSongSourcesByTorrentAndCuePath(torrentId, downloadedCueFile);
+
+                        for (SongSourceDocument cueBasedSource : cueBasedSources) {
+                            final String cueFilePath = cueBasedSource.getSongSource().getIndexSong().getCueFilePath();
+                            final File folder = getCompositionFilesFolder(saveDir, cueFilePath);
+
+                            final String trackNum = cueBasedSource.getSongSource().getIndexSong().getTrackNum();
+                            final String songName = cueBasedSource.getSongSource().getIndexSong().getSongName();
+
+                            final File mp3SongFile = new File(folder, String.format("%s. %s.mp3", trackNum, songName));
+
+                            if (mp3SongFile.exists()) {
+                                FileDocument fileDocument = createFileDocument(song, cueBasedSource.getSongSource(), mp3SongFile);
+                                dataStorage.insertFile(fileDocument);
+                                logger.info("[{}: {}] download complete", song.getArtist().getArtistName(), song.getTitle());
+                                results.add(fileDocument);
+                            } else {
+                                logger.warn("[{}: {}] download failed", song.getArtist().getArtistName(), song.getTitle());
+                            }
                         }
                     }
+                    progressListener.subStageComplete(Collections.singletonList(STEP_SAVE_RESULTS));
+
+                    progressListener.completeSubStage(
+                            ProgressListener.SUB_STAGE_DOWNLOAD_FLAC_SOURCE
+                    );
+
+                    return results;
+                };
+
+                try {
+                    fileDocuments = filesSupplier.get();
+                    fileDocuments.addAll(alreadyExistingFiles);
+                } finally {
+                    progressListener.complete(startedSteps);
                 }
-                progressListener.subStageComplete(Collections.singletonList(STEP_SAVE_RESULTS));
-
-                progressListener.completeSubStage(
-                        ProgressListener.SUB_STAGE_DOWNLOAD_FLAC_SOURCE
-                );
-
-                return results;
-            };
-
-            final CompletableFuture<List<FileDocument>> fileDocumentFuture;
-            if (async) {
-                fileDocumentFuture = CompletableFuture.supplyAsync(filesSupplier)
-                        .whenComplete((fileDocuments, throwable) -> progressListener.complete(startedSteps));
             } else {
-                fileDocumentFuture = CompletableFuture.completedFuture(filesSupplier.get());
-                progressListener.complete(startedSteps);
+                fileDocuments = alreadyExistingFiles;
             }
 
-            downloadingFiles.add(fileDocumentFuture);
+            for (FileDocument fileDocument : fileDocuments) {
+                if (!downloadingFiles.containsKey(fileDocument.getSourceId())) {
+                    downloadingFiles.put(fileDocument.getSourceId(), new ArrayList<>());
+                }
+                downloadingFiles.get(fileDocument.getSourceId()).add(fileDocument);
+            }
         });
         return downloadingFiles;
     }
@@ -441,11 +446,10 @@ public class TorrentSearcher implements Searcher {
         return cueFilePath.substring(0, cueFilePath.lastIndexOf("\\"));
     }
 
-    private List<CompletableFuture<List<FileDocument>>> downloadMp3Songs(Song song,
-                                                                         List<TorrentSongSource> mp3Sources,
-                                                                         boolean async,
-                                                                         ProgressListener progressListener) {
-        final List<CompletableFuture<List<FileDocument>>> downloadingFiles = new ArrayList<>();
+    private Map<String, List<FileDocument>> downloadMp3Songs(Song song,
+                                                             List<TorrentSongSource> mp3Sources,
+                                                             ProgressListener progressListener) {
+        final Map<String, List<FileDocument>> downloadingFiles = new HashMap<>();
 
         final Map<String, List<TorrentSongSource>> groupedMp3Sources = groupPerTorrent(mp3Sources);
         final Set<String> mp3TorrentIds = groupedMp3Sources.keySet();
@@ -457,18 +461,18 @@ public class TorrentSearcher implements Searcher {
 
             final TorrentDocument torrent = dataStorage.getTorrent(torrentId);
 
-            final List<String> startedSteps = Lists.transform(torrentSources, TorrentSongSource::getName);
-            progressListener.start(startedSteps);
-
-            final CompletableFuture<List<FileDocument>> fileDocumentFuture;
+            final List<FileDocument> fileDocumentsResult;
             if (!requiredSources.isEmpty()) {
+                final List<String> startedSteps = Lists.transform(requiredSources, TorrentSongSource::getName);
+                progressListener.start(startedSteps);
+
                 final Supplier<List<FileDocument>> filesSupplier = () -> {
                     final List<FileDocument> fileDocuments = new ArrayList<>();
 
                     progressListener.initSubStage(
                             ProgressListener.SUB_STAGE_DOWNLOAD_MP_3_SOURCE,
                             Arrays.asList(STEP_RESOLVE_MAGNET, STEP_DOWNLOAD_FILES, STEP_SAVE_RESULTS),
-                            String.format("proceeding %s torrent", torrentId)
+                            String.format("downloading %s torrent files (mp3)", torrentId)
                     );
 
                     progressListener.subStageStart(Collections.singletonList(STEP_RESOLVE_MAGNET));
@@ -523,19 +527,22 @@ public class TorrentSearcher implements Searcher {
 
                     return fileDocuments;
                 };
-                if (!async) {
-                    fileDocumentFuture = CompletableFuture.completedFuture(filesSupplier.get());
+                try {
+                    fileDocumentsResult = filesSupplier.get();
+                    fileDocumentsResult.addAll(alreadyExistingFiles);
+                } finally {
                     progressListener.complete(startedSteps);
-                } else {
-                    fileDocumentFuture = CompletableFuture.supplyAsync(filesSupplier)
-                            .whenComplete((fileDocuments, throwable) -> progressListener.complete(startedSteps));
                 }
             } else {
-                fileDocumentFuture = CompletableFuture.completedFuture(alreadyExistingFiles);
-                progressListener.complete(startedSteps);
+                fileDocumentsResult = alreadyExistingFiles;
             }
 
-            downloadingFiles.add(fileDocumentFuture);
+            for (FileDocument fileDocument : fileDocumentsResult) {
+                if (!downloadingFiles.containsKey(fileDocument.getSourceId())) {
+                    downloadingFiles.put(fileDocument.getSourceId(), new ArrayList<>());
+                }
+                downloadingFiles.get(fileDocument.getSourceId()).add(fileDocument);
+            }
         });
         return downloadingFiles;
     }

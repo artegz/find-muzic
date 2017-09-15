@@ -19,7 +19,7 @@ public interface SearchService {
 
     SongResolveReport getLastSongResolveReport(Song song);
 
-    void downloadSongs(Song song, List<TorrentSongSource> sources, boolean async, ProgressListener progressListener);
+    void downloadSongs(Song song, List<TorrentSongSource> sources, ProgressListener progressListener);
 
     List<FileDocument> getDownloadedSongs(Song song);
 }

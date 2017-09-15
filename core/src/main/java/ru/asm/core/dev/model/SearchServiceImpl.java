@@ -63,11 +63,11 @@ public class SearchServiceImpl implements SearchService {
     }
 
     @Override
-    public void downloadSongs(Song song, List<TorrentSongSource> sources, boolean async, ProgressListener progressListener) {
+    public void downloadSongs(Song song, List<TorrentSongSource> sources, ProgressListener progressListener) {
 //        for (Searcher searcher : searchers) {
 //            searcher.downloadSongs(song, sources, async);
 //        }
-        getTorrentSearcher().downloadSongs(song, sources, async, progressListener);
+        getTorrentSearcher().downloadSongs(song, sources, progressListener);
     }
 
     @Override

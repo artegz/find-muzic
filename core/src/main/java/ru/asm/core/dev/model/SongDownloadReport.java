@@ -1,6 +1,7 @@
 package ru.asm.core.dev.model;
 
 import java.util.Date;
+import java.util.Map;
 
 /**
  * User: artem.smirnov
@@ -14,4 +15,6 @@ public class SongDownloadReport {
 
     private Date startTime;
     private Date endTime;
+
+    private Map<String, String> sourcesDownloadStatuses = null;
 }

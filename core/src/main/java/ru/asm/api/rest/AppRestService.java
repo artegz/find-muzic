@@ -348,7 +348,7 @@ public class AppRestService {
             final List<TorrentSongSource> songSources = this.searchService.getSongSources(song);
             if (songSources != null) {
                 final List<TorrentSongSource> specifiedSources = filter(songSources, downloadInfo.getSourcesIds());
-                this.searchService.downloadSongs(song, specifiedSources, false, progressListener);
+                this.searchService.downloadSongs(song, specifiedSources, progressListener);
             }
             progressService.taskEnded(song);
         }
@@ -358,28 +358,30 @@ public class AppRestService {
     @Path("/alt/songs/sources/download")
     public void downloadSongs(Map<Integer, List<String>> songsDownloadInfos) {
         logger.info("downloading {} songs", songsDownloadInfos.size());
-        int complete = 0;
+        final MutableInt complete = new MutableInt(1);
         for (Integer songId : songsDownloadInfos.keySet()) {
-            final Song song = findSongById(songId);
-            final List<String> downloadInfo = songsDownloadInfos.get(songId);
+            executionService.submit(() -> {
+                final Song song = findSongById(songId);
+                final List<String> downloadInfo = songsDownloadInfos.get(songId);
 
-            if (song != null) {
-                logger.info("downloading {} ({}) from {} sources...", song.getFullName(), song.getSongId(), downloadInfo.size());
+                if (song != null) {
+                    logger.info("downloading {} ({}) from {} sources...", song.getFullName(), song.getSongId(), downloadInfo.size());
 
-                final ProgressListener progressListener = progressService.taskStarted(song, TASK_DOWNLOAD_SONGS);
-                final List<TorrentSongSource> songSources = this.searchService.getSongSources(song);
-                if (songSources != null) {
-                    final List<TorrentSongSource> specifiedSources = filter(songSources, downloadInfo);
-                    this.searchService.downloadSongs(song, specifiedSources, false, progressListener);
+                    final ProgressListener progressListener = progressService.taskStarted(song, TASK_DOWNLOAD_SONGS);
+                    final List<TorrentSongSource> songSources = this.searchService.getSongSources(song);
+                    if (songSources != null) {
+                        final List<TorrentSongSource> specifiedSources = filter(songSources, downloadInfo);
+                        this.searchService.downloadSongs(song, specifiedSources, progressListener);
+                    }
+                    progressService.taskEnded(song);
+
+                    complete.increment();
+                    logger.info("resolving complete ({} / {})", complete, songsDownloadInfos.size());
+                } else {
+                    complete.increment();
+                    logger.error("song {} not found", songId);
                 }
-                progressService.taskEnded(song);
-
-                complete++;
-                logger.info("resolving complete ({} / {})", complete, songsDownloadInfos.size());
-            } else {
-                complete++;
-                logger.error("song {} not found", songId);
-            }
+            });
         }
     }
 
