@@ -14,6 +14,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
 import org.springframework.stereotype.Component;
+import ru.asm.api.AppConfig;
 import ru.asm.core.AppConfiguration;
 import ru.asm.core.AppCoreService;
 import ru.asm.core.dev.model.*;
@@ -776,7 +777,7 @@ public class TorrentSearcher implements Searcher {
         final List<TorrentDocument> indexedTorrents = new ArrayList<>();
 
         // temp directory for FLAC mappings
-        File saveDir = new File("C:\\TEMP\\find-music\\downloads\\flac\\");
+        File saveDir = new File(AppConfiguration.FLAC_DOWNLOAD_TEMP_DIR);
         if (!saveDir.exists()) //noinspection ResultOfMethodCallIgnored
             saveDir.mkdirs();
 

@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
 import org.springframework.data.elasticsearch.repository.config.EnableElasticsearchRepositories;
+import ru.asm.core.AppConfiguration;
 
 import static org.elasticsearch.node.NodeBuilder.nodeBuilder;
 
@@ -26,9 +27,9 @@ public class ElasticsearchConfig {
                 .local(true)
                 .settings(
                         Settings.builder()
-                                .put("path.home", "C:\\TEMP\\find-music\\es_home")
+                                .put("path.home", AppConfiguration.ES_HOME_LOCATION)
                                 .put("http.enabled", "false")
-                                .put("path.data", "C:\\TEMP\\find-music\\es_data")
+                                .put("path.data", AppConfiguration.ES_DATA_LOCATION)
                                 .build()
                 )
                 .node();

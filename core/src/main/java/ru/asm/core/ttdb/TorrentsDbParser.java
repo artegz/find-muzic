@@ -23,71 +23,109 @@ import java.util.Map;
 public class TorrentsDbParser {
 
     public static final DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyy.MM.dd HH:mm:ss").withZoneUTC();
+    public static final String TORRENT = "torrent";
+    public static final String FORUM = "forum";
+    public static final String TORRENT1 = "torrent";
+    public static final String TITLE = "title";
+    public static final String MAGNET = "magnet";
+    public static final String FORUM1 = "forum";
+    public static final String CONTENT = "content";
 
     public static void parseDocument(InputStream inputStream, int groupSize, GroupHandler groupHandler) throws XMLStreamException {
         List<TorrentInfoVO> torrentInfosGroup = new ArrayList<>();
         TorrentInfoVO currentTorrentInfo = null;
 
-        String tagContent = null;
+        StringBuilder tagContent = null;
         final XMLInputFactory factory = XMLInputFactory.newInstance();
-        final XMLStreamReader reader = factory.createXMLStreamReader(inputStream);
+        final XMLStreamReader reader = factory.createXMLStreamReader(inputStream, "UTF-8");
 
         while(reader.hasNext()){
-            int event = reader.next();
+            Integer event = null;
+            try {
+                event = reader.next();
+            } catch (Throwable e) {
+                e.printStackTrace();
+                throw e;
+            }
+            if (event == null) {
+                throw new AssertionError();
+            }
 
             switch(event){
                 case XMLStreamConstants.START_ELEMENT:
-                    if ("torrent".equals(reader.getLocalName())){
-                        currentTorrentInfo = new TorrentInfoVO();
+                    String tagName = reader.getLocalName();
+                    switch (tagName) {
+                        case TORRENT: {
+                            currentTorrentInfo = new TorrentInfoVO();
 
-                        final Map<String, String> attributes = getAttributes(reader);
+                            final Map<String, String> attributes = getAttributes(reader);
 
-                        if (attributes.containsKey("registred_at")) {
-                            final DateTime registeredAt = formatter.parseDateTime(attributes.get("registred_at"));
-                            currentTorrentInfo.setCreationDate(registeredAt.toDate());
-                        }
+                            if (attributes.containsKey("registred_at")) {
+                                final DateTime registeredAt = formatter.parseDateTime(attributes.get("registred_at"));
+                                currentTorrentInfo.setCreationDate(registeredAt.toDate());
+                            }
 
-                        if (attributes.containsKey("size")) {
-                            final Long size = Long.valueOf(attributes.get("size"));
-                            currentTorrentInfo.setSize(size);
-                        }
+                            if (attributes.containsKey("size")) {
+                                final Long size = Long.valueOf(attributes.get("size"));
+                                currentTorrentInfo.setSize(size);
+                            }
 
-                        if (attributes.containsKey("id")) {
-                            final String id = attributes.get("id");
-                            currentTorrentInfo.setId(id);
+                            if (attributes.containsKey("id")) {
+                                final String id = attributes.get("id");
+                                currentTorrentInfo.setId(id);
+                            }
+                            break;
                         }
-                    } else if ("forum".equals(reader.getLocalName())) {
-                        final Map<String, String> attributes = getAttributes(reader);
-                        if (attributes.containsKey("id")) {
-                            assert (currentTorrentInfo != null);
-                            currentTorrentInfo.setForumId(attributes.get("id"));
+                        case FORUM: {
+                            final Map<String, String> attributes = getAttributes(reader);
+                            if (attributes.containsKey("id")) {
+                                assert (currentTorrentInfo != null);
+                                currentTorrentInfo.setForumId(attributes.get("id"));
+                            }
+                            tagContent = new StringBuilder();
+                            break;
                         }
+                        case TITLE:
+                        case MAGNET:
+                        case CONTENT:
+                            tagContent = new StringBuilder();
+                            break;
                     }
                     break;
 
                 case XMLStreamConstants.CHARACTERS:
-                    tagContent = reader.getText().trim();
+                case XMLStreamConstants.CDATA:
+                    if (tagContent != null) {
+                        tagContent.append(reader.getText().trim());
+                    }
                     break;
 
                 case XMLStreamConstants.END_ELEMENT:
                     switch(reader.getLocalName()){
-                        case "torrent":
+                        case TORRENT:
                             torrentInfosGroup.add(currentTorrentInfo);
                             break;
-                        case "title":
+                        case TITLE:
                             assert (currentTorrentInfo != null);
-                            currentTorrentInfo.setTitle(tagContent);
+                            assert (tagContent != null);
+                            currentTorrentInfo.setTitle(tagContent.toString());
+                            tagContent = null;
                             break;
-                        case "magnet":
+                        case MAGNET:
                             assert (currentTorrentInfo != null);
-                            currentTorrentInfo.setMagnet(tagContent);
+                            assert (tagContent != null);
+                            currentTorrentInfo.setMagnet(tagContent.toString());
+                            tagContent = null;
                             break;
-                        case "forum":
+                        case FORUM:
                             assert (currentTorrentInfo != null);
-                            currentTorrentInfo.setForum(tagContent);
+                            assert (tagContent != null);
+                            currentTorrentInfo.setForum(tagContent.toString());
+                            tagContent = null;
                             break;
-                        case "content":
+                        case CONTENT:
                             // ignore
+                            tagContent = null;
                             break;
                     }
                     break;

@@ -32,7 +32,7 @@ public class TorrentClient {
     public static final Logger logger = LoggerFactory.getLogger(TorrentClient.class);
 
     static {
-        System.setProperty("jlibtorrent.jni.path", "C:\\TEMP\\find-music\\jlibtorrent\\jlibtorrent-windows-1.2.0.6\\lib\\x86_64\\jlibtorrent.dll");
+        System.setProperty("jlibtorrent.jni.path", AppConfiguration.JLIBTORRENT_DLL_LOCATION);
     }
 
     private SessionManager s = null;
@@ -111,8 +111,8 @@ public class TorrentClient {
                             if (p > prevProgress) {
                                 logger.debug(String.format("Progress: %.2f%% for torrent '%s' (total download: %s)", p, a.torrentName(), s.stats().totalDownload()));
                                 progress.setValue(p);
-                                progressBar.setProgress((double) p);
                             }
+                            progressBar.setProgress((double) p);
                             lastActivity.setDate(new DateTime());
                             break;
                         case TORRENT_FINISHED:

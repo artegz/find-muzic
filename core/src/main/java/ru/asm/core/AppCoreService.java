@@ -400,7 +400,7 @@ public class AppCoreService {
     public void resolveSongs_flac(Integer offset, Integer limit) {
         final TorrentsDatabaseService torrentsDatabaseService = new TorrentsDatabaseService(torrentInfoRepository);
 
-        File saveDir = new File("C:\\TEMP\\find-music\\downloads\\flac\\");
+        File saveDir = new File(AppConfiguration.FLAC_DOWNLOAD_TEMP_DIR);
         if (!saveDir.exists()) //noinspection ResultOfMethodCallIgnored
             saveDir.mkdirs();
 
@@ -936,7 +936,9 @@ public class AppCoreService {
     }
 
     private static void logInfo(String message, Object... args) {
-        logger.info(String.format(message, args));
+        if (message != null) {
+            logger.info(String.format(message, args));
+        }
     }
 
     private static class ResolveResult {

@@ -50,8 +50,10 @@
                    [attr.aria-valuenow]="progressInfo.songProgresses[song.songId].currentStage.progressBar.progress"
                    aria-valuemin="0" aria-valuemax="1"
                    [style.width]="progressInfo.songProgresses[song.songId].currentStage.progressBar.progress*100 + '%'">
-                {{progressInfo.songProgresses[song.songId].currentStage.progressBar.progress*100}}%
               </div>
+            </div>
+            <div *ngIf="!!progressInfo.songProgresses[song.songId].currentStage.progressBar && progressInfo.songProgresses[song.songId].currentStage.progressBar.progress">
+              {{progressInfo.songProgresses[song.songId].currentStage.progressBar.progress*100}}%
             </div>
 
           </ng-container>
@@ -90,6 +92,9 @@
                    [style.width]="progressInfo.songProgresses[song.songId].currentStage.subStage.progressBar.progress*100 + '%'">
                 {{progressInfo.songProgresses[song.songId].currentStage.subStage.progressBar.progress*100}}%
               </div>
+            </div>
+            <div *ngIf="!!progressInfo.songProgresses[song.songId].currentStage.subStage.progressBar && progressInfo.songProgresses[song.songId].currentStage.subStage.progressBar.progress">
+              {{progressInfo.songProgresses[song.songId].currentStage.subStage.progressBar.progress*100}}%
             </div>
 
           </ng-container>

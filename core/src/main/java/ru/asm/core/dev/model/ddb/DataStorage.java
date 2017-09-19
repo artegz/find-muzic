@@ -6,9 +6,11 @@ import org.dizitart.no2.objects.Cursor;
 import org.dizitart.no2.objects.ObjectRepository;
 import org.dizitart.no2.objects.filters.ObjectFilters;
 import org.springframework.stereotype.Component;
+import ru.asm.core.AppConfiguration;
 import ru.asm.core.dev.model.SongResolveReport;
 
 import javax.annotation.PostConstruct;
+import java.io.File;
 import java.util.List;
 
 /**
@@ -32,8 +34,10 @@ public class DataStorage {
     @PostConstruct
     public void postConstruct() {
         //java initialization
+        final File folder = new File(AppConfiguration.N2O_DB_FILE_LOCATION);
+        if (!folder.exists()) folder.mkdirs();
         db = Nitrite.builder()
-                .filePath("/tmp/test.db")
+                .filePath(new File(folder, "test.db"))
                 .openOrCreate("user", "password");
         artistRepo = db.getRepository(ArtistDocument.class);
         torrentRepo = db.getRepository(TorrentDocument.class);

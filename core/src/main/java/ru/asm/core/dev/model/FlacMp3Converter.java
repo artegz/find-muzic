@@ -2,6 +2,7 @@ package ru.asm.core.dev.model;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.asm.core.AppConfiguration;
 
 import java.io.*;
 import java.nio.charset.Charset;
@@ -13,7 +14,7 @@ import java.nio.charset.Charset;
  */
 public class FlacMp3Converter {
 
-    private static final String MP3SPLT = "C:\\CommanLineTools\\mp3splt\\mp3splt.exe";
+    private static final String MP3SPLT = AppConfiguration.MP3SPLT_EXE_LOCATION;
 
     private static final Logger logger = LoggerFactory.getLogger(FlacMp3Converter.class);
 

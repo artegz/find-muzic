@@ -63,7 +63,7 @@ public class AppRestService {
             magnet = "magnet:?xt=urn:btih:77D5646C8645A40BDB635FBED263B5B3A86BCB0F";
         }
         final AppConfiguration appConfiguration = AppConfiguration.getInstance();
-        appCoreService.downloadTorrent(appConfiguration.getTorrentDbsStorageLocation(), magnet);
+        appCoreService.downloadTorrent(appConfiguration.getTorrentBackupDownloadFile(), magnet);
     }
 
     // Step 1.2: extract downloaded torrents DB
@@ -79,7 +79,7 @@ public class AppRestService {
     @Produces("application/json; charset=UTF-8")
     @Path("/torrentDbs/index")
     public void indexTorrentDb() {
-        final String pathname = "C:\\TEMP\\find-music\\rutracker_org_db\\backup.20170208185701\\backup.20170208185701.xml";
+        final String pathname = AppConfiguration.TORRENTS_BACKUP_XML_LOCATION;
         final File backup = new File(pathname);
 
         appCoreService.indexTorrentsDb(backup);
@@ -98,9 +98,9 @@ public class AppRestService {
     @Produces("application/json; charset=UTF-8")
     @Path("/playlists/import")
     public void importPlaylist() {
-        final String playlist = "nashe-test";
+        final String playlist = "nashe";
         final String comment = "test";
-        final File file = new File("C:\\IdeaProjects\\find-muzic\\core\\src\\main\\resources\\playlists/test.nashe.playlist.txt");
+        final File file = new File(AppConfiguration.DEFAULT_PLAYLIST_FILE_LOCATION);
 
         appCoreService.importPlaylist(playlist, comment, file);
     }
@@ -180,7 +180,7 @@ public class AppRestService {
     public List<String> getTorrentDbs() {
         final AppConfiguration appConfiguration = AppConfiguration.getInstance();
 
-        final File[] files = appConfiguration.getTorrentDbsStorageLocation().listFiles(File::isFile);
+        final File[] files = appConfiguration.getTorrentBackupDownloadFile().listFiles(File::isFile);
         assert files != null;
         final List<String> filenames = Lists.transform(Arrays.asList(files), File::getName);
 
@@ -311,7 +311,7 @@ public class AppRestService {
         }
 
         final int total = songIds.size();
-        final MutableInt complete = new MutableInt(1);
+        final MutableInt complete = new MutableInt(0);
         logger.info("resolving {} songs", total);
         for (Integer songId : songIds) {
             executionService.submit(() -> {
@@ -393,7 +393,8 @@ public class AppRestService {
     public ProgressInfo getProgressInfo() {
         final Map<PlaylistSongEntity, Task> progresses = new HashMap<>();
         final Map<Integer, Task> tasksInProgress = progressService.getTasksInProgress();
-        for (Integer songId : tasksInProgress.keySet()) {
+        Set<Integer> songIds = new HashSet<>(tasksInProgress.keySet());
+        for (Integer songId : songIds) {
             final PlaylistSongEntity songEntity = this.playlistSongsMapper.getSong(songId);
             progresses.put(songEntity, tasksInProgress.get(songId));
         }

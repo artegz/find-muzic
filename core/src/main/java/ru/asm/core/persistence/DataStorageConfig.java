@@ -12,6 +12,7 @@ import org.springframework.jdbc.datasource.init.DataSourceInitializer;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+import ru.asm.core.AppConfiguration;
 
 import javax.sql.DataSource;
 import java.sql.Driver;
@@ -26,7 +27,7 @@ import java.sql.Driver;
 public class DataStorageConfig {
 
     private static final String INIT_SCHEMA_LOCATION = "schema/schema2.sql";
-    private static final String DB_URL = "jdbc:h2:file:C:\\TEMP\\find-music\\h2\\fmdb";
+    private static final String DB_URL = "jdbc:h2:file:" + AppConfiguration.H2_DB_FILE_LOCATION;
 
     @Bean
     public DataSource getDataSource() {
