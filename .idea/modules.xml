@@ -2,10 +2,9 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/core.iml" filepath="$PROJECT_DIR$/.idea/modules/core.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/core_main.iml" filepath="$PROJECT_DIR$/.idea/modules/core_main.iml" group="core" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/core_test.iml" filepath="$PROJECT_DIR$/.idea/modules/core_test.iml" group="core" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/find-muzic.iml" filepath="$PROJECT_DIR$/.idea/modules/find-muzic.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/find-music.iml" filepath="$PROJECT_DIR$/.idea/modules/find-music.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/find-music_main.iml" filepath="$PROJECT_DIR$/.idea/modules/find-music_main.iml" group="find-music" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/find-music_test.iml" filepath="$PROJECT_DIR$/.idea/modules/find-music_test.iml" group="find-music" />
     </modules>
   </component>
 </project>

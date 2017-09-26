@@ -1,0 +1,68 @@
+<div class="row">
+  <div class="col-xs-4">
+    <h4>Playlist</h4>
+    <table *ngIf="!!resolvableSongs" class="table table-hover">
+      <tr *ngFor="let rs of resolvableSongs | paginate: { itemsPerPage: 10, currentPage: p, id: 'songs' }" [class.active]="rs === selectedSong">
+        <td>
+          <input type="checkbox" class="checkbox" [(ngModel)]="rs.resolve"/>
+        </td>
+        <td>
+          <a href="#" (click)="onSongSelected(rs);" >
+            {{rs.artistName}}: {{rs.title}}
+            <span *ngIf="!!rs.sources && rs.sources.length > 0" class="badge badge-info">{{rs.sources.length}}</span>
+            <span *ngIf="!!rs.files && rs.files.length > 0" class="badge badge-success">{{rs.files.length}}</span>
+          </a>
+          <i class="fa fa-spinner fa-pulse fa-fw" *ngIf="rs.inProgress"></i>
+        </td>
+      </tr>
+      <tfoot>
+        <td colspan="2">
+          <pagination-controls (pageChange)="p = $event" id="songs"></pagination-controls>
+        </td>
+      </tfoot>
+    </table>
+    <button class="btn btn-primary" (click)="selectAllForResolve()">Select all</button>
+    <button class="btn btn-primary" (click)="unselectAllForResolve()">Unselect all</button>
+  </div>
+  <div class="col-xs-4">
+    <h4>Sources</h4>
+    <table *ngIf="!!downloadableSources" class="table table-hover">
+      <tr *ngFor="let ds of downloadableSources | paginate: { itemsPerPage: 10, currentPage: sp, id: 'sources' }">
+        <td>
+          <input type="checkbox" class="checkbox" [(ngModel)]="ds.download"/>
+        </td>
+        <td>
+          {{ds.source.indexSong.torrentId}}: {{!!ds.source.indexSong.mp3FilePath ? ds.source.indexSong.mp3FilePath : ds.source.indexSong.cueFilePath + '#' + ds.source.indexSong.trackNum}}
+        </td>
+      </tr>
+      <tfoot>
+      <td >
+        <pagination-controls (pageChange)="sp = $event" id="sources"></pagination-controls>
+      </td>
+      </tfoot>
+    </table>
+    <button class="btn btn-primary" (click)="selectAllForFetch()">Select all</button>
+    <button class="btn btn-primary" (click)="unselectAllForFetch()">Unselect all</button>
+  </div>
+  <div class="col-xs-4">
+    <h4>Files</h4>
+    <table *ngIf="!!downloadedFiles" class="table">
+      <tr *ngFor="let df of downloadedFiles | paginate: { itemsPerPage: 10, currentPage: fp, id: 'files' }">
+        <td>
+          {{df.file.fsLocation}}
+        </td>
+      </tr>
+      <tfoot>
+      <td>
+        <pagination-controls (pageChange)="fp = $event" id="files"></pagination-controls>
+      </td>
+      </tfoot>
+    </table>
+  </div>
+</div>
+<div class="row">
+  <div class="col-xs-12">
+    <button class="btn btn-primary" (click)="resolveSources()">Resolve sources</button>
+    <button class="btn btn-primary" (click)="fetchFiles()">Fetch files</button>
+  </div>
+</div>
