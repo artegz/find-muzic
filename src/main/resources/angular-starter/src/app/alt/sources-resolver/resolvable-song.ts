@@ -1,14 +1,12 @@
-import {SongInfo} from "../../api/dto/song-info";
-// import {DownloadableSource} from "./downloadable-source";
-// import {DownloadedFile} from "./downloaded-file";
+import { LiteSongInfo } from '../../api/lite-song-info';
 
 export class ResolvableSong {
 
-  _song: SongInfo;
+  _song: LiteSongInfo;
 
   resolve: boolean = false;
 
-  constructor(song: SongInfo) {
+  constructor(song: LiteSongInfo) {
     this._song = song;
   }
 
@@ -25,21 +23,15 @@ export class ResolvableSong {
   }
 
   get resolveFailed(): boolean {
-    let resolveReport = this._song.resolveReport;
-    if (!!resolveReport) {
-      if (resolveReport.resolvePerformed && !resolveReport.searchPerformed) {
-        return true;
-      }
-    }
-    return false;
+    return this._song.resolveStatus === 'failed';
   }
 
   get numSources(): number {
-    let resolveReport = this._song.resolveReport;
-    if (!!resolveReport && resolveReport.foundSources) {
-      return resolveReport.foundSources.length;
-    }
-    return null;
+    return this._song.numSources;
+  }
+
+  get numFiles(): number {
+    return this._song.numFiles;
   }
 
 }

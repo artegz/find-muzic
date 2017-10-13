@@ -12,6 +12,7 @@ import org.joda.time.Seconds;
 import org.slf4j.*;
 import ru.asm.core.AppConfiguration;
 import ru.asm.core.progress.ProgressBar;
+import ru.asm.core.progress.TaskProgress;
 
 import java.io.File;
 import java.util.Timer;
@@ -80,14 +81,25 @@ public class TorrentClient {
     public void download(TorrentInfo ti,
                          File saveDir,
                          Priority[] priorities,
-                         ProgressBar progressBar) {
+                         ProgressBar progressBar,
+                         TaskProgress pTaskProgress) {
         try {
+            TaskProgress taskProgress;
+            if (pTaskProgress == null) {
+                taskProgress = new TaskProgress();
+            } else {
+                taskProgress = pTaskProgress;
+            }
+
             final CountDownLatch signal = new CountDownLatch(1);
 
             final MutableDateTime lastActivity = new MutableDateTime(new DateTime());
 
             final MutableFloat progress = new MutableFloat(0d);
             final AlertListener listener = new AlertListener() {
+
+                private long tId = 0;
+
                 @Override
                 public int[] types() {
                     return null;
@@ -102,7 +114,7 @@ public class TorrentClient {
                             logger.debug("Torrent '{}' added", ti.name());
                             ((TorrentAddedAlert) alert).handle().resume();
                             lastActivity.setDate(new DateTime());
-                            progressBar.reset();
+                            tId = taskProgress.startSubTask("downloading...");
                             break;
                         case BLOCK_FINISHED:
                             BlockFinishedAlert a = (BlockFinishedAlert) alert;
@@ -112,14 +124,16 @@ public class TorrentClient {
                                 logger.debug(String.format("Progress: %.2f%% for torrent '%s' (total download: %s)", p, a.torrentName(), s.stats().totalDownload()));
                                 progress.setValue(p);
                             }
-                            progressBar.setProgress((double) p);
+//                            progressBar.setProgress((double) p);
                             lastActivity.setDate(new DateTime());
+                            taskProgress.setSubTaskProgress(tId, (double) a.handle().status().progress());
                             break;
                         case TORRENT_FINISHED:
                             logger.debug("Torrent '{}' finished", ti.name());
-                            progressBar.complete();
+//                            progressBar.complete();
                             lastActivity.setDate(new DateTime());
                             signal.countDown();
+                            taskProgress.completeSubTask(tId);
                             break;
                     }
                 }

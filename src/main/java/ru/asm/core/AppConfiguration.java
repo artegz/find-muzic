@@ -44,6 +44,8 @@ public class AppConfiguration {
     public static final String DEFAULT_PLAYLIST_FILE_LOCATION = "C:\\IdeaProjects\\find-muzic\\src\\main\\resources\\playlists/test.nashe.playlist.txt";
 
 
+    public static final String OUTPUT_FOLDER = "C:\\TEMP\\find-music\\out";
+
     public static AppConfiguration getInstance() {
         return instance;
     }

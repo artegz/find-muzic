@@ -48,7 +48,7 @@ public class Test {
                 songList.stream().collect(Collectors.groupingBy(o -> o.getArtist().getArtistId()));
 
         for (Integer artistId : result.keySet()) {
-            System.out.println(String.format("artist %s have %s songs", artistId, result.get(artistId)));
+            System.out.println(String.format("artist %s have %s songs", artistId, result.get(artistId).size()));
         }
 
 

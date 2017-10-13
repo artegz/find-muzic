@@ -12,7 +12,7 @@ import java.util.Map;
  * Date: 13.09.2017
  * Time: 9:18
  */
-public class SongResolveReport {
+public class ArtistResolveReport {
 
     private Integer songId;
     private Integer artistId;
@@ -31,10 +31,10 @@ public class SongResolveReport {
     private Boolean searchPerformed;
     private List<String> foundSources;
 
-    public SongResolveReport() {
+    public ArtistResolveReport() {
     }
 
-    public SongResolveReport(Integer songId, Integer artistId) {
+    public ArtistResolveReport(Integer artistId) {
         this.songId = songId;
         this.artistId = artistId;
     }
@@ -109,7 +109,7 @@ public class SongResolveReport {
     }
 
     public Boolean getResolvePerformed() {
-        return resolvePerformed;
+        return resolvePerformed != null && resolvePerformed;
     }
 
     public Status getResolveStatus() {
@@ -125,7 +125,7 @@ public class SongResolveReport {
     }
 
     public Boolean getIndexingPerformed() {
-        return indexingPerformed;
+        return indexingPerformed != null && indexingPerformed;
     }
 
     public Map<String, String> getTorrentsIndexingStatuses() {
@@ -133,7 +133,7 @@ public class SongResolveReport {
     }
 
     public Boolean getSearchPerformed() {
-        return searchPerformed;
+        return searchPerformed != null && searchPerformed;
     }
 
     public List<String> getFoundSources() {

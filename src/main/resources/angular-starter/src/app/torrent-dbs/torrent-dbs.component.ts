@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import {RestService} from "../api/rest.service";
+import { RestService } from '../api/rest.service';
 
 @Component({
   selector: 'my-torrent-dbs',

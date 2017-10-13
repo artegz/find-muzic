@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import {RestService} from "../api/rest.service";
-import {SingleSongResult} from "../api/single-song-result";
+import { RestService } from '../api/rest.service';
+import { SingleSongResult } from '../api/single-song-result';
 
 @Component({
   selector: 'my-found-songs',

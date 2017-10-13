@@ -1,0 +1,43 @@
+<h4>Artists</h4>
+<div class="row">
+  <div class="col-xs-6">
+    <div *ngIf="!!indexableArtists" class="list-group">
+      <ng-container *ngFor="let ia of excludedArtists() | paginate: { itemsPerPage: 15, currentPage: p1, id: 'artistsAll' }">
+        <a href="#" (click)="select(ia)"
+           class="list-group-item"
+           [class.index-succeeded]="ia.artistInfo.indexingStatus === 'succeeded' || ia.artistInfo.indexingStatus === 'partially_succeedded'"
+           [class.index-failed]="ia.artistInfo.indexingStatus === 'failed'">
+          <span>{{ia.getArtistName()}}</span>
+        </a>
+      </ng-container>
+    </div>
+    <div>
+      <pagination-controls (pageChange)="p1 = $event" id="artistsAll"></pagination-controls>
+    </div>
+  </div>
+  <div class="col-xs-6">
+    <div *ngIf="!!indexableArtists" class="list-group">
+      <ng-container *ngFor="let ia of includedArtists() | paginate: { itemsPerPage: 15, currentPage: p2, id: 'artistsIncluded' }">
+        <a href="#" class="list-group-item" (click)="select(ia)">
+          <span>{{ia.getArtistName()}}</span>
+        </a>
+      </ng-container>
+    </div>
+    <div>
+      <pagination-controls (pageChange)="p2 = $event" id="artistsIncluded"></pagination-controls>
+    </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col-xs-12">
+    <button class="btn btn-default" (click)="selectAllForIndex()">Select all</button>
+    <button class="btn btn-default" (click)="unselectAllForIndex()">Unselect all</button>
+    <button class="btn btn-primary" (click)="indexArtists()">Index</button>
+  </div>
+</div>
+
+<!--<tr class="active">...</tr>
+<tr class="success">...</tr>
+<tr class="warning">...</tr>
+<tr class="danger">...</tr>
+<tr class="info">...</tr>-->

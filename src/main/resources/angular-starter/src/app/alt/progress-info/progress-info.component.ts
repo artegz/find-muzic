@@ -1,7 +1,8 @@
 
-import {Component, OnDestroy, OnInit} from '@angular/core';
-import {RestService} from "../../api/rest.service";
-import {ProgressInfo} from "../../api/progress-info";
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { RestService } from '../../api/rest.service';
+import { SimpleProgressInfo } from '../../api/simple-progress-info';
+import {TaskProgress} from "../../api/task-progress";
 
 @Component({
   selector: 'app-progress-info',
@@ -9,22 +10,27 @@ import {ProgressInfo} from "../../api/progress-info";
 })
 export class ProgressInfoComponent implements OnInit, OnDestroy {
 
-  progressInfo: ProgressInfo;
-  timerId: number;
+  progressInfo: SimpleProgressInfo;
+  timerId: any;
 
   constructor(private rest: RestService) {}
 
   ngOnInit(): void {
     this.timerId = setInterval(() => {
-      this.rest.getProgressInfo()
+      this.rest.getProgressInfo2()
         .subscribe(res => {
           this.progressInfo = res;
         });
-    }, 2500);
+    }, 3000);
   }
 
 
   ngOnDestroy(): void {
-    clearInterval(this.timerId)
+    clearInterval(this.timerId);
   }
+
+  getSubTaskIds(taskProgress: TaskProgress) {
+    return Object.keys(taskProgress.subTasks);
+  }
+
 }

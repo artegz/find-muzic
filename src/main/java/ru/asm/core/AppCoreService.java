@@ -146,7 +146,7 @@ public class AppCoreService {
                 }
             }
 
-            torrentClient.download(torrentInfo, folder, null, new ProgressBar());
+            torrentClient.download(torrentInfo, folder, null, new ProgressBar(), null);
         } finally {
         }
     }
@@ -290,7 +290,7 @@ public class AppCoreService {
                         final File saveDir = new File(AppConfiguration.DOWNLOADED_SONGS_STORAGE);
                         if (!saveDir.exists()) //noinspection ResultOfMethodCallIgnored
                             saveDir.mkdirs();
-                        torrentClient.download(torrentInfo, saveDir, priorities, new ProgressBar());
+                        torrentClient.download(torrentInfo, saveDir, priorities, new ProgressBar(), null);
 
                         final File downloadedSong = new File(saveDir, mp3FilePath);
                         if (downloadedSong.exists()) {
@@ -917,7 +917,7 @@ public class AppCoreService {
     private File downloadCue(TorrentInfo torrentInfo, Priority[] priorities, File targetFolder) {
         if (!targetFolder.exists()) //noinspection ResultOfMethodCallIgnored
             targetFolder.mkdirs();
-        torrentClient.download(torrentInfo, targetFolder, priorities, new ProgressBar());
+        torrentClient.download(torrentInfo, targetFolder, priorities, new ProgressBar(), null);
         return targetFolder;
     }
 

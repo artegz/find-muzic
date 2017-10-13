@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import {RestService} from "../api/rest.service";
-import {StatusEntity} from "../api/status-entity";
+import { RestService } from '../api/rest.service';
+import { StatusEntity } from '../api/status-entity';
 
 @Component({
   selector: 'my-statuses',

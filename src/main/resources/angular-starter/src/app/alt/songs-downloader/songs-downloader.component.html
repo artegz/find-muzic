@@ -1,0 +1,17 @@
+<div class="row">
+  <div class="col-xs-6">
+    <h4>Sources</h4>
+    <div *ngIf="!!downloadableTorrents" class="list-group">
+      <a *ngFor="let dt of downloadableTorrents | paginate: { itemsPerPage: 15, currentPage: p, id: 'torrents' }"
+         href="#" class="list-group-item" (click)="selectTorrent(dt)" [class.active]="dt.download">
+        <span>{{dt.title}} [{{dt.format}}] ({{dt.torrentId}}) - {{dt.containedSources.length}} sources</span>
+      </a>
+    </div>
+    <div>
+      <pagination-controls (pageChange)="p = $event" id="torrents"></pagination-controls>
+    </div>
+    <button class="btn btn-default" (click)="selectAllForDownload()">Select all</button>
+    <button class="btn btn-default" (click)="unselectAllForDownload()">Unselect all</button>
+    <button class="btn btn-primary" (click)="fetchFiles()">Download</button>
+  </div>
+</div>

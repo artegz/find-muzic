@@ -13,8 +13,8 @@ import 'angular2-datatable';
 import 'ngx-pagination';
 
 // import "font-awesome-loader";
-import "font-awesome-webpack";
-import "font-awesome/css/font-awesome.css";
+import 'font-awesome-webpack';
+import 'font-awesome/css/font-awesome.css';
 
 import 'rxjs';
 import '@angularclass/hmr';

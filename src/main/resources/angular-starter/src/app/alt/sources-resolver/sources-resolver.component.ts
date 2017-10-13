@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import {RestService} from "../../api/rest.service";
-import {ResolvableSong} from "./resolvable-song";
-import {Router} from "@angular/router";
+import { RestService } from '../../api/rest.service';
+import { ResolvableSong } from './resolvable-song';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-sources-resolver',
@@ -10,15 +10,13 @@ import {Router} from "@angular/router";
 export class SourcesResolverComponent implements OnInit {
 
   resolvableSongs: ResolvableSong[];
-  // selectedSong: ResolvableSong;
-
   p: number = 1;
 
   constructor(private rest: RestService,
               private router: Router) {}
 
   ngOnInit(): void {
-    this.rest.getSongs("nashe", false, true)
+    this.rest.getSongsForSearch()
       .subscribe(res => {
         this.resolvableSongs = res.map(info => new ResolvableSong(info));
       });
@@ -45,9 +43,9 @@ export class SourcesResolverComponent implements OnInit {
         return s;
       })
       .map(s => s.id);
-    this.rest.resolveSongs(ids)
+    this.rest.searchSongs(ids)
       .subscribe(() => {
-        this.router.navigate(["/progress"])
+        this.router.navigate(["/progress"]);
       });
     return false;
   }

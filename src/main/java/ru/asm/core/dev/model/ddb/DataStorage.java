@@ -7,7 +7,7 @@ import org.dizitart.no2.objects.ObjectRepository;
 import org.dizitart.no2.objects.filters.ObjectFilters;
 import org.springframework.stereotype.Component;
 import ru.asm.core.AppConfiguration;
-import ru.asm.core.dev.model.SongResolveReport;
+import ru.asm.core.dev.model.ArtistResolveReport;
 
 import javax.annotation.PostConstruct;
 import java.io.File;
@@ -29,7 +29,7 @@ public class DataStorage {
     private ObjectRepository<FileDocument> filesRepo;
     private ObjectRepository<SongSourceDocument> songSourceRepo;
 
-    private ObjectRepository<SongResolveReport> songResolveReportRepo;
+    private ObjectRepository<ArtistResolveReport> songResolveReportRepo;
 
     @PostConstruct
     public void postConstruct() {
@@ -44,18 +44,18 @@ public class DataStorage {
 //        songRepo = db.getRepository(SongDocument.class);
         filesRepo = db.getRepository(FileDocument.class);
         songSourceRepo = db.getRepository(SongSourceDocument.class);
-        songResolveReportRepo = db.getRepository(SongResolveReport.class);
+        songResolveReportRepo = db.getRepository(ArtistResolveReport.class);
     }
 
-    public SongResolveReport getSongResolveReport(Integer songId) {
-        final Cursor<SongResolveReport> cursor = songResolveReportRepo.find(ObjectFilters.eq("songId", songId));
+    public ArtistResolveReport getSongResolveReport(Integer artistId) {
+        final Cursor<ArtistResolveReport> cursor = songResolveReportRepo.find(ObjectFilters.eq("artistId", artistId));
         return cursor.firstOrDefault();
     }
 
-    public void saveSongResolveReport(Integer songId, SongResolveReport report) {
+    public void saveArtistResolveReport(ArtistResolveReport report) {
         final UpdateOptions updateOptions = new UpdateOptions();
         updateOptions.setUpsert(true);
-        songResolveReportRepo.update(ObjectFilters.eq("songId", songId), report, updateOptions);
+        songResolveReportRepo.update(ObjectFilters.eq("artistId", report.getArtistId()), report, updateOptions);
     }
 
 
@@ -97,6 +97,11 @@ public class DataStorage {
 
     public List<SongSourceDocument> getSongSources(Integer songId) {
         final Cursor<SongSourceDocument> songSourceDocuments = songSourceRepo.find(ObjectFilters.eq("songId", songId));
+        return songSourceDocuments.toList();
+    }
+
+    public List<SongSourceDocument> getSongSourcesByTorrent(String torrentId) {
+        final Cursor<SongSourceDocument> songSourceDocuments = songSourceRepo.find(ObjectFilters.eq("songSource.indexSong.torrentId", torrentId));
         return songSourceDocuments.toList();
     }
 

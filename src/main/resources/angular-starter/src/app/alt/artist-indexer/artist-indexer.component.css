@@ -1,0 +1,7 @@
+.index-failed {
+  background-color: pink;
+}
+
+.index-succeeded {
+  background-color: lightgreen;
+}

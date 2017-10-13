@@ -1,4 +1,4 @@
-import {FileDocument} from "../../api/dto/file-document";
+import { FileDocument } from '../../api/dto/file-document';
 
 export class DownloadedFile {
 

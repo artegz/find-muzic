@@ -1,6 +1,6 @@
 <header>
   <nav>
-    <a [routerLink]="['']">Home</a>
+    <a class="btn" [routerLink]="['']">Home</a>
     <!--<a [routerLink]="['about']">About</a>-->
     <!--<a [routerLink]="['artists']">Artists</a>-->
 
@@ -10,9 +10,13 @@
     <!--<a [routerLink]="['statuses']">Statuses</a>-->
     <!--<a [routerLink]="['foundSongs']">Songs</a>-->
 
-    <a [routerLink]="['sourcesResolver']">Resolve</a>
-    <a [routerLink]="['playlistManager']">Playlist manager</a>
-    <a [routerLink]="['progress']">Progress</a>
+    <!--<a [routerLink]="['playlistManager']">Playlist manager</a>-->
+
+    <a class="btn" [routerLink]="['artist-indexer']">Index</a>
+    <a class="btn" [routerLink]="['sources-resolver']">Search</a>
+    <a class="btn" [routerLink]="['songs-downloader']">Download</a>
+    <a class="btn" [routerLink]="['playlist-builder']">Output</a>
+    <a class="btn" [routerLink]="['progress']">Progress</a>
   </nav>
 </header>
 <main>

@@ -1,6 +1,6 @@
-import {SongInfo} from "../../api/dto/song-info";
-import {DownloadableSource} from "./downloadable-source";
-import {DownloadedFile} from "./downloaded-file";
+import { SongInfo } from '../../api/dto/song-info';
+import { DownloadableSource } from './downloadable-source';
+import { DownloadedFile } from './downloaded-file';
 
 export class ResolvableSong {
 

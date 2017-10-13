@@ -2,26 +2,28 @@ import { NgModule, ApplicationRef } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { HttpModule } from '@angular/http';
 import { FormsModule } from '@angular/forms';
-import { DataTableModule } from "angular2-datatable";
+import { DataTableModule } from 'angular2-datatable';
 
 import { AppComponent } from './app.component';
 import { HomeComponent } from './home/home.component';
 import { AboutComponent } from './about/about.component';
-// import { ArtistsListComponent } from "./artists-list/artists-list.component";
 import { MyTestComponent } from './test/test.component';
 import { ApiService } from './shared';
 import { routing } from './app.routing';
 
-import { RestService } from "./api";
+import { RestService } from './api';
 
 import { removeNgStyles, createNewHosts } from '@angularclass/hmr';
-import {NgxPaginationModule} from "ngx-pagination/dist/ngx-pagination";
-import {TorrentDbsComponent} from "./torrent-dbs/torrent-dbs.component";
-import {MyStatusesComponent} from "./statuses/statuses.component";
-import {MyFoundSongsComponent} from './songs/songs.component';
-import {PlaylistManagerComponent} from "./alt/playlist-manager/playlist-manager.component";
-import {ProgressInfoComponent} from "./alt/progress-info/progress-info.component";
-import {SourcesResolverComponent} from "./alt/sources-resolver/sources-resolver.component";
+import { NgxPaginationModule } from 'ngx-pagination/dist/ngx-pagination';
+import { TorrentDbsComponent } from './torrent-dbs/torrent-dbs.component';
+import { MyStatusesComponent } from './statuses/statuses.component';
+import { MyFoundSongsComponent } from './songs/songs.component';
+import { PlaylistManagerComponent } from './alt/playlist-manager/playlist-manager.component';
+import { ProgressInfoComponent } from './alt/progress-info/progress-info.component';
+import { SourcesResolverComponent } from './alt/sources-resolver/sources-resolver.component';
+import { SongsDownloaderComponent } from './alt/songs-downloader/songs-downloader.component';
+import { PlaylistBuilderComponent } from './alt/playlist-builder/playlist-builder.component';
+import { ArtistIndexerComponent } from './alt/artist-indexer/artist-indexer.component';
 
 @NgModule({
   imports: [
@@ -41,8 +43,12 @@ import {SourcesResolverComponent} from "./alt/sources-resolver/sources-resolver.
     MyStatusesComponent,
     MyFoundSongsComponent,
     PlaylistManagerComponent,
+
     ProgressInfoComponent,
-    SourcesResolverComponent
+    ArtistIndexerComponent,
+    SourcesResolverComponent,
+    SongsDownloaderComponent,
+    PlaylistBuilderComponent
   ],
   providers: [
     ApiService,

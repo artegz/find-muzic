@@ -18,13 +18,13 @@ public class SongInfo {
 
     private List<FileDocument> files;
 
-    private SongResolveReport lastResolveReport;
+    private ArtistResolveReport lastResolveReport;
 
-    public SongResolveReport getLastResolveReport() {
+    public ArtistResolveReport getLastResolveReport() {
         return lastResolveReport;
     }
 
-    public void setLastResolveReport(SongResolveReport lastResolveReport) {
+    public void setLastResolveReport(ArtistResolveReport lastResolveReport) {
         this.lastResolveReport = lastResolveReport;
     }
 

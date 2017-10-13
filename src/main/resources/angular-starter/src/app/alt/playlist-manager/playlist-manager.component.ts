@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import {RestService} from "../../api/rest.service";
-import {ResolvableSong} from "./resolvable-song";
-import {DownloadableSource} from "./downloadable-source";
-import {DownloadedFile} from "./downloaded-file";
-import {Router} from "@angular/router";
+import { RestService } from '../../api/rest.service';
+import { ResolvableSong } from './resolvable-song';
+import { DownloadableSource } from './downloadable-source';
+import { DownloadedFile } from './downloaded-file';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-playlist-manager',
@@ -79,7 +79,7 @@ export class PlaylistManagerComponent implements OnInit {
     // });
     this.rest.resolveSongs(ids)
       .subscribe(() => {
-        this.router.navigate(["/progress"])
+        this.router.navigate(["/progress"]);
       });
     return false;
   }

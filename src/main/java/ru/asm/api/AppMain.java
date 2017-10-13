@@ -32,7 +32,9 @@ public class AppMain {
         resourceHandler.setDirectoriesListed(true);
         resourceHandler.setWelcomeFiles(new String[] { "index.html" });
 //        resourceHandler.setResourceBase("./out/production/core/angular-starter/dist");
-        resourceHandler.setResourceBase("C:\\IdeaProjects\\find-muzic\\src\\main\\resources\\angular-starter\\dist");
+//        resourceHandler.setResourceBase("C:\\IdeaProjects\\find-muzic\\src\\main\\resources\\angular-starter\\dist");
+//        resourceHandler.setResourceBase("C:\\IdeaProjects\\find-muzic\\build\\resources\\main\\angular-starter\\dist");
+        resourceHandler.setResourceBase("C:\\IdeaProjects\\find-muzic\\out\\production\\resources\\angular-starter\\dist");
 
 
         ContextHandler staticContextHandler = new ContextHandler();
