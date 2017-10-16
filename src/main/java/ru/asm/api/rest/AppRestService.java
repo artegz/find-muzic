@@ -266,7 +266,7 @@ public class AppRestService {
 //    @GET
 //    @Produces("application/json; charset=UTF-8")
 //    @Path("/alt/songs/{songId}/sources")
-//    public List<Mp3TorrentSongSource> getSongSources(@PathParam("songId") Integer songId) {
+//    public List<TorrentSongSource> getSongSources(@PathParam("songId") Integer songId) {
 //        PlaylistSongEntity foundSong = findSong(songId);
 //
 //        if (foundSong != null) {
@@ -702,7 +702,7 @@ public class AppRestService {
 //                    final Artist artist = getSongsArtist(artistSongs);
 //                    logger.info("downloading {} songs of {}...", artistSongs.size(), artist.getArtistName());
 //
-//                    final TaskProgress taskProgress = progressService.taskStarted(
+//                    final TaskProgressDto taskProgress = progressService.taskStarted(
 //                            taskId,
 //                            String.format("downloading '%s' songs", artist.getArtistName()),
 //                            artist,
