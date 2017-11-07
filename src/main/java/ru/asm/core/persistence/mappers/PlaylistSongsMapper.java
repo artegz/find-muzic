@@ -38,9 +38,6 @@ public interface PlaylistSongsMapper {
             "where t3.song_id = #{songId} ")
     PlaylistSongEntity getSongById(@Param("songId") Integer songId);
 
-    @Select("SELECT distinct artist FROM ARTISTS")
-    List<String> getAllArtistsNames();
-
     @Select("SELECT artist FROM ARTISTS where artist_id = #{artistId}")
     String getArtistNameById(@Param("artistId") Integer artistId);
 

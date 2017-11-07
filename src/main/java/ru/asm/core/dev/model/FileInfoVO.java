@@ -8,7 +8,7 @@ import ru.asm.core.dev.model.torrent.TorrentSongSource;
  * Date: 05.10.2017
  * Time: 9:39
  */
-public class LiteFileInfo {
+public class FileInfoVO {
 
     private Song song;
 

@@ -5,7 +5,7 @@ package ru.asm.core.dev.model;
  * Date: 31.08.2017
  * Time: 15:24
  */
-public class LiteSongInfo {
+public class SongInfoVO {
 
     private Song song;
     private int numSources;

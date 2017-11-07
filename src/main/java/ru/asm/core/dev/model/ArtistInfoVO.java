@@ -5,7 +5,7 @@ package ru.asm.core.dev.model;
  * Date: 11.10.2017
  * Time: 9:11
  */
-public class LiteArtistInfo {
+public class ArtistInfoVO {
 
     private Artist artist;
     private OperationStatus indexingStatus;

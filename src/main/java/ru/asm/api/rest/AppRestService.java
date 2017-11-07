@@ -8,13 +8,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import ru.asm.core.AppConfiguration;
 import ru.asm.core.AppCoreService;
 import ru.asm.core.dev.model.*;
-import ru.asm.core.dev.model.ddb.DataStorage;
 import ru.asm.core.dev.model.ddb.FileDocument;
 import ru.asm.core.dev.model.ddb.SongSourceDocument;
 import ru.asm.core.dev.model.ddb.TorrentDocument;
 import ru.asm.core.dev.model.torrent.TorrentSongSource;
-import ru.asm.core.persistence.domain.PlaylistSongEntity;
-import ru.asm.core.persistence.mappers.PlaylistSongsMapper;
 import ru.asm.core.progress.ProgressService;
 import ru.asm.core.progress.SimpleProgressInfo;
 import ru.asm.core.progress.TaskProgress;
@@ -44,16 +41,6 @@ public class AppRestService {
     private static final String SEARCH_SONGS = "search songs";
     private static final String TASK_DOWNLOAD_TORRENTS = "download torrents";
 
-    @Autowired
-    private SearchService searchService;
-
-    @Autowired
-    private DataStorage dataStorage;
-
-    // todo asm: move
-    @SuppressWarnings("SpringJavaAutowiringInspection")
-    @Autowired
-    private PlaylistSongsMapper playlistSongsMapper;
 
     @Autowired
     private AppCoreService appCoreService;
@@ -121,39 +108,30 @@ public class AppRestService {
     @GET
     @Produces("application/json; charset=UTF-8")
     @Path("/alt/index/artists")
-    public List<LiteArtistInfo> getArtistsForIndex() {
-        final List<Song> songs = getPlaylistSongsImpl("nashe");
-        final Set<Artist> artists = songs.stream()
-                .map(Song::getArtist)
-                .collect(Collectors.toSet());
+    public List<ArtistInfoVO> getArtistsForIndex() {
+        final Set<Artist> artists = appCoreService.getPlaylistArtists("nashe");
 
-        final List<LiteArtistInfo> liteArtistInfos = new ArrayList<>();
+        final List<ArtistInfoVO> artistInfos = new ArrayList<>();
         for (Artist artist : artists) {
-            final LiteArtistInfo liteArtistInfo = new LiteArtistInfo();
-            liteArtistInfo.setArtist(artist);
+            final ArtistInfoVO artistInfo = new ArtistInfoVO();
+            artistInfo.setArtist(artist);
 
-            final ArtistResolveReport artistResolveReport = this.searchService.getArtistResolveReport(artist);
-            if (artistResolveReport != null) {
-                if (artistResolveReport.isIndexingSucceeded()) {
-                    liteArtistInfo.setIndexingStatus(OperationStatus.succeeded);
-                } else {
-                    if (artistResolveReport.getResolvePerformed() || artistResolveReport.getIndexingPerformed()) {
-                        liteArtistInfo.setIndexingStatus(OperationStatus.failed);
-                    } else {
-                        liteArtistInfo.setIndexingStatus(OperationStatus.unkwnown);
-                    }
-                }
-            } else {
-                liteArtistInfo.setIndexingStatus(OperationStatus.unkwnown);
-            }
+            final ArtistResolveReport artistResolveReport = this.appCoreService.getArtistResolveReport(artist);
 
-            liteArtistInfos.add(liteArtistInfo);
+            final OperationStatus resultStatus = (artistResolveReport != null)
+                    ? artistResolveReport.getResultStatus()
+                    : OperationStatus.unkwnown;
+            artistInfo.setIndexingStatus(resultStatus);
+
+            artistInfos.add(artistInfo);
         }
 
-        liteArtistInfos.sort(Comparator.comparing(o -> o.getArtist().getArtistName()));
+        artistInfos.sort(Comparator.comparing(o -> o.getArtist().getArtistName()));
 
-        return liteArtistInfos;
+        return artistInfos;
     }
+
+
     @POST
     @Produces("application/json; charset=UTF-8")
     @Path("/alt/index/artists/start")
@@ -180,7 +158,7 @@ public class AppRestService {
 
                 try {
                     logger.info("indexing artist {}", artistId);
-                    final Artist artist = getArtistById(artistId);
+                    final Artist artist = appCoreService.getArtistById(artistId);
 
                     logger.info("[{}/{}] indexing...", complete, total);
 
@@ -193,7 +171,7 @@ public class AppRestService {
                             TASK_INDEX_ARTISTS
                     );
 
-                    this.searchService.indexArtist(artist, taskProgress);
+                    this.appCoreService.indexArtist(artist, taskProgress);
                 } catch (Throwable e) {
                     logger.error(e.getMessage(), e);
                 } finally {
@@ -211,52 +189,38 @@ public class AppRestService {
     @GET
     @Produces("application/json; charset=UTF-8")
     @Path("/alt/search/songs")
-    public List<LiteSongInfo> getSongsForSearch() {
-        final List<Song> songs = getPlaylistSongsImpl("nashe");
+    public List<SongInfoVO> getSongsForSearch() {
+        final List<Song> songs = appCoreService.getPlaylistSongs("nashe");
 
         //noinspection UnnecessaryLocalVariable
-        final List<LiteSongInfo> songInfos = new ArrayList<>(Lists.transform(songs, s -> {
+        final List<SongInfoVO> songInfos = new ArrayList<>(Lists.transform(songs, s -> {
             assert (s != null);
 
-            final ArtistResolveReport artistResolveReport = this.searchService.getArtistResolveReport(s.getArtist());
-            final List<TorrentSongSource> songSources = this.searchService.getSongSources(s);
-            final List<FileDocument> songDownloadedFiles = this.searchService.getSongDownloadedFiles(s);
+            final ArtistResolveReport artistResolveReport = this.appCoreService.getArtistResolveReport(s.getArtist());
+            final List<TorrentSongSource> songSources = this.appCoreService.getSongSources(s);
+            final List<FileDocument> songDownloadedFiles = this.appCoreService.getDownloadedSongs(s);
 
-            final LiteSongInfo liteSongInfo = new LiteSongInfo();
+            final SongInfoVO songInfo = new SongInfoVO();
 
-            liteSongInfo.setSong(s);
-            liteSongInfo.setNumFiles(songDownloadedFiles.size());
-            liteSongInfo.setNumSources(songSources.size());
+            songInfo.setSong(s);
+            songInfo.setNumFiles(songDownloadedFiles.size());
+            songInfo.setNumSources(songSources.size());
 
             // determine status
-            final OperationStatus resolveStatus;
-            if (artistResolveReport != null) {
-                if (artistResolveReport.getSearchPerformed()) {
-                    if (songSources.isEmpty()) {
-                        resolveStatus = OperationStatus.failed;
-                    } else {
-                        resolveStatus = OperationStatus.succeeded;
-                    }
-                } else {
-                    if (artistResolveReport.getIndexingPerformed() || artistResolveReport.getResolvePerformed()) {
-                        resolveStatus = OperationStatus.failed;
-                    } else {
-                        resolveStatus = OperationStatus.unkwnown;
-                    }
-                }
-            } else {
-                resolveStatus = OperationStatus.unkwnown;
-            }
+            final OperationStatus resolveStatus = (artistResolveReport != null)
+                    ? artistResolveReport.getResultStatus(songSources)
+                    : OperationStatus.unkwnown;
 
-            liteSongInfo.setResolveStatus(resolveStatus);
+            songInfo.setResolveStatus(resolveStatus);
 
-            return liteSongInfo;
+            return songInfo;
         }));
 
         songInfos.sort(Comparator.comparing(o -> o.getSong().getFullName()));
 
         return songInfos;
     }
+
     @POST
     @Produces("application/json; charset=UTF-8")
     @Path("/alt/search/songs/start")
@@ -271,7 +235,7 @@ public class AppRestService {
 
         for (Integer songId : songIds) {
             executionService.submit(() -> {
-                final Song song = findSongById(songId);
+                final Song song = appCoreService.getSongById(songId);
                 final String taskId = ProgressService.searchSongTaskId(songId);
 
                 try {
@@ -286,7 +250,7 @@ public class AppRestService {
                             SEARCH_SONGS
                     );
 
-                    this.searchService.searchSong(song.getArtist(), song, taskProgress);
+                    this.appCoreService.searchSong(song.getArtist(), song, taskProgress);
                 } catch (Throwable e) {
                     logger.error(e.getMessage(), e);
                 } finally {
@@ -304,21 +268,21 @@ public class AppRestService {
     @GET
     @Produces("application/json; charset=UTF-8")
     @Path("/alt/download/torrents")
-    public List<LiteTorrentInfo> getTorrentsForDownload() {
-        final List<Song> songs = getPlaylistSongsImpl("nashe");
+    public List<TorrentInfoVO> getTorrentsForDownload() {
+        final List<Song> songs = appCoreService.getPlaylistSongs("nashe");
 
-        final Map<String, LiteTorrentInfo> torrentInfos = new HashMap<>();
+        final Map<String, TorrentInfoVO> torrentInfos = new HashMap<>();
 
         for (Song song : songs) {
-            final List<TorrentSongSource> sources = searchService.getSongSources(song);
+            final List<TorrentSongSource> sources = appCoreService.getSongSources(song);
 
             for (TorrentSongSource source : sources) {
                 final String torrentId = source.getIndexSong().getTorrentId();
 
                 if (!torrentInfos.containsKey(torrentId)) {
-                    final TorrentDocument torrent = dataStorage.getTorrent(torrentId);
+                    final TorrentDocument torrent = appCoreService.getTorrentById(torrentId);
 
-                    final LiteTorrentInfo torrentInfo = new LiteTorrentInfo();
+                    final TorrentInfoVO torrentInfo = new TorrentInfoVO();
                     torrentInfo.setTorrentId(torrentId);
                     torrentInfo.setTitle(torrent.getTorrentInfo().getTitle());
                     torrentInfo.setFormat(torrent.getFormat());
@@ -331,11 +295,12 @@ public class AppRestService {
             }
         }
 
-        final List<LiteTorrentInfo> result = new ArrayList<>(torrentInfos.values());
-        result.sort(Comparator.comparing(LiteTorrentInfo::getTitle));
+        final List<TorrentInfoVO> result = new ArrayList<>(torrentInfos.values());
+        result.sort(Comparator.comparing(TorrentInfoVO::getTitle));
 
         return result;
     }
+
     @POST
     @Produces("application/json; charset=UTF-8")
     @Path("/alt/download/torrents/start")
@@ -371,7 +336,7 @@ public class AppRestService {
                     );
 
                     final Map<Song, List<TorrentSongSource>> downloadRequest = prepareDownloadRequestSingleTorrent(torrentId, torrentSources.get(torrentId));
-                    this.searchService.downloadTorrent(torrentId, downloadRequest, taskProgress);
+                    this.appCoreService.downloadTorrent(torrentId, downloadRequest, taskProgress);
                 } finally {
                     complete.add(1);
                     logger.info("downloading complete ({} / {})", complete, total);
@@ -387,23 +352,23 @@ public class AppRestService {
     @GET
     @Produces("application/json; charset=UTF-8")
     @Path("/alt/build/files")
-    public List<LiteFileInfo> getDownloadedFiles() {
-        final List<Song> songs = getPlaylistSongsImpl("nashe");
+    public List<FileInfoVO> getDownloadedFiles() {
+        final List<Song> songs = appCoreService.getPlaylistSongs("nashe");
 
-        final List<LiteFileInfo> fileInfos = new ArrayList<>();
+        final List<FileInfoVO> fileInfos = new ArrayList<>();
 
         for (Song song : songs) {
-            final List<FileDocument> files = dataStorage.getFiles(song.getSongId());
+            final List<FileDocument> files = appCoreService.getFilesBySongId(song.getSongId());
 
             for (FileDocument file : files) {
-                final SongSourceDocument songSource = dataStorage.getSongSource(file.getSourceId());
+                final SongSourceDocument songSource = appCoreService.getSourceById(file.getSourceId());
 
-                final LiteFileInfo liteFileInfo = new LiteFileInfo();
-                liteFileInfo.setSong(song);
-                liteFileInfo.setFile(file);
-                liteFileInfo.setSongSource(songSource.getSongSource());
+                final FileInfoVO fileInfo = new FileInfoVO();
+                fileInfo.setSong(song);
+                fileInfo.setFile(file);
+                fileInfo.setSongSource(songSource.getSongSource());
 
-                fileInfos.add(liteFileInfo);
+                fileInfos.add(fileInfo);
             }
         }
 
@@ -411,12 +376,13 @@ public class AppRestService {
 
         return fileInfos;
     }
+
     @POST
     @Produces("application/json; charset=UTF-8")
     @Path("/alt/build/files/start")
     public void buildPlaylist(List<Long> fileIds) {
-        final List<LiteFileInfo> downloadedFiles = getDownloadedFiles();
-        final List<LiteFileInfo> requestedFiles = downloadedFiles.stream()
+        final List<FileInfoVO> downloadedFiles = getDownloadedFiles();
+        final List<FileInfoVO> requestedFiles = downloadedFiles.stream()
                 .filter(liteFileInfo -> fileIds.contains(liteFileInfo.getFile().getId()))
                 .collect(Collectors.toList());
 
@@ -429,7 +395,7 @@ public class AppRestService {
             outputFolder.mkdirs();
         }
 
-        for (LiteFileInfo requestedFile : requestedFiles) {
+        for (FileInfoVO requestedFile : requestedFiles) {
             final File songFile = new File(requestedFile.getFile().getFsLocation());
             final File destFile = new File(outputFolder, songFile.getName());
             try {
@@ -451,61 +417,11 @@ public class AppRestService {
         return new SimpleProgressInfo(numQueuedTasks, taskProgresses);
     }
 
-    private PlaylistSongEntity findSong(Integer songId) {
-        return this.playlistSongsMapper.getSongById(songId);
-    }
-
-    private Song getSong(PlaylistSongEntity foundSong) {
-        final Song song = new Song();
-        final Artist artist = getArtist(foundSong);
-        song.setSongId(foundSong.getSongId());
-        song.setTitle(foundSong.getTitle());
-        song.setArtist(artist);
-        return song;
-    }
-
-    private Artist getArtist(PlaylistSongEntity foundSong) {
-        final Artist artist = new Artist();
-        artist.setArtistId(foundSong.getArtistId());
-        artist.setArtistName(foundSong.getArtist());
-        return artist;
-    }
-
-
-    private List<Song> getPlaylistSongsImpl(@SuppressWarnings("SameParameterValue") String playlistId) {
-        final Set<Song> songs = new HashSet<>();
-        final List<PlaylistSongEntity> songEntities = this.playlistSongsMapper.getSongsByPlaylist(playlistId);
-        for (PlaylistSongEntity songEntity : songEntities) {
-            final Song song = getSong(songEntity);
-            songs.add(song);
-        }
-        return new ArrayList<>(songs);
-    }
-
-    private Song findSongById(Integer songId) {
-        final Song song;
-        PlaylistSongEntity foundSong = findSong(songId);
-        if (foundSong != null) {
-            song = getSong(foundSong);
-        } else {
-            song = null;
-        }
-        return song;
-    }
-
-    private Artist getArtistById(Integer artistId) {
-        final String artistName = playlistSongsMapper.getArtistNameById(artistId);
-
-        final Artist artist = new Artist();
-        artist.setArtistId(artistId);
-        artist.setArtistName(artistName);
-        return artist;
-    }
 
     private Map<Song, List<TorrentSongSource>> prepareDownloadRequestSingleTorrent(String torrentId, List<String> sourceIds) {
         final Map<Song, List<TorrentSongSource>> downloadRequest = new HashMap<>();
 
-        final List<SongSourceDocument> songSourceDocuments = dataStorage.getSongSourcesByTorrent(torrentId);
+        final List<SongSourceDocument> songSourceDocuments = appCoreService.getSongSourcesByTorrentId(torrentId);
         for (SongSourceDocument songSourceDocument : songSourceDocuments) {
             if (!sourceIds.contains(songSourceDocument.getSourceId())) {
                 // source skipped
@@ -515,7 +431,7 @@ public class AppRestService {
             final Integer songId = songSourceDocument.getSongId();
             final TorrentSongSource songSource = songSourceDocument.getSongSource();
 
-            final Song song = findSongById(songId);
+            final Song song = appCoreService.getSongById(songId);
 
             if (!downloadRequest.containsKey(song)) {
                 downloadRequest.put(song, new ArrayList<>());

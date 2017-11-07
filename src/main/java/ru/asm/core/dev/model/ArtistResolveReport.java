@@ -1,5 +1,6 @@
 package ru.asm.core.dev.model;
 
+import ru.asm.core.dev.model.torrent.TorrentSongSource;
 import ru.asm.util.ResolveStatuses;
 
 import java.util.Date;
@@ -138,6 +139,38 @@ public class ArtistResolveReport {
 
     public List<String> getFoundSources() {
         return foundSources;
+    }
+
+    public OperationStatus getResultStatus() {
+        OperationStatus resultStatus;
+        if (isIndexingSucceeded()) {
+            resultStatus = OperationStatus.succeeded;
+        } else {
+            if (getResolvePerformed() || getIndexingPerformed()) {
+                resultStatus = OperationStatus.failed;
+            } else {
+                resultStatus = OperationStatus.unkwnown;
+            }
+        }
+        return resultStatus;
+    }
+
+    public OperationStatus getResultStatus(List<TorrentSongSource> songSources) {
+        OperationStatus resolveStatus;
+        if (getSearchPerformed()) {
+            if (songSources.isEmpty()) {
+                resolveStatus = OperationStatus.failed;
+            } else {
+                resolveStatus = OperationStatus.succeeded;
+            }
+        } else {
+            if (getIndexingPerformed() || getResolvePerformed()) {
+                resolveStatus = OperationStatus.failed;
+            } else {
+                resolveStatus = OperationStatus.unkwnown;
+            }
+        }
+        return resolveStatus;
     }
 
     public static enum Status {

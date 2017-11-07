@@ -10,7 +10,7 @@ import java.util.List;
  * Date: 11.10.2017
  * Time: 9:47
  */
-public class LiteTorrentInfo {
+public class TorrentInfoVO {
 
     private String torrentId;
     private String title;
