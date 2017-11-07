@@ -10,9 +10,11 @@ import org.springframework.context.annotation.*;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import ru.asm.api.rest.AppRestService;
 import ru.asm.api.rest.JaxRsApiApplication;
+import ru.asm.core.index.ElasticsearchConfig;
+import ru.asm.core.persistence.DataStorageConfig;
 
 import javax.ws.rs.ext.RuntimeDelegate;
-import java.util.Arrays;
+import java.util.Collections;
 
 /**
  * User: artem.smirnov
@@ -23,8 +25,12 @@ import java.util.Arrays;
 @ComponentScan(
         basePackages = "ru.asm.core"
 )
+@Import({
+        DataStorageConfig.class,
+        ElasticsearchConfig.class
+})
 @EnableTransactionManagement
-public class AppConfig {
+public class ApplicationConfig {
 
     @Bean(destroyMethod = "shutdown")
     public SpringBus cxf() {
@@ -34,10 +40,10 @@ public class AppConfig {
     @Bean
     @DependsOn("cxf")
     public Server jaxRsServer() {
-        JAXRSServerFactoryBean factory = RuntimeDelegate.getInstance().createEndpoint(jaxRsApiApplication(), JAXRSServerFactoryBean.class);
-        factory.setServiceBeans(Arrays.<Object>asList(appRestService()));
+        final JAXRSServerFactoryBean factory = RuntimeDelegate.getInstance().createEndpoint(jaxRsApiApplication(), JAXRSServerFactoryBean.class);
+        factory.setServiceBeans(Collections.singletonList(appRestService()));
         factory.setAddress(factory.getAddress());
-        factory.setProviders(Arrays.asList(jsonProvider()));
+        factory.setProviders(Collections.singletonList(jsonProvider()));
 
         return factory.create();
     }

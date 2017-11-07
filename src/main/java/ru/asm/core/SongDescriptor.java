@@ -35,7 +35,7 @@ public class SongDescriptor implements Comparable<SongDescriptor> {
 
     @Override
     public String toString() {
-        return new SongDescriptorMapper().formatSongDescriptor(this);
+        return "${sd.artist} - ${sd.title}";
     }
 
     @Override

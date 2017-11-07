@@ -14,20 +14,14 @@ import java.util.Map;
  */
 public interface Searcher {
 
-    void resolveSongSources(Song song, TaskProgress taskProgress);
-
     void indexArtist(Artist artist, TaskProgress taskProgress);
 
     void searchSong(Artist artist, Song song, TaskProgress taskProgress);
-
-    void resolveSongSources(Artist artist, List<Song> songs, TaskProgress taskProgress);
 
     List<TorrentSongSource> getSongSources(Song song);
 
     ArtistResolveReport getLastSongResolveReport(Artist artist);
 
-    void downloadSongs(Song song, List<TorrentSongSource> sources, TaskProgress taskProgress);
-    void downloadSongs(Artist artist, Map<Song, List<TorrentSongSource>> downloadRequest, TaskProgress taskProgress);
     void downloadTorrent(String torrentId, Map<Song, List<TorrentSongSource>> downloadRequest, TaskProgress taskProgress);
 
     List<FileDocument> getDownloadedSongs(Song song);

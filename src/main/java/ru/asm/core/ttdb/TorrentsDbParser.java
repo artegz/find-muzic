@@ -3,6 +3,8 @@ package ru.asm.core.ttdb;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.asm.core.index.domain.TorrentInfoVO;
 
 import javax.xml.stream.XMLInputFactory;
@@ -22,14 +24,14 @@ import java.util.Map;
  */
 public class TorrentsDbParser {
 
-    public static final DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyy.MM.dd HH:mm:ss").withZoneUTC();
-    public static final String TORRENT = "torrent";
-    public static final String FORUM = "forum";
-    public static final String TORRENT1 = "torrent";
-    public static final String TITLE = "title";
-    public static final String MAGNET = "magnet";
-    public static final String FORUM1 = "forum";
-    public static final String CONTENT = "content";
+    private static Logger logger = LoggerFactory.getLogger(TorrentsDbParser.class);
+
+    private static final DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyy.MM.dd HH:mm:ss").withZoneUTC();
+    private static final String TORRENT = "torrent";
+    private static final String FORUM = "forum";
+    private static final String TITLE = "title";
+    private static final String MAGNET = "magnet";
+    private static final String CONTENT = "content";
 
     public static void parseDocument(InputStream inputStream, int groupSize, GroupHandler groupHandler) throws XMLStreamException {
         List<TorrentInfoVO> torrentInfosGroup = new ArrayList<>();
@@ -40,13 +42,14 @@ public class TorrentsDbParser {
         final XMLStreamReader reader = factory.createXMLStreamReader(inputStream, "UTF-8");
 
         while(reader.hasNext()){
-            Integer event = null;
+            Integer event;
             try {
                 event = reader.next();
             } catch (Throwable e) {
-                e.printStackTrace();
+                logger.error(e.getMessage(), e);
                 throw e;
             }
+            //noinspection ConstantConditions
             if (event == null) {
                 throw new AssertionError();
             }

@@ -7,9 +7,12 @@ package ru.asm.core.persistence.domain;
  */
 public class ArtistEntity {
 
-    Integer artistId;
+    private Integer artistId;
 
-    String artist;
+    private String artist;
+
+    public ArtistEntity() {
+    }
 
     public ArtistEntity(Integer artistId, String artist) {
         this.artistId = artistId;
@@ -22,5 +25,13 @@ public class ArtistEntity {
 
     public String getArtist() {
         return artist;
+    }
+
+    public void setArtistId(Integer artistId) {
+        this.artistId = artistId;
+    }
+
+    public void setArtist(String artist) {
+        this.artist = artist;
     }
 }

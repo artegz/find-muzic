@@ -75,9 +75,4 @@ public class DataStorageConfig {
         dataSourceInitializer.setDataSource(dataSource);
         return dataSourceInitializer;
     }
-
-    @Bean
-    public DataStorageService getDataStorageService() {
-        return new DataStorageService();
-    }
 }

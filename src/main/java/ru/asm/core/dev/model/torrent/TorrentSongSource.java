@@ -32,6 +32,7 @@ public class TorrentSongSource implements SongSource {
         this.sourceId = indexSong.getId();
     }
 
+    @Override
     public String getSourceId() {
         return sourceId;
     }
@@ -48,6 +49,7 @@ public class TorrentSongSource implements SongSource {
         return indexSong.getType().toUpperCase().equals(MusicFormats.FORMAT_MP3);
     }
 
+    @Override
     public String getName() {
         if (isMp3()) {
             return String.format("%s: %s (%s)", indexSong.getArtistName(), indexSong.getSongName(), indexSong.getMp3FilePath());

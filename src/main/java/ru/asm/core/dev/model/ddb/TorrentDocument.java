@@ -18,8 +18,6 @@ public class TorrentDocument {
 
     private String status;
 
-    //private List<TorrentSongVO> torrentSongs;
-
 
     public String getTorrentId() {
         return torrentId;
@@ -53,11 +51,4 @@ public class TorrentDocument {
         this.status = status;
     }
 
-//    public List<TorrentSongVO> getTorrentSongs() {
-//        return torrentSongs;
-//    }
-//
-//    public void setTorrentSongs(List<TorrentSongVO> torrentSongs) {
-//        this.torrentSongs = torrentSongs;
-//    }
 }

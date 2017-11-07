@@ -26,7 +26,7 @@ public class AppMain {
         servletContextHandler.addServlet(new ServletHolder(new CXFServlet()), "/*");
         servletContextHandler.addEventListener(new ContextLoaderListener());
         servletContextHandler.setInitParameter("contextClass", AnnotationConfigWebApplicationContext.class.getName());
-        servletContextHandler.setInitParameter("contextConfigLocation", AppConfig.class.getName());
+        servletContextHandler.setInitParameter("contextConfigLocation", ApplicationConfig.class.getName());
 
         ResourceHandler resourceHandler = new ResourceHandler();
         resourceHandler.setDirectoriesListed(true);

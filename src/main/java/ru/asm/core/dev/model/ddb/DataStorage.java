@@ -25,7 +25,6 @@ public class DataStorage {
 
     private ObjectRepository<ArtistDocument> artistRepo;
     private ObjectRepository<TorrentDocument> torrentRepo;
-//    private ObjectRepository<SongDocument> songRepo;
     private ObjectRepository<FileDocument> filesRepo;
     private ObjectRepository<SongSourceDocument> songSourceRepo;
 
@@ -35,7 +34,8 @@ public class DataStorage {
     public void postConstruct() {
         //java initialization
         final File folder = new File(AppConfiguration.N2O_DB_FILE_LOCATION);
-        if (!folder.exists()) folder.mkdirs();
+        if (!folder.exists()) //noinspection ResultOfMethodCallIgnored
+            folder.mkdirs();
         db = Nitrite.builder()
                 .filePath(new File(folder, "test.db"))
                 .openOrCreate("user", "password");

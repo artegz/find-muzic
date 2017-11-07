@@ -1,4 +1,4 @@
-package ru.asm.core.dev.model;
+package ru.asm.core.flac;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -9,9 +9,9 @@ import org.apache.commons.lang.mutable.MutableFloat;
 import org.joda.time.DateTime;
 import org.joda.time.MutableDateTime;
 import org.joda.time.Seconds;
-import org.slf4j.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.asm.core.AppConfiguration;
-import ru.asm.core.progress.ProgressBar;
 import ru.asm.core.progress.TaskProgress;
 
 import java.io.File;
@@ -27,6 +27,9 @@ import java.util.concurrent.TimeUnit;
  */
 public class TorrentClient {
 
+    private static final String ERR_SESSION_INIT_FAILED = "ERR_SESSION_INIT_FAILED";
+    private static final String ERR_MAGNET_RETRIEVAL_FAILED = "ERR_MAGNET_RETRIEVAL_FAILED";
+    private static final String ERR_DOWNLOAD_ERROR = "ERR_DOWNLOAD_ERROR";
 
     // todo asm: make methods async with return future
 
@@ -81,8 +84,7 @@ public class TorrentClient {
     public void download(TorrentInfo ti,
                          File saveDir,
                          Priority[] priorities,
-                         ProgressBar progressBar,
-                         TaskProgress pTaskProgress) {
+                         TaskProgress pTaskProgress) throws TorrentClientException {
         try {
             TaskProgress taskProgress;
             if (pTaskProgress == null) {
@@ -124,13 +126,11 @@ public class TorrentClient {
                                 logger.debug(String.format("Progress: %.2f%% for torrent '%s' (total download: %s)", p, a.torrentName(), s.stats().totalDownload()));
                                 progress.setValue(p);
                             }
-//                            progressBar.setProgress((double) p);
                             lastActivity.setDate(new DateTime());
                             taskProgress.setSubTaskProgress(tId, (double) a.handle().status().progress());
                             break;
                         case TORRENT_FINISHED:
                             logger.debug("Torrent '{}' finished", ti.name());
-//                            progressBar.complete();
                             lastActivity.setDate(new DateTime());
                             signal.countDown();
                             taskProgress.completeSubTask(tId);
@@ -166,15 +166,7 @@ public class TorrentClient {
     }
 
     public TorrentInfo findByMagnet(String uri) {
-        final TorrentInfo torrentInfo = fetchMagnet(uri);
-        return torrentInfo;
-    }
-
-    public TorrentInfo findByHash(String hash) {
-        String uri = String.format("magnet:?xt=urn:btih:%s", hash);
-        final TorrentInfo torrentInfo = fetchMagnet(uri);
-
-        return torrentInfo;
+        return fetchMagnet(uri);
     }
 
     private TorrentInfo fetchMagnet(String uri) {
@@ -200,7 +192,7 @@ public class TorrentClient {
 
         private String errCode;
 
-        public TorrentClientException(String errCode) {
+        TorrentClientException(String errCode) {
             super(errCode);
             this.errCode = errCode;
         }
@@ -209,8 +201,4 @@ public class TorrentClient {
             return errCode;
         }
     }
-
-    public static final String ERR_SESSION_INIT_FAILED = "ERR_SESSION_INIT_FAILED";
-    public static final String ERR_MAGNET_RETRIEVAL_FAILED = "ERR_MAGNET_RETRIEVAL_FAILED";
-    public static final String ERR_DOWNLOAD_ERROR = "ERR_DOWNLOAD_ERROR";
 }

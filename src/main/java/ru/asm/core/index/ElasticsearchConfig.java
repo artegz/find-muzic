@@ -42,9 +42,4 @@ public class ElasticsearchConfig {
         return new ElasticsearchTemplate(client);
     }
 
-    @Bean
-    public TorrentsDatabaseService getTorrentsDatabaseService() {
-        return new TorrentsDatabaseService();
-    }
-
 }

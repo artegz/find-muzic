@@ -6,4 +6,8 @@ package ru.asm.core.dev.model;
  * Time: 11:42
  */
 public interface SongSource {
+    
+    String getSourceId();
+
+    String getName();
 }

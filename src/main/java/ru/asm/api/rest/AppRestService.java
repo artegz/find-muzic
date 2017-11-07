@@ -40,11 +40,9 @@ public class AppRestService {
 
     public static final Logger logger = LoggerFactory.getLogger(AppRestService.class);
 
-    public static final String TASK_INDEX_ARTISTS = "index artists";
-//    public static final String TASK_RESOLVE_SOURCES = "resolve sources";
-    public static final String SEARCH_SONGS = "search songs";
-//    public static final String TASK_DOWNLOAD_SONGS = "download songs";
-    public static final String TASK_DOWNLOAD_TORRENTS = "download torrents";
+    private static final String TASK_INDEX_ARTISTS = "index artists";
+    private static final String SEARCH_SONGS = "search songs";
+    private static final String TASK_DOWNLOAD_TORRENTS = "download torrents";
 
     @Autowired
     private SearchService searchService;
@@ -52,6 +50,8 @@ public class AppRestService {
     @Autowired
     private DataStorage dataStorage;
 
+    // todo asm: move
+    @SuppressWarnings("SpringJavaAutowiringInspection")
     @Autowired
     private PlaylistSongsMapper playlistSongsMapper;
 
@@ -114,205 +114,6 @@ public class AppRestService {
 
         appCoreService.importPlaylist(playlist, comment, file);
     }
-//
-//    @GET
-//    @Produces("application/json; charset=UTF-8")
-//    @Path("/artists")
-//    public List<Integer> getArtists() {
-//        return appCoreService.getArtistIds();
-//    }
-//
-//    // Step 3: resolve artist torrents (find artists in torrents DB)
-//    @POST
-//    @Produces("application/json; charset=UTF-8")
-//    @Path("/artists/search")
-//    public void searchArtists() {
-//        appCoreService.resolveArtists();
-//    }
-//
-//    // Step 4: index songs from torrents
-//    // search for playlist artist songs in torrents (mp3 and flac files) and index them
-//    @POST
-//    @Produces("application/json; charset=UTF-8")
-//    @Path("/songs/index")
-//    public void indexSongs(@QueryParam("format") String format) {
-//        if (format.equals("mp3")) {
-//            appCoreService.resolveSongs_mp3(null, null);
-//        } else if (format.equals("flac")) {
-//            appCoreService.resolveSongs_flac(null, null);
-//        }
-//    }
-//
-//    // Step 5: resolve playlist songs (find desired sons in index)
-//    @POST
-//    @Produces("application/json; charset=UTF-8")
-//    @Path("/songs/search")
-//    public void searchSongs() {
-//        appCoreService.resolveSongs();
-//    }
-//
-//    @GET
-//    @Produces("application/json; charset=UTF-8")
-//    @Path("/songs")
-//    public List<ResolvedSongEntity> getFoundSongs() {
-//        return appCoreService.getFoundSongs();
-//    }
-//
-//    // Step 6: download playlist songs
-//    @POST
-//    @Produces("application/json; charset=UTF-8")
-//    @Path("/songs/download")
-//    public void downloadSongs() {
-//        // todo
-//        appCoreService.downloadFoundSongs_mp3(0, 10);
-//    }
-
-//
-//
-//    @GET
-//    @Produces(MediaType.TEXT_HTML)
-//    @Path("/sample")
-//    public InputStream sample() {
-//        return getClass().getResourceAsStream("/sample.html");
-//    }
-//
-//    @GET
-//    @Produces("application/json; charset=UTF-8")
-//    @Path("/artists")
-//    public List<String> artists() {
-//        final List<String> artists = playlistSongsMapper.getAllArtists();
-//        return artists;
-//    }
-
-//    @GET
-//    @Produces("application/json; charset=UTF-8")
-//    @Path("/torrentDbs")
-//    public List<String> getTorrentDbs() {
-//        final AppConfiguration appConfiguration = AppConfiguration.getInstance();
-//
-//        final File[] files = appConfiguration.getTorrentBackupDownloadFile().listFiles(File::isFile);
-//        assert files != null;
-//        final List<String> filenames = Lists.transform(Arrays.asList(files), File::getName);
-//
-//        return filenames;
-//    }
-//
-//
-//    @GET
-//    @Produces("application/json; charset=UTF-8")
-//    @Path("/results/statuses")
-//    public List<StatusEntity> getStatuses() {
-//        final List<StatusEntity> entities = playlistSongsMapper.getStatuses();
-//        return entities;
-//    }
-//
-//    @GET
-//    @Produces("application/json; charset=UTF-8")
-//    @Path("/results/songs")
-//    public List<ResolvedSongEntity> getResolvedSongs() {
-//        return getFoundSongs();
-//    }
-//
-
-
-
-//    @GET
-//    @Produces("application/json; charset=UTF-8")
-//    @Path("/alt/artists")
-//    public List<Artist> getArtistsAll() {
-//        final Set<Artist> artists = new HashSet<>();
-//        final List<PlaylistSongEntity> songs = this.playlistSongsMapper.getSongs("nashe-test");
-//        for (PlaylistSongEntity song : songs) {
-//            artists.add(getArtist(song));
-//        }
-//        return new ArrayList<>(artists);
-//    }
-//
-//    @GET
-//    @Produces("application/json; charset=UTF-8")
-//    @Path("/alt/artists/{artistId}/songs")
-//    public List<Song> getArtistSongs(@PathParam("artistId") Integer artistId) {
-//        final Set<Song> songs = new HashSet<>();
-//        final List<PlaylistSongEntity> songEntities = this.playlistSongsMapper.getSongs("nashe-test");
-//        for (PlaylistSongEntity songEntity : songEntities) {
-//            if (songEntity.getArtistId().equals(artistId)) {
-//                final Song song = getSong(songEntity);
-//                songs.add(song);
-//            }
-//        }
-//        return new ArrayList<>(songs);
-//    }
-//
-//    @GET
-//    @Produces("application/json; charset=UTF-8")
-//    @Path("/alt/songs")
-//    public List<Song> getAllSongs() {
-//        final Set<Song> songs = new HashSet<>();
-//        final List<PlaylistSongEntity> songEntities = this.playlistSongsMapper.getSongs("nashe-test");
-//        for (PlaylistSongEntity songEntity : songEntities) {
-//            final Song song = getSong(songEntity);
-//            songs.add(song);
-//        }
-//        return new ArrayList<>(songs);
-//    }
-//
-//    @GET
-//    @Produces("application/json; charset=UTF-8")
-//    @Path("/alt/playlists/{playlistId}/songs")
-//    public List<Song> getPlaylistSongs(@QueryParam("playlistId") String playlistId) {
-//        return getPlaylistSongs(playlistId);
-//    }
-
-//    @GET
-//    @Produces("application/json; charset=UTF-8")
-//    @Path("/alt/songs/{songId}/sources")
-//    public List<TorrentSongSource> getSongSources(@PathParam("songId") Integer songId) {
-//        PlaylistSongEntity foundSong = findSong(songId);
-//
-//        if (foundSong != null) {
-//            final Song song = getSong(foundSong);
-//            return this.searchService.getSongSources(song);
-//        } else {
-//            return null;
-//        }
-//    }
-
-
-
-
-    // Step 1: see playlist
-//    @GET
-//    @Produces("application/json; charset=UTF-8")
-//    @Path("/alt/playlists/{playlistId}/songs")
-//    public List<SongInfo> getPlaylistSongs2(@PathParam("playlistId") String playlistId,
-//                                            @QueryParam("includeSources") Boolean includeSources,
-//                                            @QueryParam("includeFiles") Boolean includeFiles,
-//                                            @QueryParam("includeResolveReport") Boolean includeResolveReport,
-//                                            @QueryParam("includeDownloadReport") Boolean includeDownloadReport) {
-//        final List<Song> songs = getPlaylistSongsImpl(playlistId);
-//
-//        final List<SongInfo> songInfos = Lists.transform(songs, s -> {
-//            final SongInfo songInfo = new SongInfo();
-//            songInfo.setSong(s);
-//            if (includeSources) {
-//                songInfo.setSources(this.searchService.getSongSources(s));
-//            }
-//            if (includeFiles) {
-//                songInfo.setFiles(this.searchService.getSongDownloadedFiles(s));
-//            }
-//            if (includeResolveReport) {
-//                assert (s != null);
-//                songInfo.setLastResolveReport(this.searchService.getArtistResolveReport(s.getArtist()));
-//            }
-//            return songInfo;
-//        });
-//
-//        return songInfos;
-//    }
-
-
-
-
 
 
 
@@ -624,6 +425,7 @@ public class AppRestService {
 
 
         if (!outputFolder.exists()) {
+            //noinspection ResultOfMethodCallIgnored
             outputFolder.mkdirs();
         }
 
@@ -639,106 +441,7 @@ public class AppRestService {
     }
 
 
-    // Step 2: resolve sources
-//    @POST
-//    @Produces("application/json; charset=UTF-8")
-//    @Path("/alt/songs/{songId}/sources/resolve")
-//    public void searchSongs(@PathParam("songId") Integer songId) {
-//        final Song song = findSongById(songId);
-//        if (song != null) {
-//            final ProgressListener progressListener = progressService.taskStarted(song, TASK_RESOLVE_SOURCES);
-//            this.searchService.searchSongs(song, progressListener);
-//            progressService.taskEnded(song);
-//        }
-//    }
 
-
-    // Step 3: download
-//    @POST
-//    @Produces("application/json; charset=UTF-8")
-//    @Path("/alt/songs/{songId}/sources/download")
-//    public void downloadSongs(@PathParam("songId") Integer songId, DownloadInfo downloadInfo) {
-//        final Song song = findSongById(songId);
-//
-//        if (song != null) {
-//            final ProgressListener progressListener = progressService.taskStarted(song, TASK_DOWNLOAD_SONGS);
-//            final List<TorrentSongSource> songSources = this.searchService.getSongSources(song);
-//            if (songSources != null) {
-//                final List<TorrentSongSource> specifiedSources = filter(songSources, downloadInfo.getSourcesIds());
-//                this.searchService.downloadSongs(song, specifiedSources, progressListener);
-//            }
-//            progressService.taskEnded(song);
-//        }
-//    }
-//    @POST
-//    @Produces("application/json; charset=UTF-8")
-//    @Path("/alt/songs/sources/download")
-//    public void downloadSongs(Map<Integer, List<String>> songsDownloadInfos) {
-//        final int total = songsDownloadInfos.size();
-//        final MutableInt complete = new MutableInt(0);
-//
-//        logger.info("downloading {} songs", total);
-//
-//        // group songs per artist
-//        final Map<Integer, List<Song>> songsPerArtist = groupPerArtist(songsDownloadInfos.keySet());
-//
-//        // all artist ids
-//        final Set<Integer> artistIds = songsPerArtist.keySet();
-//
-//        // queue all tasks to be done
-//        progressService.queueTasks(
-//                artistIds.stream()
-//                        .map(ProgressService::downloadArtistSongsTaskId)
-//                        .collect(Collectors.toList()),
-//                TASK_DOWNLOAD_SONGS
-//        );
-//
-//        for (Integer artistId : artistIds) {
-//            executionService.submit(() -> {
-//                final List<Song> artistSongs = songsPerArtist.get(artistId);
-//                final String taskId = ProgressService.downloadArtistSongsTaskId(artistId);
-//
-//                try {
-//                    final Artist artist = getSongsArtist(artistSongs);
-//                    logger.info("downloading {} songs of {}...", artistSongs.size(), artist.getArtistName());
-//
-//                    final TaskProgressDto taskProgress = progressService.taskStarted(
-//                            taskId,
-//                            String.format("downloading '%s' songs", artist.getArtistName()),
-//                            artist,
-//                            artistSongs,
-//                            TASK_DOWNLOAD_SONGS
-//                    );
-//
-//                    final Map<Song, List<TorrentSongSource>> downloadRequest = prepareDownloadRequest(songsDownloadInfos, artistSongs);
-//                    this.searchService.downloadSongs(artist, downloadRequest, taskProgress);
-//                } finally {
-//                    complete.add(artistSongs.size());
-//                    logger.info("resolving complete ({} / {})", complete, total);
-//
-//                    progressService.taskEnded(taskId, TASK_DOWNLOAD_SONGS);
-//                }
-//            });
-//        }
-//    }
-//
-//
-//
-//    @GET
-//    @Produces("application/json; charset=UTF-8")
-//    @Path("/progresses")
-//    public ProgressInfo getProgressInfo() {
-//        final Map<PlaylistSongEntity, Task> progresses = new HashMap<>();
-//        final Map<Integer, Task> tasksInProgress = new HashMap<>();//progressService.getTasksInProgress();
-//        Set<Integer> songIds = new HashSet<>(tasksInProgress.keySet());
-//        for (Integer songId : songIds) {
-//            final PlaylistSongEntity songEntity = this.playlistSongsMapper.getSong(songId);
-//            progresses.put(songEntity, tasksInProgress.get(songId));
-//        }
-//        final List<PlaylistSongEntity> sortedSongs = new ArrayList<>(progresses.keySet());
-//        sortedSongs.sort(Comparator.comparing(PlaylistSongEntity::getSongId));
-//        return new ProgressInfo(sortedSongs, tasksInProgress);
-//    }
     @GET
     @Produces("application/json; charset=UTF-8")
     @Path("/progresses2")
@@ -748,21 +451,8 @@ public class AppRestService {
         return new SimpleProgressInfo(numQueuedTasks, taskProgresses);
     }
 
-
-
-    private List<TorrentSongSource> filter(List<TorrentSongSource> songSources, List<String> sourcesIds) {
-        final List<TorrentSongSource> specifiedSources = new ArrayList<>();
-        for (TorrentSongSource songSource : songSources) {
-            if (sourcesIds.contains(songSource.getSourceId())) {
-                specifiedSources.add(songSource);
-            }
-        }
-        return specifiedSources;
-    }
-
-
     private PlaylistSongEntity findSong(Integer songId) {
-        return this.playlistSongsMapper.getSong(songId);
+        return this.playlistSongsMapper.getSongById(songId);
     }
 
     private Song getSong(PlaylistSongEntity foundSong) {
@@ -782,9 +472,9 @@ public class AppRestService {
     }
 
 
-    private List<Song> getPlaylistSongsImpl(String playlistId) {
+    private List<Song> getPlaylistSongsImpl(@SuppressWarnings("SameParameterValue") String playlistId) {
         final Set<Song> songs = new HashSet<>();
-        final List<PlaylistSongEntity> songEntities = this.playlistSongsMapper.getSongs(playlistId);
+        final List<PlaylistSongEntity> songEntities = this.playlistSongsMapper.getSongsByPlaylist(playlistId);
         for (PlaylistSongEntity songEntity : songEntities) {
             final Song song = getSong(songEntity);
             songs.add(song);
@@ -803,60 +493,8 @@ public class AppRestService {
         return song;
     }
 
-    private Map<Integer, List<Song>> groupPerArtist(Collection<Integer> songIds) {
-        final MutableInt notFound = new MutableInt(0);
-        final Map<Integer, List<Song>> songsPerArtist =
-                songIds.stream()
-                        .map(this::findSongById)
-                        .filter(song -> {
-                            final boolean found = (song != null);
-                            if (!found) {
-                                notFound.increment();
-                            }
-                            return found;
-                        })
-                        .collect(Collectors.groupingBy(o -> o.getArtist().getArtistId()));
-        if (notFound.toInteger() > 0) {
-            logger.warn("{} songs not found", notFound.toInteger());
-        }
-        return songsPerArtist;
-    }
-
-    private List<TorrentSongSource> getSources(Song song, List<String> requestedSourceIds) {
-        final List<TorrentSongSource> existingSongSources = this.searchService.getSongSources(song);
-        final List<TorrentSongSource> sourcesToDownload;
-        if (existingSongSources != null) {
-            sourcesToDownload = filter(existingSongSources, requestedSourceIds);
-        } else {
-            sourcesToDownload = Collections.emptyList();
-        }
-        return sourcesToDownload;
-    }
-
-    private Map<Song, List<TorrentSongSource>> prepareDownloadRequest(Map<Integer, List<String>> songsDownloadInfos, List<Song> songs) {
-        final Map<Song, List<TorrentSongSource>> downloadRequest = new HashMap<>();
-        for (Song song : songs) {
-            // requested sources ids to download
-            final List<TorrentSongSource> sourcesToDownload = getSources(song, songsDownloadInfos.get(song.getSongId()));
-            downloadRequest.put(song, sourcesToDownload);
-        }
-        return downloadRequest;
-    }
-
-
-    private Artist getSongsArtist(List<Song> artistSongs) {
-        if (artistSongs.isEmpty()) {
-            logger.warn("no artist songs found");
-            throw new AssertionError();
-        }
-        final Artist artist;
-        artist = artistSongs.get(0).getArtist();
-        return artist;
-    }
-
-
     private Artist getArtistById(Integer artistId) {
-        final String artistName = playlistSongsMapper.getArtist(artistId);
+        final String artistName = playlistSongsMapper.getArtistNameById(artistId);
 
         final Artist artist = new Artist();
         artist.setArtistId(artistId);

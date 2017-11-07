@@ -8,6 +8,5 @@ package ru.asm.core.dev.model;
 public enum OperationStatus {
     unkwnown,
     failed,
-    partially_succeedded,
     succeeded
 }

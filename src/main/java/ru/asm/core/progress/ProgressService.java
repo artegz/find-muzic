@@ -20,16 +20,8 @@ public class ProgressService {
     private Map<String, TaskProgress> tasksInProgress = new HashMap<>();
     private List<String> queuedTasks = new ArrayList<>();
 
-    public static String downloadArtistSongsTaskId(Integer artistId) {
-        return String.valueOf(artistId);
-    }
-
     public static String downloadTorrentsTaskId(String torrentId) {
         return String.valueOf(torrentId);
-    }
-
-    public static String resolveArtistSongsTaskId(Integer artistId) {
-        return String.valueOf(artistId);
     }
 
     public static String searchSongTaskId(Integer songId) {
@@ -65,14 +57,6 @@ public class ProgressService {
         queuedTasks.remove(key);
     }
 
-    @Deprecated
-    public Map<Integer, Task> getTasksInProgress() {
-        return new HashMap<>();
-    }
-
-    public int getNumTasksInProgress() {
-        return tasksInProgress.keySet().size();
-    }
     public int getNumQueuedTasks() {
         return queuedTasks.size();
     }

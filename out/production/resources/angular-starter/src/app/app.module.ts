@@ -6,24 +6,17 @@ import { DataTableModule } from 'angular2-datatable';
 
 import { AppComponent } from './app.component';
 import { HomeComponent } from './home/home.component';
-import { AboutComponent } from './about/about.component';
-import { MyTestComponent } from './test/test.component';
-import { ApiService } from './shared';
 import { routing } from './app.routing';
 
 import { RestService } from './api';
 
 import { removeNgStyles, createNewHosts } from '@angularclass/hmr';
 import { NgxPaginationModule } from 'ngx-pagination/dist/ngx-pagination';
-import { TorrentDbsComponent } from './torrent-dbs/torrent-dbs.component';
-import { MyStatusesComponent } from './statuses/statuses.component';
-import { MyFoundSongsComponent } from './songs/songs.component';
-import { PlaylistManagerComponent } from './alt/playlist-manager/playlist-manager.component';
-import { ProgressInfoComponent } from './alt/progress-info/progress-info.component';
-import { SourcesResolverComponent } from './alt/sources-resolver/sources-resolver.component';
-import { SongsDownloaderComponent } from './alt/songs-downloader/songs-downloader.component';
-import { PlaylistBuilderComponent } from './alt/playlist-builder/playlist-builder.component';
-import { ArtistIndexerComponent } from './alt/artist-indexer/artist-indexer.component';
+import { ProgressInfoComponent } from './fm/progress-info/progress-info.component';
+import { SourcesResolverComponent } from './fm/sources-resolver/sources-resolver.component';
+import { SongsDownloaderComponent } from './fm/songs-downloader/songs-downloader.component';
+import { PlaylistBuilderComponent } from './fm/playlist-builder/playlist-builder.component';
+import { ArtistIndexerComponent } from './fm/artist-indexer/artist-indexer.component';
 
 @NgModule({
   imports: [
@@ -36,13 +29,6 @@ import { ArtistIndexerComponent } from './alt/artist-indexer/artist-indexer.comp
   declarations: [
     AppComponent,
     HomeComponent,
-    AboutComponent,
-    // ArtistsListComponent,
-    MyTestComponent,
-    TorrentDbsComponent,
-    MyStatusesComponent,
-    MyFoundSongsComponent,
-    PlaylistManagerComponent,
 
     ProgressInfoComponent,
     ArtistIndexerComponent,
@@ -51,7 +37,6 @@ import { ArtistIndexerComponent } from './alt/artist-indexer/artist-indexer.comp
     PlaylistBuilderComponent
   ],
   providers: [
-    ApiService,
     RestService
   ],
   bootstrap: [AppComponent]
