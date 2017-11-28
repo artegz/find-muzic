@@ -1,15 +1,32 @@
+<h4>Downloadable sources</h4>
 <div class="row">
   <div class="col-xs-6">
-    <h4>Sources</h4>
     <div *ngIf="!!downloadableTorrents" class="list-group">
-      <a *ngFor="let dt of downloadableTorrents | paginate: { itemsPerPage: 15, currentPage: p, id: 'torrents' }"
-         href="#" class="list-group-item" (click)="selectTorrent(dt)" [class.active]="dt.download">
-        <span>{{dt.title}} [{{dt.format}}] ({{dt.torrentId}}) - {{dt.containedSources.length}} sources</span>
-      </a>
+      <ng-container *ngFor="let dt of excludedTorrents() | paginate: { itemsPerPage: 15, currentPage: p, id: 'torrentsAll' }">
+        <a href="#" class="list-group-item" (click)="selectTorrent(dt)">
+          <span>{{dt.title}} [{{dt.format}}] ({{dt.torrentId}}) - {{dt.containedSources.length}} sources</span>
+        </a>
+      </ng-container>
     </div>
     <div>
-      <pagination-controls (pageChange)="p = $event" id="torrents"></pagination-controls>
+      <pagination-controls (pageChange)="p = $event" id="torrentsAll"></pagination-controls>
     </div>
+  </div>
+  <div class="col-xs-6">
+    <div *ngIf="!!downloadableTorrents" class="list-group">
+      <ng-container *ngFor="let dt of includedTorrents() | paginate: { itemsPerPage: 15, currentPage: p2, id: 'torrentsIncluded' }">
+        <a href="#" class="list-group-item" (click)="selectTorrent(dt)">
+          <span>{{dt.title}} [{{dt.format}}] ({{dt.torrentId}}) - {{dt.containedSources.length}} sources</span>
+        </a>
+      </ng-container>
+    </div>
+    <div>
+      <pagination-controls (pageChange)="p2 = $event" id="torrentsIncluded"></pagination-controls>
+    </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col-xs-12">
     <button class="btn btn-default" (click)="selectAllForDownload()">Select all</button>
     <button class="btn btn-default" (click)="unselectAllForDownload()">Unselect all</button>
     <button class="btn btn-primary" (click)="fetchFiles()">Download</button>

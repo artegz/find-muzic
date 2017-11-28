@@ -27,6 +27,13 @@ export class SourcesResolverComponent implements OnInit {
     return false;
   }
 
+  includedSongs(): ResolvableSong[] {
+    return this.resolvableSongs.filter(value => value.resolve);
+  }
+  excludedSongs(): ResolvableSong[] {
+    return this.resolvableSongs.filter(value => !value.resolve);
+  }
+
   selectAllForResolve(): boolean {
     this.resolvableSongs.forEach(value => value.resolve = true);
     return false;

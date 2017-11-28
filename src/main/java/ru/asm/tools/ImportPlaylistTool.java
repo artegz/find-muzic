@@ -2,7 +2,7 @@ package ru.asm.tools;
 
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import ru.asm.core.AppCoreService;
+import ru.asm.core.AppCoreServiceImpl;
 
 import java.io.File;
 
@@ -19,7 +19,7 @@ class ImportPlaylistTool {
         final File file = new File("C:\\IdeaProjects\\find-muzic\\core\\src\\main\\resources\\playlists/102015.nashe.playlist.txt");
 
         ApplicationContext applicationContext = new AnnotationConfigApplicationContext("ru.asm");
-        final AppCoreService appCoreService = applicationContext.getBean(AppCoreService.class);
+        final AppCoreServiceImpl appCoreService = applicationContext.getBean(AppCoreServiceImpl.class);
 
         appCoreService.importPlaylist(playlist, comment, file);
     }

@@ -1,15 +1,33 @@
+<h4>Playlist</h4>
 <div class="row">
   <div class="col-xs-6">
-    <h4>Playlist</h4>
     <div *ngIf="!!downloadedSongs" class="list-group">
-      <a *ngFor="let ds of downloadedSongs | paginate: { itemsPerPage: 15, currentPage: p, id: 'files' }"
-         href="#" class="list-group-item" [class.danger]="ds.outputFails" [class.active]="ds.output" (click)="select(ds)">
-        <span>{{ds.artistName}}: {{ds.title}} ({{ds.filePath}})</span>
-      </a>
+      <ng-container *ngFor="let ds of excludedSongs() | paginate: { itemsPerPage: 15, currentPage: p, id: 'filesAll' }">
+        <a href="#" class="list-group-item" (click)="select(ds)">
+          <span>{{ds.artistName}}: {{ds.title}} ({{ds.filePath}})</span>
+          <i *ngIf="ds.outputFails" class="fa fa-exclamation-triangle" aria-hidden="true" style="color: red;"></i>
+        </a>
+      </ng-container>
     </div>
     <div>
-      <pagination-controls (pageChange)="p = $event" id="files"></pagination-controls>
+      <pagination-controls (pageChange)="p = $event" id="filesAll"></pagination-controls>
     </div>
+  </div>
+  <div class="col-xs-6">
+    <div *ngIf="!!downloadedSongs" class="list-group">
+      <ng-container *ngFor="let ds of includedSongs() | paginate: { itemsPerPage: 15, currentPage: p2, id: 'filesIncluded' }">
+        <a href="#" class="list-group-item" (click)="select(ds)">
+          <span>{{ds.artistName}}: {{ds.title}} ({{ds.filePath}})</span>
+        </a>
+      </ng-container>
+    </div>
+    <div>
+      <pagination-controls (pageChange)="p2 = $event" id="filesIncluded"></pagination-controls>
+    </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col-xs-12">
     <button class="btn btn-default" (click)="selectAllForOutput()">Select all</button>
     <button class="btn btn-default" (click)="unselectAllForOutput()">Unselect all</button>
     <button class="btn btn-primary" (click)="preparePlaylist()">Generate</button>

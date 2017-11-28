@@ -4,7 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import ru.asm.core.AppCoreService;
+import ru.asm.core.AppCoreServiceImpl;
 
 import java.io.*;
 
@@ -24,7 +24,7 @@ class IndexTorrentsDbTool {
         ApplicationContext applicationContext = new AnnotationConfigApplicationContext("ru.asm");
         logInfo("application context initialized");
 
-        final AppCoreService appCoreService = applicationContext.getBean(AppCoreService.class);
+        final AppCoreServiceImpl appCoreService = applicationContext.getBean(AppCoreServiceImpl.class);
         appCoreService.indexTorrentsDb(backup);
     }
 

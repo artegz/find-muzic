@@ -1,18 +1,38 @@
+<h4>Songs</h4>
 <div class="row">
   <div class="col-xs-6">
-    <h4>Songs</h4>
     <div *ngIf="!!resolvableSongs" class="list-group">
-      <a *ngFor="let rs of resolvableSongs | paginate: { itemsPerPage: 15, currentPage: p, id: 'songs' }"
-         href="#" class="list-group-item" [class.danger]="rs.resolveFailed" [class.active]="rs.resolve" (click)="select(rs)">
-        <span>{{rs.artistName}}: {{rs.title}}</span>
-        <span *ngIf="!!rs.numSources" class="badge badge-info">{{rs.numSources}}</span>
-      </a>
+      <ng-container *ngFor="let rs of excludedSongs() | paginate: { itemsPerPage: 15, currentPage: p, id: 'songsAll' }">
+        <a href="#" class="list-group-item" (click)="select(rs)">
+          <span>{{rs.artistName}}: {{rs.title}}</span>
+          <i *ngIf="rs.numSources == 0 && rs.resolveFailed" class="fa fa-exclamation-triangle" aria-hidden="true" style="color: red;"></i>
+          <i *ngIf="rs.numSources > 0 && !rs.resolveFailed" class="fa fa-check-square-o" aria-hidden="true" style="color: green;"></i>
+          <i *ngIf="rs.numSources > 0 && rs.resolveFailed" class="fa fa-check-square-o" aria-hidden="true" style="color: lightgray;"></i>
+          <span *ngIf="!!rs.numSources" class="badge badge-info">{{rs.numSources}}</span>
+        </a>
+      </ng-container>
     </div>
     <div>
-      <pagination-controls (pageChange)="p = $event" id="songs"></pagination-controls>
+      <pagination-controls (pageChange)="p = $event" id="songsAll"></pagination-controls>
     </div>
-    <button class="btn btn-default" (click)="selectAllForResolve()">Select all</button>
-    <button class="btn btn-default" (click)="unselectAllForResolve()">Unselect all</button>
-    <button class="btn btn-primary" (click)="resolveSources()">Search</button>
+  </div>
+  <div class="col-xs-6">
+    <div *ngIf="!!resolvableSongs" class="list-group">
+      <ng-container *ngFor="let is of includedSongs() | paginate: { itemsPerPage: 15, currentPage: p2, id: 'songsIncluded' }">
+        <a href="#" class="list-group-item" (click)="select(is)">
+          <span>{{is.artistName}}: {{is.title}}</span>
+        </a>
+      </ng-container>
+    </div>
+    <div>
+      <pagination-controls (pageChange)="p2 = $event" id="songsIncluded"></pagination-controls>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-xs-12">
+      <button class="btn btn-default" (click)="selectAllForResolve()">Select all</button>
+      <button class="btn btn-default" (click)="unselectAllForResolve()">Unselect all</button>
+      <button class="btn btn-primary" (click)="resolveSources()">Search</button>
+    </div>
   </div>
 </div>

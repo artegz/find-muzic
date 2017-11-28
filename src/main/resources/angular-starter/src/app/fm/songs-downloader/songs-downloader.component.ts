@@ -47,6 +47,13 @@ export class SongsDownloaderComponent implements OnInit{
     return false;
   }
 
+  includedTorrents(): TorrentDownloadInfoDto[] {
+    return this.downloadableTorrents.filter(value => value.download);
+  }
+  excludedTorrents(): TorrentDownloadInfoDto[] {
+    return this.downloadableTorrents.filter(value => !value.download);
+  }
+
   fetchFiles(): boolean {
     let sources: {[key:string]:string[]} = {};
 

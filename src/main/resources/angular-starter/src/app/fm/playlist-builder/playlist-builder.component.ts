@@ -28,6 +28,13 @@ export class PlaylistBuilderComponent implements OnInit{
     return false;
   }
 
+  includedSongs(): DownloadedSong[] {
+    return this.downloadedSongs.filter(value => value.output);
+  }
+  excludedSongs(): DownloadedSong[] {
+    return this.downloadedSongs.filter(value => !value.output);
+  }
+
   selectAllForOutput(): boolean {
     this.downloadedSongs.forEach(value => value.output = true);
     return false;

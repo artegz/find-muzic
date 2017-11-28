@@ -27,7 +27,6 @@ export class ArtistIndexerComponent implements OnInit {
   includedArtists(): IndexableArtist[] {
     return this.indexableArtists.filter(value => value.index);
   }
-
   excludedArtists(): IndexableArtist[] {
     return this.indexableArtists.filter(value => !value.index);
   }

@@ -118,6 +118,7 @@ public class AppRestService {
 
             final ArtistResolveReport artistResolveReport = this.appCoreService.getArtistResolveReport(artist);
 
+            // todo: add error info + num found torrents
             final OperationStatus resultStatus = (artistResolveReport != null)
                     ? artistResolveReport.getResultStatus()
                     : OperationStatus.unkwnown;
